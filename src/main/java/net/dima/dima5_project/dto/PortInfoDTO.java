@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dima.dima5_project.entity.PortInfoEntity;
 
 @Data
 @AllArgsConstructor
@@ -15,11 +16,11 @@ public class PortInfoDTO {
     private double locLat;
     private double locLon;
 
-    // public static PortInfoDTO toDTO(PortInfoEntity portInfoEntity) {
-    //     return PortInfoDTO.builder()
-    //         .portId(portInfoEntity.getPortId())
-    //         .locLat(portInfoEntity.getLocLat())
-    //         .locLon(portInfoEntity.getLocLon())
-    //         .build();
-    // }
+    public static PortInfoDTO toDTO(PortInfoEntity portInfoEntity) {
+        return PortInfoDTO.builder()
+            .portId(portInfoEntity.getPortId())
+            .locLat(portInfoEntity.getLocLat())
+            .locLon(portInfoEntity.getLocLon())
+            .build();
+    }
 }

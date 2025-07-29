@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dima.dima5_project.entity.PortNameEntity;
 
 @Data
 @AllArgsConstructor
@@ -20,15 +21,15 @@ public class PortNameDTO {
     private String portNameJp;
 
 
-    // public static PortNameDTO toDTO(PortNameEntity portNameEntity) {
-    //     return PortNameDTO.builder()
-    //         .portId(portNameEntity.getPortId())
-    //         .countryNameKr(portNameEntity.getCountryNameKr())
-    //         .portNameKr(portNameEntity.getPortNameKr())
-    //         .countryNameEn(portNameEntity.getCountryNameEn())
-    //         .portNameEn(portNameEntity.getPortNameEn())
-    //         .countryNameJp(portNameEntity.getCountryNameJp())
-    //         .portNameJp(portNameEntity.getPortNameJp())
-    //         .build();
-    // }
+    public static PortNameDTO toDTO(PortNameEntity portNameEntity) {
+        return PortNameDTO.builder()
+            .portId(portNameEntity.getPortId())
+            .countryNameKr(portNameEntity.getCountryNameKr())
+            .portNameKr(portNameEntity.getPortNameKr())
+            .countryNameEn(portNameEntity.getCountryNameEn())
+            .portNameEn(portNameEntity.getPortNameEn())
+            .countryNameJp(portNameEntity.getCountryNameJp())
+            .portNameJp(portNameEntity.getPortNameJp())
+            .build();
+    }
 }

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dima.dima5_project.dto.PortNameDTO;
 
 @Entity
 @Table(name="port_name")
@@ -39,6 +40,18 @@ public class PortNameEntity {
 
     @Column(name="port_name_jp")
     private String portNameJp;
+
+    public static PortNameEntity toEntity(PortNameDTO portNameDTO) {
+        return PortNameEntity.builder()
+            .portId(portNameDTO.getPortId())
+            .countryNameKr(portNameDTO.getCountryNameKr())
+            .portNameEn(portNameDTO.getPortNameKr())
+            .countryNameEn(portNameDTO.getCountryNameEn())
+            .portNameJp(portNameDTO.getPortNameJp())
+            .countryNameJp(portNameDTO.getCountryNameJp())
+            .portNameKr(portNameDTO.getPortNameKr())
+            .build();
+    }
 
 
     
