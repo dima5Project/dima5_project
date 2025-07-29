@@ -28,12 +28,12 @@ public class PortInfoEntity {
     @Column(name="loc_lon")
     private double locLon;
 
-    public static PortInfoEntity toEntity(PortInfoDTO PortInfoDTO) {
-        return PortInfoEntity.builder()
-            .portId(PortInfoDTO.getPortId())
-            .locLat(PortInfoDTO.getLocLat())
-            .locLon(PortInfoDTO.getLocLon())
-            .build();
-    }
+    // public static PortInfoEntity toEntity(PortInfoDTO PortInfoDTO) {
+    //     return PortInfoEntity.builder()
+    //         .portId(PortInfoDTO.getPortId())
+    //         .locLat(PortInfoDTO.getLocLat())
+    //         .locLon(PortInfoDTO.getLocLon())
+    //         .build();
+    // }
     
 }
