@@ -1,10 +1,10 @@
-package net.dima.project;
+package net.dima.dima5_project;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProjectApplicationTests {
+class Dima5ProjectApplicationTests {
 
 	@Test
 	void contextLoads() {
