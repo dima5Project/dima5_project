@@ -31,7 +31,7 @@ public class AskController {
     @Value("${spring.servlet.multipart.location}")
     String uploadPath;
 
-    @GetMapping("/ask")
+    @GetMapping("")
     public String ask(
             @PageableDefault(page = 1) Pageable pageable,
             @RequestParam(name = "searchItem", defaultValue = "askTitle") String searchItem,
