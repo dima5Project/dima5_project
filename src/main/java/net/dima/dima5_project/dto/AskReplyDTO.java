@@ -22,7 +22,7 @@ public class AskReplyDTO {
             return null;
         return AskReplyDTO.builder()
                 .replyNum(entity.getReplyNum())
-                .askBoardSeq(entity.getAskBoardSeq() != null ? entity.getAskBoardSeq().getAskSeq() : null)
+                .askBoardSeq(entity.getAskBoard() != null ? entity.getAskBoard().getAskSeq() : null)
                 .askTitle(entity.getAskTitle())
                 .replyContent(entity.getReplyContent())
                 .replyDate(entity.getReplyDate())
@@ -35,7 +35,7 @@ public class AskReplyDTO {
             return null;
         return AskReplyEntity.builder()
                 .replyNum(dto.getReplyNum())
-                .askBoardSeq(askBoardEntity) // FK → Entity 연결
+                .askBoard(askBoardEntity) // FK → Entity 연결
                 .askTitle(dto.getAskTitle())
                 .replyContent(dto.getReplyContent())
                 .replyDate(dto.getReplyDate())

@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,7 +30,7 @@ public class AskReplyEntity {
 
     @OneToOne
     @JoinColumn(name = "reply_num", referencedColumnName = "ask_seq")
-    private AskBoardEntity askBoardSeq;
+    private AskBoardEntity askBoard;
 
     @Column(name = "ask_title")
     private String askTitle;
@@ -45,7 +44,7 @@ public class AskReplyEntity {
     public static AskReplyEntity toEntity(AskReplyDTO askReplyDTO, AskBoardEntity askBoardEntity) {
         return AskReplyEntity.builder()
                 .replyNum(askReplyDTO.getReplyNum())
-                .askBoardSeq(askBoardEntity)
+                .askBoard(askBoardEntity)
                 .askTitle(askReplyDTO.getAskTitle())
                 .replyContent(askReplyDTO.getReplyContent())
                 .replyDate(askReplyDTO.getReplyDate())
