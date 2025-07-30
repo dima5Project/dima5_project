@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dima.dima5_project.dto.AskBoardDTO;
 
 @Entity
 @Table(name = "ask_board")
@@ -26,8 +29,9 @@ import lombok.Setter;
 public class AskBoardEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ask_seq")
-    private Integer askSeq;
+    private Long askSeq;
 
     @Column(name = "ask_type")
     private String askType;
@@ -42,8 +46,9 @@ public class AskBoardEntity {
     @JoinColumn(name = "ask_writer", referencedColumnName = "user_id")
     private PredictUserEntity writer;
 
+    @Builder.Default
     @Column(name = "create_date")
-    private LocalDateTime createDate;
+    private LocalDateTime createDate = LocalDateTime.now();
 
     @Column(name = "original_filename")
     private String originalFilename;
@@ -60,4 +65,20 @@ public class AskBoardEntity {
     // AskReply 1:1 역방향
     @OneToOne(mappedBy = "askBoard", cascade = CascadeType.ALL)
     private AskReplyEntity reply;
+
+    public static AskBoardEntity toEntity(AskBoardDTO askBoardDTO) {
+        return AskBoardEntity.builder()
+                .askSeq(askBoardDTO.getAskSeq())
+                .askType(askBoardDTO.getAskType())
+                .askTitle(askBoardDTO.getAskTitle())
+                .askContent(askBoardDTO.getAskContent())
+                .writer(askBoardDTO.getWriter())
+                .createDate(askBoardDTO.getCreateDate())
+                .originalFilename(askBoardDTO.getOriginalFilename())
+                .savedFilename(askBoardDTO.getSavedFilename())
+                .askPwd(askBoardDTO.getAskPwd())
+                .replyStatus(askBoardDTO.getReplyStatus())
+                .reply(askBoardDTO.getReply())
+                .build();
+    }
 }

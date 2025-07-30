@@ -2,15 +2,18 @@ package net.dima.dima5_project.dto;
 
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Builder;
 import lombok.Data;
-
+import net.dima.dima5_project.entity.AskBoardEntity;
+import net.dima.dima5_project.entity.AskReplyEntity;
 import net.dima.dima5_project.entity.PredictUserEntity;
 
 @Data
 @Builder
 public class AskBoardDTO {
-    private Integer askSeq;
+    private Long askSeq;
     private String askType;
     private String askTitle;
     private String askContent;
@@ -20,22 +23,25 @@ public class AskBoardDTO {
     private String savedFilename;
     private Integer askPwd;
     private Boolean replyStatus;
-    private AskReplyDTO reply;
+    private AskReplyEntity reply;
 
-    // public static AskBoardDTO toDTO(AskBoardEntity askBoardEntity) {
-    // return AskBoardDTO.builder()
-    // .askSeq(askBoardEntity.getAskSeq())
-    // .askType(askBoardEntity.getAskType())
-    // .askTitle(askBoardEntity.getAskTitle())
-    // .askContent(askBoardEntity.getAskContent())
-    // .writer(askBoardEntity.getWriter())
-    // .createDate(askBoardEntity.getCreateDate())
-    // .originalFilename(askBoardEntity.getOriginalFilename())
-    // .savedFilename(askBoardEntity.getSavedFilename())
-    // .askPwd(askBoardEntity.getAskPwd())
-    // .replyStatus(askBoardEntity.getReplyStatus())
-    // .reply(askBoardEntity.getReply())
-    // .build();
-    // }
+    // 파일 첨부되었을 때를 위한 추가 작업
+    private MultipartFile uploadFile;
+
+    public static AskBoardDTO toDTO(AskBoardEntity askBoardEntity) {
+        return AskBoardDTO.builder()
+                .askSeq(askBoardEntity.getAskSeq())
+                .askType(askBoardEntity.getAskType())
+                .askTitle(askBoardEntity.getAskTitle())
+                .askContent(askBoardEntity.getAskContent())
+                .writer(askBoardEntity.getWriter())
+                .createDate(askBoardEntity.getCreateDate())
+                .originalFilename(askBoardEntity.getOriginalFilename())
+                .savedFilename(askBoardEntity.getSavedFilename())
+                .askPwd(askBoardEntity.getAskPwd())
+                .replyStatus(askBoardEntity.getReplyStatus())
+                .reply(askBoardEntity.getReply())
+                .build();
+    }
 
 }
