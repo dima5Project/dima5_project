@@ -34,11 +34,6 @@ public class PortPsoEntity {
     @Column(name="pso_lon")
     private double psoLon;
 
-    // 주인 테이블 (predict 기준으로 port 정보 접근 가능)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "port_id")
-    private PortInfoEntity portInfo;
-
 
     public static PortPsoEntity toDTO(PortPsoDTO portPsoDTO) {
         return PortPsoEntity.builder()

@@ -34,15 +34,6 @@ public class PortInfoEntity {
     @Column(name="loc_lon")
     private double locLon;
 
-    // 하나의 항구가 여러 개의 항구명을 갖는다 (1:N 관계)
-    @OneToMany(mappedBy = "portInfo", fetch = FetchType.LAZY)
-    private List<PortNameEntity> portNameList = new ArrayList<>();
-
-    // 하나의 항구가 여러 개의 항로 좌표를 갖는다 (1:N 관계)
-    @OneToMany(mappedBy = "portInfo", fetch = FetchType.LAZY)
-    private List<PortPsoEntity> portPsoList = new ArrayList<>();
-
-
     public static PortInfoEntity toEntity(PortInfoDTO PortInfoDTO) {
         return PortInfoEntity.builder()
             .portId(PortInfoDTO.getPortId())

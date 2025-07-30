@@ -41,6 +41,8 @@ public class PortNameEntity {
     @Column(name="port_name_jp")
     private String portNameJp;
 
+    
+
     public static PortNameEntity toEntity(PortNameDTO portNameDTO) {
         return PortNameEntity.builder()
             .portId(portNameDTO.getPortId())

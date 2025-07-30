@@ -37,7 +37,7 @@ public class PortPredictDTO {
     public static PortPredictDTO toDTO(PortPredictEntity portPredictEntity){
         return PortPredictDTO.builder()
             .predictSeq(portPredictEntity.getPredictSeq())
-            .portId(portPredictEntity.getPortId())
+            //.portId(portPredictEntity.getPortId())
             .clusterNum(portPredictEntity.getClusterNum())
             .vesselId(portPredictEntity.getVesselId())
             .timePoint(portPredictEntity.getTimePoint())
