@@ -46,8 +46,9 @@ public class AskBoardEntity {
     @JoinColumn(name = "ask_writer", referencedColumnName = "user_id")
     private PredictUserEntity writer;
 
+    @Builder.Default
     @Column(name = "create_date")
-    private LocalDateTime createDate;
+    private LocalDateTime createDate = LocalDateTime.now();
 
     @Column(name = "original_filename")
     private String originalFilename;

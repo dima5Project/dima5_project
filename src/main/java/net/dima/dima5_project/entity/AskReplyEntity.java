@@ -30,7 +30,6 @@ public class AskReplyEntity {
     private Integer replyNum;
 
     @OneToOne
-    @MapsId // PK == FK
     @JoinColumn(name = "reply_num", referencedColumnName = "ask_seq")
     private AskBoardEntity askBoardSeq;
 
@@ -43,15 +42,6 @@ public class AskReplyEntity {
     @Column(name = "reply_date")
     private LocalDateTime replyDate;
 
-    // public static AskReplyEntity toEntity(AskReplyDTO dto, AskBoardEntity
-    // askBoardEntity) {
-    // return AskReplyEntity.builder()
-    // .replyNum(dto.getReplyNum())
-    // .askBoard(askBoardEntity)
-    // .askTitle(dto.getAskTitle())
-    // .replyContent(dto.getReplyContent())
-    // .replyDate(dto.getReplyDate())
-    //
     public static AskReplyEntity toEntity(AskReplyDTO askReplyDTO, AskBoardEntity askBoardEntity) {
         return AskReplyEntity.builder()
                 .replyNum(askReplyDTO.getReplyNum())
