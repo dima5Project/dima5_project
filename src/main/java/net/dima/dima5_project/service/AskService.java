@@ -24,7 +24,7 @@ public class AskService {
     private final AskBoardRepository AskBoardRepository;
 
     // 글개수
-    @Value("${user.board.pageLimit}")
+    @Value("${ask.board.pageLimit}")
     int pageLimit;
 
     // 파일 저장 변수 선언
@@ -53,19 +53,19 @@ public class AskService {
             case "askTitle":
                 temp = AskBoardRepository.findByAskTitleContains(
                         searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "boardSeq")));
+                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
                 break;
 
             case "writer":
-                temp = AskBoardRepository.findByAskWriterContains(
+                temp = AskBoardRepository.findByWriterContains(
                         searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "boardSeq")));
+                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
                 break;
 
             case "askContent":
                 temp = AskBoardRepository.findByAskContentContains(
                         searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "boardSeq")));
+                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
                 break;
         }
 

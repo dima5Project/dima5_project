@@ -25,12 +25,15 @@ public class AskController {
     private final AskService askService;
 
     // 한페이지에 보여줄 글 갯수
-    @Value("${user.board.pageLimit}")
+    @Value("${ask.board.pageLimit}")
     int pageLimit;
 
     @Value("${spring.servlet.multipart.location}")
     String uploadPath;
 
+    /**
+     * 글쓰기 페이지로 로딩이 됨... 하아
+     */
     @GetMapping("")
     public String ask(
             @PageableDefault(page = 1) Pageable pageable,

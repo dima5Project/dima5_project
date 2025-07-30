@@ -10,25 +10,25 @@
 <body>
     <!-- 게시글 등록 화면 -->
     <div class="content">
-        <form action="/board/boardWrite" method="POST" enctype="multipart/form-data">
+        <form action="/ask/askWrite" method="POST" enctype="multipart/form-data">
             <table border="1">
                 <tr>
                     <th>작성자</th>
                     <td><!-- 로그인한 사람의 아이디 -->
-                        <input type="text" id="boardWriter" name="boardWriter" th:value="${#authentication.name}"
-                            readonly>
+                        <!-- th:value="${#authentication.name} 로그인한 경우 요청이라 잠시 주석-->
+                        <input type="text" id="writer" name="writer" readonly>
                     </td>
                 <tr>
                 <tr>
                     <th>글 제목</th>
                     <td>
-                        <input type="text" id="boardTitle" name="boardTitle" required>
+                        <input type="text" id="askTitle" name="askTitle" required>
                     </td>
                 <tr>
                 <tr>
                     <th>글 내용</th>
                     <td>
-                        <textarea id="boardContent" name="boardContent" cols="30" rows="10" required></textarea>
+                        <textarea id="askContent" name="askContent" cols="30" rows="10" required></textarea>
                     </td>
                 <tr>
                 <tr>
