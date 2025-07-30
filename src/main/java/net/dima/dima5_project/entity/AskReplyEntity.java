@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dima.dima5_project.dto.AskReplyDTO;
 
 @Entity
 @Table(name = "ask_reply")
@@ -29,9 +30,8 @@ public class AskReplyEntity {
     private Integer replyNum;
 
     @OneToOne
-    @MapsId // PK == FK
     @JoinColumn(name = "reply_num", referencedColumnName = "ask_seq")
-    private AskBoardEntity askBoard;
+    private AskBoardEntity askBoardSeq;
 
     @Column(name = "ask_title")
     private String askTitle;
@@ -41,4 +41,14 @@ public class AskReplyEntity {
 
     @Column(name = "reply_date")
     private LocalDateTime replyDate;
+
+    public static AskReplyEntity toEntity(AskReplyDTO askReplyDTO, AskBoardEntity askBoardEntity) {
+        return AskReplyEntity.builder()
+                .replyNum(askReplyDTO.getReplyNum())
+                .askBoardSeq(askBoardEntity)
+                .askTitle(askReplyDTO.getAskTitle())
+                .replyContent(askReplyDTO.getReplyContent())
+                .replyDate(askReplyDTO.getReplyDate())
+                .build();
+    }
 }
