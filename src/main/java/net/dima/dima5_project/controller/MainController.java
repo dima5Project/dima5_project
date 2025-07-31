@@ -11,7 +11,7 @@ public class MainController {
      */
     @GetMapping("/")
     public String getMethodName() {
-        return "index";
+        return "banner";
     }
     
 }

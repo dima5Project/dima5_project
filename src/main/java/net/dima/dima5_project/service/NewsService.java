@@ -4,6 +4,9 @@ import net.dima.dima5_project.dto.NewsBoardDTO;
 import net.dima.dima5_project.entity.NewsBoardEntity;
 import net.dima.dima5_project.repository.NewsRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +54,13 @@ public class NewsService {
         dtoPage = entityPage.map(NewsBoardDTO::toDTO);
 
         return dtoPage; // DTO 를 페이지 단위로 담아서 반환
+    }
+
+    public List<NewsBoardDTO> getAllnews() {
+        List<NewsBoardEntity> temp = newsRepository.findAll(Sort.by(Sort.Direction.DESC, "newsSeq"));
+        List<NewsBoardDTO> list = new ArrayList<>();
+        temp.forEach((news) -> list.add(NewsBoardDTO.toDTO(news)));
+        return list;
     }
 
 }
