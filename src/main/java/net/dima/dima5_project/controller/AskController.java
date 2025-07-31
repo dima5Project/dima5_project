@@ -1,5 +1,9 @@
 package net.dima.dima5_project.controller;
 
+<<<<<<< HEAD
+=======
+import java.io.FileInputStream;
+>>>>>>> backend/ask
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.web.bind.annotation.PostMapping;
+
 @Controller
 @RequestMapping("/ask")
 @Slf4j
@@ -43,9 +53,6 @@ public class AskController {
     @Value("${spring.servlet.multipart.location}")
     String uploadPath;
 
-    /**
-     * 글쓰기 페이지로 로딩이 됨... 하아
-     */
     @GetMapping("")
     public String ask(
             @PageableDefault(page = 1) Pageable pageable,
@@ -68,7 +75,7 @@ public class AskController {
         model.addAttribute("searchWord", searchWord);
         model.addAttribute("navi", navi);
 
-        return "ask";
+        return "ask/askList";
     }
 
     /**
@@ -78,10 +85,11 @@ public class AskController {
      */
     @GetMapping("/write")
     public String write() {
-        return "ask/write";
+        return "ask/askWrite";
     }
 
     /**
+<<<<<<< HEAD
      * 글 자세히 보기
      * 
      * @param askboardDTO
@@ -118,6 +126,32 @@ public class AskController {
         rttr.addAttribute("searchWord", searchWord);
 
         return "redirect:/ask/askList";
+=======
+     * 글쓰고 나서 DB에 저장 후 목록으로 리다이렉트 부분
+     */
+    @PostMapping("/write")
+    public String askwrite(@ModelAttribute AskBoardDTO askBoardDTO) {
+        askService.insertAskBoard(askBoardDTO);
+        return "redirect:/ask";
+    }
+
+    /**
+     * Ajax 요청 처리 - 문의 상세 내용만 fragment로 반환하는 것
+     * 토글로 보여주는.. 그것을 쓴 것이긴 함
+     * 
+     * @param param
+     * @return
+     */
+    @GetMapping("/askDetail")
+    public String askDetail(@RequestParam("askSeq") Long askSeq,
+            @RequestParam(name = "searchItem", defaultValue = "boardTitle") String searchItem,
+            @RequestParam(name = "searchWord", defaultValue = "") String searchWord, Model model) {
+        AskBoardDTO askBoardDTO = askService.checkOne(askSeq); // 서비스에서 문의 하나 가져오기
+        model.addAttribute("ask", askBoardDTO);
+        model.addAttribute("searchItem", searchItem);
+        model.addAttribute("searchWord", searchWord);
+        return "board/boardDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
+>>>>>>> backend/ask
     }
 
     /**
@@ -129,6 +163,7 @@ public class AskController {
         log.info("첨부파일명: {}", askBoardDTO.getSavedFilename());
         String originalFilename = askBoardDTO.getOriginalFilename();
         String savedFilename = askBoardDTO.getSavedFilename();
+<<<<<<< HEAD
         try{
             String tempName = URLEncoder.encode(
                 originalFilename, StandardCharsets.UTF_8.toString());
@@ -138,4 +173,29 @@ public class AskController {
         return null;
     }
 
+=======
+        try {
+            String tempName = URLEncoder.encode(
+                    originalFilename, StandardCharsets.UTF_8.toString());
+            response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String fullpath = uploadPath + "/" + savedFilename;
+        // 스트림 설정(실제 다운로드가 일어나는 구간)
+        FileInputStream filein = null;
+        ServletOutputStream fileout = null;
+        try {
+            filein = new FileInputStream(fullpath);
+            fileout = response.getOutputStream();
+            FileCopyUtils.copy(filein, fileout);
+
+            fileout.close();
+            filein.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+>>>>>>> backend/ask
 }
