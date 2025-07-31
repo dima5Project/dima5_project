@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- askDetailAjax.html -->
+    <div th:fragment="detailFragment">
+        <div class="ask-detail-box">
+            <p><strong>문의 내용:</strong></p>
+            <p th:text="${ask.askContent}">문의 내용이 여기에 표시됩니다.</p>
+
+            <hr>
+
+            <p><strong>답변:</strong></p>
+            <div th:if="${ask.askReplyDTOList != null and !#lists.isEmpty(ask.askReplyDTOList)}">
+                <ul>
+                    <li th:each="reply : ${ask.askReplyDTOList}" th:text="${reply.replyContent}">답변 내용</li>
+                </ul>
+            </div>
+            <div th:if="${ask.askReplyDTOList == null or #lists.isEmpty(ask.askReplyDTOList)}">
+                <p>아직 답변이 등록되지 않았습니다.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -81,4 +81,5 @@ public class AskBoardEntity {
                 .reply(askBoardDTO.getReply())
                 .build();
     }
+
 }
