@@ -10,25 +10,33 @@ import net.dima.dima5_project.entity.AskReplyEntity;
 @Data
 @Builder
 public class AskReplyDTO {
-
-    private Long askSeq;
+    private Integer replyNum;
+    private Long askBoardSeq;
+    private String askTitle;
     private String replyContent;
     private LocalDateTime replyDate;
 
-    /**
-     * toEntity 메서드란?
-     * → Entity → DTO 변환 메서드
-     * 
-     * @param dto
-     * @param askBoardEntity
-     * @return
-     */
+    // Entity → DTO 변환
+    public static AskReplyDTO fromEntity(AskReplyEntity entity) {
+        if (entity == null)
+            return null;
+        return AskReplyDTO.builder()
+                .replyNum(entity.getReplyNum())
+                .askBoardSeq(entity.getAskBoard() != null ? entity.getAskBoard().getAskSeq() : null)
+                .askTitle(entity.getAskTitle())
+                .replyContent(entity.getReplyContent())
+                .replyDate(entity.getReplyDate())
+                .build();
+    }
+
+    // DTO → Entity 변환 (askBoard는 외부에서 주입)
     public static AskReplyEntity toEntity(AskReplyDTO dto, AskBoardEntity askBoardEntity) {
         if (dto == null)
             return null;
         return AskReplyEntity.builder()
-                .askSeq(dto.getAskSeq())
-                .askBoard(askBoardEntity)
+                .replyNum(dto.getReplyNum())
+                .askBoard(askBoardEntity) // FK → Entity 연결
+                .askTitle(dto.getAskTitle())
                 .replyContent(dto.getReplyContent())
                 .replyDate(dto.getReplyDate())
                 .build();

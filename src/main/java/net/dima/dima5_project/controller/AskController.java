@@ -1,10 +1,15 @@
 package net.dima.dima5_project.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.FileInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -67,7 +76,7 @@ public class AskController {
      */
     @GetMapping("/write")
     public String write() {
-        return "ask/askwrite";
+        return "ask/askWrite";
     }
 
     /**
@@ -97,4 +106,36 @@ public class AskController {
         return "board/boardDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
     }
 
+    /**
+     * 첨부파일 다운로드
+     */
+    @GetMapping("/download")
+    public String download(@RequestParam(name = "askSeq") Long askSeq, HttpServletResponse response) {
+        AskBoardDTO askBoardDTO = askService.checkOne(askSeq);
+        log.info("첨부파일명: {}", askBoardDTO.getSavedFilename());
+        String originalFilename = askBoardDTO.getOriginalFilename();
+        String savedFilename = askBoardDTO.getSavedFilename();
+        try {
+            String tempName = URLEncoder.encode(
+                    originalFilename, StandardCharsets.UTF_8.toString());
+            response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String fullpath = uploadPath + "/" + savedFilename;
+        // 스트림 설정(실제 다운로드가 일어나는 구간)
+        FileInputStream filein = null;
+        ServletOutputStream fileout = null;
+        try {
+            filein = new FileInputStream(fullpath);
+            fileout = response.getOutputStream();
+            FileCopyUtils.copy(filein, fileout);
+
+            fileout.close();
+            filein.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

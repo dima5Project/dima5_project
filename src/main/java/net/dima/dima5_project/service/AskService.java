@@ -1,6 +1,5 @@
 package net.dima.dima5_project.service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.dto.AskBoardDTO;
 import net.dima.dima5_project.entity.AskBoardEntity;
-import net.dima.dima5_project.entity.PredictUserEntity;
 import net.dima.dima5_project.repository.AskBoardRepository;
 import net.dima.dima5_project.util.FileService;
 
@@ -76,7 +74,7 @@ public class AskService {
                 .askType(askboard.getAskType())
                 .askTitle(askboard.getAskTitle())
                 .askContent(askboard.getAskContent())
-                // .writer(askboard.getWriter())
+                .writer(askboard.getWriter())
                 .createDate(askboard.getCreateDate())
                 .originalFilename(askboard.getOriginalFilename())
                 .savedFilename(askboard.getSavedFilename())
@@ -128,6 +126,28 @@ public class AskService {
             askBoardDTO = AskBoardDTO.toDTO(entity);
         }
         return askBoardDTO;
+    }
+
+    /**
+     * 하나의 게시글 삭제
+     * 
+     * @param askSeq
+     */
+    public void deleteOne(Long askSeq) {
+        Optional<AskBoardEntity> temp = askBoardRepository.findById(askSeq);
+
+        if (!temp.isPresent())
+            return;
+
+        AskBoardEntity askBoardEntity = temp.get();
+        String savedFilename = askBoardEntity.getSavedFilename();
+
+        // 글이 삭제되면서 첨부파일도 삭제함
+        if (savedFilename != null) {
+            String fullPath = uploadPath + "/" + savedFilename;
+            FileService.deleteFile(fullPath);
+        }
+        askBoardRepository.deleteById(askSeq);
     }
 
 }
