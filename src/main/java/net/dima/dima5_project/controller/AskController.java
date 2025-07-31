@@ -1,9 +1,8 @@
 package net.dima.dima5_project.controller;
 
-<<<<<<< HEAD
-=======
-import java.io.FileInputStream;
->>>>>>> backend/ask
+<<<<<<<HEAD=======
+
+import java.io.FileInputStream;>>>>>>>backend/ask
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -89,7 +88,7 @@ public class AskController {
     }
 
     /**
-<<<<<<< HEAD
+     * <<<<<<< HEAD
      * 글 자세히 보기
      * 
      * @param askboardDTO
@@ -126,7 +125,7 @@ public class AskController {
         rttr.addAttribute("searchWord", searchWord);
 
         return "redirect:/ask/askList";
-=======
+    /*
      * 글쓰고 나서 DB에 저장 후 목록으로 리다이렉트 부분
      */
     @PostMapping("/write")
@@ -151,7 +150,6 @@ public class AskController {
         model.addAttribute("searchItem", searchItem);
         model.addAttribute("searchWord", searchWord);
         return "board/boardDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
->>>>>>> backend/ask
     }
 
     /**
@@ -163,39 +161,40 @@ public class AskController {
         log.info("첨부파일명: {}", askBoardDTO.getSavedFilename());
         String originalFilename = askBoardDTO.getOriginalFilename();
         String savedFilename = askBoardDTO.getSavedFilename();
-<<<<<<< HEAD
-        try{
-            String tempName = URLEncoder.encode(
-                originalFilename, StandardCharsets.UTF_8.toString());
-                response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
-        } catch (UnsupportedEncodingException e) {}
-        
-        return null;
-    }
 
-=======
         try {
             String tempName = URLEncoder.encode(
                     originalFilename, StandardCharsets.UTF_8.toString());
             response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
-        String fullpath = uploadPath + "/" + savedFilename;
-        // 스트림 설정(실제 다운로드가 일어나는 구간)
-        FileInputStream filein = null;
-        ServletOutputStream fileout = null;
-        try {
-            filein = new FileInputStream(fullpath);
-            fileout = response.getOutputStream();
-            FileCopyUtils.copy(filein, fileout);
 
-            fileout.close();
-            filein.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return null;
     }
->>>>>>> backend/ask
-}
+
+    {
+        String tempName = URLEncoder.encode(
+                originalFilename, StandardCharsets.UTF_8.toString());
+        response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
+    }catch(
+    UnsupportedEncodingException e)
+    {
+        e.printStackTrace();
+    }
+    String fullpath = uploadPath + "/" + savedFilename;
+    // 스트림 설정(실제 다운로드가 일어나는 구간)
+    FileInputStream filein = null;
+    ServletOutputStream fileout = null;try
+    {
+        filein = new FileInputStream(fullpath);
+        fileout = response.getOutputStream();
+        FileCopyUtils.copy(filein, fileout);
+
+        fileout.close();
+        filein.close();
+    }catch(
+    Exception e)
+    {
+        e.printStackTrace();
+    }return null;
+}}
