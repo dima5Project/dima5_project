@@ -16,36 +16,36 @@ import lombok.NoArgsConstructor;
 import net.dima.dima5_project.dto.PortPredictDTO;
 
 @Entity
-@Table(name="port_predict")
+@Table(name = "port_predict")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class PortPredictEntity {
-    
+
     @Id
-    @Column(name="predict_seq")
+    @Column(name = "predict_seq")
     private Long predictSeq;
 
-    // @Column(name="port_id")
-    // private String portId;
+    @Column(name = "port_id")
+    private String portId;
 
-    @Column(name="cluster_num")
+    @Column(name = "cluster_num")
     private int clusterNum;
 
-    @Column(name="vessel_id")
+    @Column(name = "vessel_id")
     private String vesselId;
 
-    @Column(name="time_point")
+    @Column(name = "time_point")
     private int timePoint;
 
-    @Column(name="time_stamp")
+    @Column(name = "time_stamp")
     private LocalDateTime timeStamp;
 
     private LocalDateTime eta;
     private LocalDateTime ata;
 
-    @Column(name="eta_error_hour")
+    @Column(name = "eta_error_hour")
     private double etaErrorHour;
 
     private double lat;
@@ -53,22 +53,22 @@ public class PortPredictEntity {
     private double cog;
     private double heading;
 
-    @Column(name="top1_port")
+    @Column(name = "top1_port")
     private String top1Port;
 
-    @Column(name="top1_prob")
+    @Column(name = "top1_prob")
     private double top1Prob;
 
-    @Column(name="top2_port")
+    @Column(name = "top2_port")
     private String top2Port;
 
-    @Column(name="top2_prob")
+    @Column(name = "top2_prob")
     private double top2Prob;
 
-    @Column(name="top3_port")
+    @Column(name = "top3_port")
     private String top3Port;
 
-    @Column(name="top3_prob")
+    @Column(name = "top3_prob")
     private double top3Prob;
 
     // 단방향 참조: PortInfo
@@ -86,27 +86,27 @@ public class PortPredictEntity {
     @JoinColumn(name = "pso_seq")
     private PortPsoEntity portPso;
 
-    public static PortPredictEntity toEntity(PortPredictDTO portPredictDTO){
+    public static PortPredictEntity toEntity(PortPredictDTO portPredictDTO) {
         return PortPredictEntity.builder()
-            .predictSeq(portPredictDTO.getPredictSeq())
-            //.portId(portPredictDTO.getPortId())
-            .clusterNum(portPredictDTO.getClusterNum())
-            .vesselId(portPredictDTO.getVesselId())
-            .timePoint(portPredictDTO.getTimePoint())
-            .timeStamp(portPredictDTO.getTimeStamp())
-            .eta(portPredictDTO.getEta())
-            .ata(portPredictDTO.getAta())
-            .etaErrorHour(portPredictDTO.getEtaErrorHour())
-            .lat(portPredictDTO.getLat())
-            .lon(portPredictDTO.getLon())
-            .cog(portPredictDTO.getCog())
-            .heading(portPredictDTO.getHeading())
-            .top1Port(portPredictDTO.getTop1Port())
-            .top1Prob(portPredictDTO.getTop1Prob())
-            .top2Port(portPredictDTO.getTop2Port())
-            .top2Prob(portPredictDTO.getTop2Prob())
-            .top3Port(portPredictDTO.getTop3Port())
-            .top3Prob(portPredictDTO.getTop3Prob())
-            .build();
+                .predictSeq(portPredictDTO.getPredictSeq())
+                .portId(portPredictDTO.getPortId())
+                .clusterNum(portPredictDTO.getClusterNum())
+                .vesselId(portPredictDTO.getVesselId())
+                .timePoint(portPredictDTO.getTimePoint())
+                .timeStamp(portPredictDTO.getTimeStamp())
+                .eta(portPredictDTO.getEta())
+                .ata(portPredictDTO.getAta())
+                .etaErrorHour(portPredictDTO.getEtaErrorHour())
+                .lat(portPredictDTO.getLat())
+                .lon(portPredictDTO.getLon())
+                .cog(portPredictDTO.getCog())
+                .heading(portPredictDTO.getHeading())
+                .top1Port(portPredictDTO.getTop1Port())
+                .top1Prob(portPredictDTO.getTop1Prob())
+                .top2Port(portPredictDTO.getTop2Port())
+                .top2Prob(portPredictDTO.getTop2Prob())
+                .top3Port(portPredictDTO.getTop3Port())
+                .top3Prob(portPredictDTO.getTop3Prob())
+                .build();
     }
 }

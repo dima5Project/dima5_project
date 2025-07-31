@@ -18,10 +18,10 @@ public class PortPsoDTO {
 
     public static PortPsoDTO toDTO(PortPsoEntity portPsoEntity) {
         return PortPsoDTO.builder()
-            .psoSeq(portPsoEntity.getPsoSeq())
-            .portId(portPsoEntity.getPortId())
-            .psoLat(portPsoEntity.getPsoLat())
-            .psoLon(portPsoEntity.getPsoLon())
-            .build();
+                .psoSeq(portPsoEntity.getPsoSeq())
+                .portId(portPsoEntity.getPortId())
+                .psoLat(portPsoEntity.getPsoLat())
+                .psoLon(portPsoEntity.getPsoLon())
+                .build();
     }
 }
