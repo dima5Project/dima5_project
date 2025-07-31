@@ -133,7 +133,9 @@ public class AskController {
             String tempName = URLEncoder.encode(
                 originalFilename, StandardCharsets.UTF_8.toString());
                 response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
-        } catch (UnsupportedEncodingException e)
+        } catch (UnsupportedEncodingException e) {}
+        
+        return null;
     }
 
 }
