@@ -14,7 +14,7 @@ import net.dima.dima5_project.entity.PortPredictEntity;
 @Builder
 public class PortPredictDTO {
 
-    private int predictSeq;
+    private long predictSeq;
     private String portId;
     private int clusterNum;
     private String vesselId;
