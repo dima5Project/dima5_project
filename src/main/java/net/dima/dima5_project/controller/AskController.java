@@ -1,8 +1,6 @@
 package net.dima.dima5_project.controller;
 
-<<<<<<<HEAD=======
-
-import java.io.FileInputStream;>>>>>>>backend/ask
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -25,12 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -88,44 +80,6 @@ public class AskController {
     }
 
     /**
-     * <<<<<<< HEAD
-     * 글 자세히 보기
-     * 
-     * @param askboardDTO
-     * @return
-     */
-    @PostMapping("/askWrite")
-    public String askWrite(@ModelAttribute AskBoardDTO askboardDTO) {
-        askService.insertAskBoard(askboardDTO);
-        return "redirect:/ask/askList";
-    }
-
-    /**
-     * 답변 토글 열리기 + 조회
-     */
-    public String askDetail(@RequestParam(name = "askSeq") Long askSeq,
-            @RequestParam(name = "searchItem", defaultValue = "askTitle") String searchItem,
-            @RequestParam(name = "searchWord", defaultValue = "") String searchWord, Model model) {
-        AskBoardDTO askBoardDTO = askService.checkOne(askSeq);
-        model.addAttribute("ask", askBoardDTO);
-        model.addAttribute("searchItem", searchItem);
-        model.addAttribute("searchWord", searchWord);
-        return "ask/askDetailAjax :: detailFragment";
-    }
-
-    /**
-     * 문의 글 삭제
-     */
-    @GetMapping("/askDelete")
-    public String askDelete(@RequestParam(name = "askSeq") Long askSeq,
-            @RequestParam(name = "searchItem", defaultValue = "askTitle") String searchItem,
-            @RequestParam(name = "searchWord", defaultValue = "") String searchWord, RedirectAttributes rttr) {
-        askService.deleteOne(askSeq);
-        rttr.addAttribute("searchItem", searchItem);
-        rttr.addAttribute("searchWord", searchWord);
-
-        return "redirect:/ask/askList";
-    /*
      * 글쓰고 나서 DB에 저장 후 목록으로 리다이렉트 부분
      */
     @PostMapping("/write")
@@ -161,40 +115,27 @@ public class AskController {
         log.info("첨부파일명: {}", askBoardDTO.getSavedFilename());
         String originalFilename = askBoardDTO.getOriginalFilename();
         String savedFilename = askBoardDTO.getSavedFilename();
-
         try {
             String tempName = URLEncoder.encode(
                     originalFilename, StandardCharsets.UTF_8.toString());
             response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
         } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
+        String fullpath = uploadPath + "/" + savedFilename;
+        // 스트림 설정(실제 다운로드가 일어나는 구간)
+        FileInputStream filein = null;
+        ServletOutputStream fileout = null;
+        try {
+            filein = new FileInputStream(fullpath);
+            fileout = response.getOutputStream();
+            FileCopyUtils.copy(filein, fileout);
 
+            fileout.close();
+            filein.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
-
-    {
-        String tempName = URLEncoder.encode(
-                originalFilename, StandardCharsets.UTF_8.toString());
-        response.setHeader("Content-Disposition", "attachment;filename=" + tempName);
-    }catch(
-    UnsupportedEncodingException e)
-    {
-        e.printStackTrace();
-    }
-    String fullpath = uploadPath + "/" + savedFilename;
-    // 스트림 설정(실제 다운로드가 일어나는 구간)
-    FileInputStream filein = null;
-    ServletOutputStream fileout = null;try
-    {
-        filein = new FileInputStream(fullpath);
-        fileout = response.getOutputStream();
-        FileCopyUtils.copy(filein, fileout);
-
-        fileout.close();
-        filein.close();
-    }catch(
-    Exception e)
-    {
-        e.printStackTrace();
-    }return null;
-}}
+}
