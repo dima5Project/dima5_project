@@ -456,13 +456,13 @@
     </section>
     <section id="form" class="qna-form-section">
         <div class="form-container">
-            <form class="qna-form">
+            <form class="qna-form" action="/ask/write" method="post" enctype="multipart/form-data">
                 <div class="form-row">
-                    <label for="inquiry-type">문의유형</label>
+                    <label for="askType">문의유형</label>
                     <div class="input-wrapper">
                         <div class="select-wrapper">
-                            <select id="inquiry-type">
-                                <option>회원가입</option>
+                            <select id="askType" name="askType">
+                                <option value="회원가입">회원가입</option>
                             </select>
                             <img src="images/askImages/I447_362_447_353.svg" alt="dropdown arrow" class="select-arrow">
                         </div>
@@ -472,44 +472,44 @@
                     <label>공개여부</label>
                     <div class="input-wrapper">
                         <div class="button-group">
+                            <!-- optional: 공개여부 필드는 따로 DTO 필드에 없으면 제거 가능 -->
                             <button type="button" class="toggle-btn">비공개</button>
                             <button type="button" class="toggle-btn active">공개</button>
                         </div>
                     </div>
                 </div>
                 <div class="form-row">
-                    <label for="title">제목</label>
+                    <label for="askTitle">제목</label>
                     <div class="input-wrapper">
-                        <input type="text" id="title" placeholder="">
+                        <input type="text" id="askTitle" name="askTitle">
                     </div>
                 </div>
                 <div class="form-row content-row">
-                    <label for="content">내용</label>
+                    <label for="askContent">내용</label>
                     <div class="input-wrapper">
-                        <textarea id="content"></textarea>
+                        <textarea id="askContent" name="askContent"></textarea>
                     </div>
                 </div>
                 <div class="form-row">
-                    <label for="attachment">첨부파일</label>
+                    <label for="uploadFile">첨부파일</label>
                     <div class="input-wrapper file-input-wrapper">
                         <input type="text" class="file-name-display" readonly>
                         <button type="button" class="file-select-btn">파일 선택</button>
-                        <input type="file" id="attachment" class="file-input-hidden">
+                        <input type="file" id="uploadFile" name="uploadFile" class="file-input-hidden">
                     </div>
                 </div>
                 <div class="form-row">
-                    <label for="password">비밀번호</label>
+                    <label for="askPwd">비밀번호</label>
                     <div class="input-wrapper password-wrapper">
-                        <input type="password" id="password">
+                        <input type="password" id="askPwd" name="askPwd">
                         <span class="password-hint">숫자 4자리를 입력하세요</span>
                     </div>
                 </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">등록</button>
+                    <button type="button" class="btn btn-secondary" onclick="location.href='/ask'">목록</button>
+                </div>
             </form>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">등록</button>
-                <button type="button" class="btn btn-secondary">목록</button>
-            </div>
-        </div>
     </section>
     <section id="footer">
         <footer class="site-footer">
