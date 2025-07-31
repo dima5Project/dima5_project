@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/join.css">
+  <style id="sections-styles">
+  /* CSS for section section:signup */
+  .signup-header {
+      margin-bottom: 68px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-text {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 36px;
+    }
+
+    .signup-main {
+      display: flex;
+      justify-content: center;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 557px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .back-link {
+      width: 27px;
+      height: 13.35px;
+      margin-bottom: 39.65px;
+    }
+
+    .form-title {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 20px;
+      margin: 0 0 67px 0;
+    }
+
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 45px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
+    .form-input {
+      height: 60px;
+      padding: 0 21px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      background-color: var(--background-color);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .form-input::placeholder {
+      color: var(--placeholder-color);
+      opacity: 1;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-group .form-input {
+      flex-grow: 1;
+    }
+
+    .btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 5px;
+      box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 20px;
+      height: 60px;
+    }
+
+    .btn-dark {
+      background-color: var(--primary-color);
+      color: var(--background-color);
+    }
+
+    .input-group .btn {
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    .error-message {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 20px;
+      color: var(--error-color);
+      margin: 0;
+      min-height: 20px;
+    }
+
+    .email-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .email-local-input {
+      width: 240px;
+    }
+
+    .email-at {
+      font-size: 20px;
+      font-weight: 500;
+      padding: 0 10px;
+    }
+
+    .custom-select {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 60px;
+      width: 136px;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 0 14px;
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--placeholder-color);
+      cursor: pointer;
+    }
+    
+    .select-value {
+      color: var(--text-color);
+      opacity: 0.3;
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      opacity: 0.3;
+      width: 15px;
+      height: 11px;
+    }
+
+    .btn-auto-width {
+      width: auto;
+      padding: 20px 22px;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 0 10px;
+    }
+
+    .radio-option input[type="radio"] {
+      display: none;
+    }
+
+    .radio-option label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .radio-option input[type="radio"]:checked + label {
+      /* Add styles for selected state if any */
+    }
+
+    .btn-full-width {
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .signup-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .form-container {
+        align-items: center;
+      }
+      .back-link {
+        align-self: flex-start;
+      }
+      .form-title {
+        text-align: center;
+      }
+      .email-group {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .email-local-input, .custom-select, .btn-auto-width {
+        width: 100%;
+      }
+      .email-at {
+        display: none;
+      }
+      .radio-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+  <script src="../static/js/join.js" defer></script>
+</head>
+<body>
+  <section id="signup-section" class="page-container">
+    <header class="signup-header">
+      <a href="#" class="logo">
+        <img th:src="@{images/joinImages/246_50.svg}" alt="부3갈매기 logo icon">
+        <span class="logo-text">부3갈매기</span>
+      </a>
+    </header>
+
+    <main class="signup-main">
+      <div class="form-container">
+        <a href="#" class="back-link">
+          <img th:src="@{images/joinImages/246_53.svg}" alt="Back">
+        </a>
+        <h1 class="form-title">회원가입</h1>
+
+        <form class="signup-form">
+          <div class="form-group">
+            <label for="name" class="form-label">이름</label>
+            <input type="text" id="name" class="form-input" placeholder="실명 또는 회사명을 입력하세요">
+          </div>
+
+          <div class="form-group">
+            <label for="user-id" class="form-label">아이디</label>
+            <div class="input-group">
+              <input type="text" id="user-id" class="form-input" placeholder="영문 5~10자를 입력하세요">
+              <button type="button" class="btn btn-dark">중복확인</button>
+            </div>
+            <p class="error-message">존재하는 아이디입니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">비밀번호</label>
+            <input type="password" id="password" class="form-input" placeholder="영문 5~10자를 입력하세요.">
+            <p class="error-message">영문자 5~10개를 입력하세요</p>
+          </div>
+
+          <div class="form-group">
+            <label for="password-confirm" class="form-label">비밀번호 확인</label>
+            <input type="password" id="password-confirm" class="form-input" placeholder="비밀번호 확인">
+            <p class="error-message">일치하지 않는 비밀번호입니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="email-local" class="form-label">이메일</label>
+            <div class="email-group">
+              <input type="text" id="email-local" class="form-input email-local-input" placeholder="이메일 주소">
+              <span class="email-at">@</span>
+              <div class="custom-select">
+                <span class="select-value">naver.com</span>
+                <img th:src="@{images/joinImages/279_134.svg}" alt="dropdown arrow" class="select-arrow">
+              </div>
+              <button type="button" class="btn btn-dark btn-auto-width">인증번호 받기</button>
+            </div>
+            <p class="error-message">존재하지 않는 이메일입니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label for="auth-code" class="form-label">인증번호</label>
+            <input type="text" id="auth-code" class="form-input" placeholder="인증번호를 입력하세요.">
+            <p class="error-message">인증번호가 잘못되었습니다.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">사용자 유형</label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" id="type-shipper" name="user-type" checked>
+                <label for="type-shipper">
+                  <img th:src="@{images/joinImages/I161_65_158_15.svg}" alt="radio icon">
+                  <span>화주</span>
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="type-carrier" name="user-type">
+                <label for="type-carrier">
+                  <img th:src="@{images/joinImages/I161_68_158_15.svg}" alt="radio icon">
+                  <span>선사</span>
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="type-port" name="user-type">
+                <label for="type-port">
+                  <img th:src="@{images/joinImages/I161_71_158_15.svg}" alt="radio icon">
+                  <span>항만사</span>
+                </label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" id="type-general" name="user-type">
+                <label for="type-general">
+                  <img th:src="@{images/joinImages/I161_74_158_15.svg}" alt="radio icon">
+                  <span>일반 사용자</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-dark btn-full-width">가입하기</button>
+        </form>
+      </div>
+    </main>
+  </section>
+</body>
+</html>

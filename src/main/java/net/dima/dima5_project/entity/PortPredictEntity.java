@@ -25,7 +25,7 @@ public class PortPredictEntity {
     
     @Id
     @Column(name="predict_seq")
-    private int predictSeq;
+    private Long predictSeq;
 
     // @Column(name="port_id")
     // private String portId;
