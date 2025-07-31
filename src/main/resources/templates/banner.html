@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap" rel="stylesheet">
+  <title>부3갈매기 - Next Port, First Insight</title>
+  <link rel="stylesheet" href="../static/css/banner.css">
+
+  <style id="sections-styles">
+    /* CSS for section section:header */
+    .site-header {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      padding-top: 25px;
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 80px;
+    }
+
+    .header-top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .user-auth-links {
+      display: flex;
+      gap: 25px;
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-secondary);
+    }
+
+    .lang-switcher {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .header-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--color-background-header);
+      height: 90px;
+      padding: 0 60px;
+      border-radius: 5px;
+    }
+
+    .logo {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .main-nav ul {
+      display: flex;
+      gap: 120px;
+    }
+
+    .main-nav a {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-dark);
+      position: relative;
+      padding-bottom: 8px;
+    }
+
+    .main-nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background-color: var(--color-primary);
+      transition: width 0.3s ease;
+    }
+
+    .main-nav a:hover::after {
+      width: 100%;
+    }
+
+    @media (max-width: 1200px) {
+      .header-container {
+        padding: 0 40px;
+      }
+      .main-nav ul {
+        gap: 60px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .header-main {
+        padding: 0 30px;
+      }
+      .main-nav ul {
+        gap: 30px;
+      }
+      .main-nav a {
+        font-size: 18px;
+      }
+      .logo {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-main {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+      }
+      .main-nav ul {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        margin-top: 20px;
+      }
+      .header-top-bar {
+        padding: 0 20px;
+      }
+    }
+
+    /* CSS for section section:hero */
+    .hero-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url('images/cda50cdccd81cc3b58cc73a4d85d29dfac9a3eab.png');
+      background-size: cover;
+      background-position: center;
+      padding: 150px 20px 50px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+      color: var(--color-text-dark);
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .hero-text .subtitle {
+      font-size: 40px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .hero-text .title {
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 260px;
+      height: 70px;
+      background-color: var(--color-secondary);
+      color: var(--color-text-light);
+      font-size: 26px;
+      font-weight: 500;
+      border-radius: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .scroll-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      color: var(--color-secondary);
+      font-size: 24px;
+      font-weight: 350;
+    }
+
+    @media (max-width: 768px) {
+      .hero-text .subtitle {
+        font-size: 28px;
+      }
+      .hero-text .title {
+        font-size: 48px;
+      }
+      .cta-button {
+        width: 220px;
+        height: 60px;
+        font-size: 22px;
+      }
+    }
+
+    /* CSS for section section:features */
+    .features-section {
+      padding: 100px 0;
+      background-color: var(--color-background-light);
+    }
+
+    .service-intro {
+      text-align: center;
+      max-width: 1030px;
+      margin: 0 auto 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 29px;
+    }
+
+    .separator-line {
+      width: 70px;
+      height: 2px;
+      background-color: var(--color-primary);
+    }
+
+    .service-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin: 0;
+    }
+
+    .service-description {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--color-secondary);
+      margin: 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-image-link {
+      display: block;
+      overflow: hidden;
+    }
+
+    .card-image-wrapper {
+      position: relative;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(30, 30, 30, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .discover-more {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-text-light);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .discover-more img {
+      transform: rotate(-180deg);
+    }
+
+    .feature-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .feature-card:hover .card-image {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      padding: 24px;
+    }
+
+    .card-content h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+
+    .card-content p {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 992px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 50px;
+      }
+      .service-description {
+        font-size: 20px;
+      }
+    }
+
+    /* CSS for section section:footer */
+    .site-footer {
+      background-color: var(--color-secondary);
+      color: var(--color-text-light);
+      padding: 57px 0;
+    }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-size: 24px;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    .footer-info address {
+      font-style: normal;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .footer-socials {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-socials a img {
+      width: 25px;
+      height: 25px;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-socials a:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .footer-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+      }
+    }
+  </style>
+  <script src="banner.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-container">
+      <div class="header-top-bar">
+        <div class="user-auth-links">
+          <a th:href="@{/user/login}">로그인</a>
+          <a th:href="@{/user/join}">회원가입</a>
+        </div>
+        <button class="lang-switcher" aria-label="Language switcher">
+          <img th:src="@{/static/images/bannerImages/I226_321_162_213.svg}" alt="Language icon">
+        </button>
+      </div>
+      <div class="header-main">
+        <a href="#hero" class="logo">부3갈매기</a>
+        <nav class="main-nav">
+          <ul>
+            <li><a href="#features">소개</a></li>
+            <li><a href="#features">차항지 예측</a></li>
+            <li><a href="#features">부가정보</a></li>
+            <li><a th:href="@{/news/main}">뉴스룸</a></li>
+            <li><a href="#footer">문의</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <section id="hero" class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <p class="subtitle">Next Port, First Insight.</p>
+        <h1 class="title">차기 정박항을 예측하는<br>가장 똑똑한 방법</h1>
+      </div>
+      <a href="#" class="cta-button">시작하기</a>
+      <a href="#features" class="scroll-indicator">
+        <span>SCROLL</span>
+        <img th:src="@{/static/images/bannerImages/226_305.svg}" alt="Scroll down arrow">
+      </a>
+    </div>
+  </section>
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="service-intro">
+        <div class="separator-line"></div>
+        <h2 class="service-title">OUR SERVICE</h2>
+        <p class="service-description">
+          “ AIS 데이터를 기반으로 선박의 차기 정박항 정보를 실시간 제공하며, 물류 예측과 전략 수립을 위한 통합 의사결정 지원 도구로 활용할 수 있습니다. 더불어 예측 정보를 기반으로 항만 스케줄 조정, 하역 준비, 통관 업무, 물류 운용 최적화 등을 지원합니다. “
+        </p>
+      </div>
+      <div class="features-grid">
+        <article class="feature-card">
+          <!--merged image-->
+          <a href="#" class="card-image-link">
+            <div class="card-image-wrapper">
+              <img th:src="@{static/images/bannerImages/522304ab9efa94349e1f5f67ed1a97fd603949d7.png}" alt="팀 소개" class="card-image">
+              <div class="card-overlay">
+                <div class="discover-more">
+                  <span>DISCOVER MORE</span>
+                  <img th:src="@{static/images/bannerImages/I226_336_109_149.svg}" alt="arrow icon">
+                </div>
+              </div>
+            </div>
+          </a>
+          <div class="card-content">
+            <h3>팀 소개</h3>
+            <p>무역아카데미의 팀 부3갈매기에 대해 자세히 알아보세요.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <!--merged image-->
+          <a href="#" class="card-image-link">
+            <div class="card-image-wrapper">
+              <img th:src="@{static/images/bannerImages/bb6eacb258d486f429aa122b5cc7b97a9a5087ae.png}" alt="서비스 소개" class="card-image">
+              <div class="card-overlay">
+                <div class="discover-more">
+                  <span>DISCOVER MORE</span>
+                  <img th:src="@{static/images/bannerImages/I226_337_109_128.svg}" alt="arrow icon">
+                </div>
+              </div>
+            </div>
+          </a>
+          <div class="card-content">
+            <h3>서비스 소개</h3>
+            <p>우리 팀의 차항지 예측 서비스를 안내합니다.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <!--merged image-->
+          <a href="#" class="card-image-link">
+            <div class="card-image-wrapper">
+              <img th:src="@{static/images/bannerImages/5a92fd1da190f48f53dc756e94db8b560af0add9.png}" alt="뉴스룸" class="card-image">
+              <div class="card-overlay">
+                <div class="discover-more">
+                  <span>DISCOVER MORE</span>
+                  <img th:src="@{static/images/bannerImages/I226_338_109_170.svg}" alt="arrow icon">
+                </div>
+              </div>
+            </div>
+          </a>
+          <div class="card-content">
+            <h3>뉴스룸</h3>
+            <p>물류 관련 최신 동향 및 이슈들을 확인해보세요.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+  <footer id="footer" class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-info">
+        <h4 class="footer-logo">부3갈매기</h4>
+        <address>
+          서울 강남구 삼성동 159 무역아카데미<br>
+          wta.kdt3@gmail.com
+        </address>
+      </div>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook"><img th:src="@{static/images/bannerImages/226_327.svg}" alt="Facebook icon"></a>
+        <a href="#" aria-label="YouTube"><img th:src="@{static/images/bannerImages/226_328.svg}" alt="YouTube icon"></a>
+        <a href="#" aria-label="Instagram"><img th:src="@{static/images/bannerImages/226_331.svg}" alt="Instagram icon"></a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<<<<<<< HEAD
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+=======
+<html lang="en">
+>>>>>>> backend/ask
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
+    <title>문의</title>
+</head>
+
+<body>
+    <!-- 게시글 등록 화면 -->
+    <div class="content">
+        <form action="/ask/askWrite" method="POST" enctype="multipart/form-data">
+            <table border="1">
+                <tr>
+                    <th>작성자</th>
+                    <td><!-- 로그인한 사람의 아이디 -->
+                        <!-- th:value="${#authentication.name} 로그인한 경우 요청이라 잠시 주석-->
+                        <input type="text" id="writer" name="writer" readonly>
+                    </td>
+                <tr>
+                <tr>
+                    <th>글 제목</th>
+                    <td>
+                        <input type="text" id="askTitle" name="askTitle" required>
+                    </td>
+                <tr>
+                <tr>
+                    <th>글 내용</th>
+                    <td>
+                        <textarea id="askContent" name="askContent" cols="30" rows="10" required></textarea>
+                    </td>
+                <tr>
+                <tr>
+                    <th>첨부파일</th>
+                    <td>
+                        <input id="uploadFile" type="file" class="btn" name="uploadFile">
+                    </td>
+                <tr>
+                <tr>
+                    <th colspan="2">
+                        <input type="submit" value="등록">
+                    </th>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+=======
+    <title>Generated Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <style id="sections-styles">
+        /* CSS for section section:header */
+        .header-hero-section {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding-bottom: 118px;
+        }
+
+        .header-top-bar {
+            padding: 16px 0;
+        }
+
+        .header-top-bar .content-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            font-size: 20px;
+        }
+
+        .user-actions a {
+            color: var(--white-color);
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .main-header {
+            background-color: #fcfcfd;
+            color: var(--black-color);
+            padding: 0 20px;
+        }
+
+        .main-header .content-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 90px;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--brand-color);
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 120px;
+        }
+
+        .main-nav a {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--black-color);
+        }
+
+        .hero-content {
+            text-align: center;
+            padding-top: 187px;
+        }
+
+        .hero-content h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 30px 0;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .main-nav ul {
+                gap: 60px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-header .content-wrapper {
+                flex-direction: column;
+                height: auto;
+                padding: 20px 0;
+            }
+
+            .main-nav ul {
+                gap: 30px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .main-nav a {
+                font-size: 18px;
+            }
+
+            .hero-content {
+                padding-top: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .user-actions {
+                font-size: 16px;
+                gap: 15px;
+            }
+
+            .main-nav ul {
+                gap: 15px;
+            }
+
+            .hero-content {
+                padding-top: 60px;
+                padding-bottom: 60px;
+            }
+
+            .hero-content h1 {
+                font-size: 28px;
+            }
+
+            .hero-content p {
+                font-size: 16px;
+            }
+        }
+
+        /* CSS for section section:board */
+        .qna-board-section {
+            padding-top: 57px;
+            padding-bottom: 96px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 35px;
+            margin-bottom: 57px;
+        }
+
+        .filter-btn {
+            background-color: var(--white-color);
+            border: 1.5px solid #c2bfbf;
+            border-radius: 15px;
+            padding: 12px 35px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border-color: var(--primary-color);
+        }
+
+        .board-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+            border-top: 1px solid var(--black-color);
+            border-bottom: 1px solid var(--black-color);
+            margin-bottom: 30px;
+        }
+
+        .total-count {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .total-count strong {
+            color: var(--brand-color);
+        }
+
+        .search-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 8px;
+            height: 8px;
+            border-bottom: 2px solid var(--black-color);
+            border-right: 2px solid var(--black-color);
+            pointer-events: none;
+        }
+
+        .search-area select,
+        .search-area input {
+            height: 48px;
+            border: 1px solid var(--black-color);
+            border-radius: 3px;
+            padding: 0 15px;
+            font-size: 20px;
+        }
+
+        .search-area select {
+            width: 175px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 30px;
+        }
+
+        .search-area input {
+            width: 382px;
+        }
+
+        .search-area input::placeholder {
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        .search-btn,
+        .write-btn {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: 3px;
+            height: 48px;
+            padding: 0 35px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .qna-table {
+            border-top: 2px solid var(--border-color-dark);
+        }
+
+        .table-header,
+        .table-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .table-header {
+            background-color: var(--light-grey-bg);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .table-row {
+            border-bottom: 1px solid var(--border-color-light);
+            font-size: 16px;
+            color: var(--black-color);
+        }
+
+        .table-header>div,
+        .table-row>div {
+            padding: 25px 10px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .col-serial {
+            flex: 0 0 150px;
+        }
+
+        .col-type {
+            flex: 0 0 200px;
+        }
+
+        .col-title {
+            flex: 1 1 637px;
+            justify-content: flex-start !important;
+            padding-left: 20px;
+        }
+
+        .col-author {
+            flex: 0 0 150px;
+        }
+
+        .col-date {
+            flex: 0 0 150px;
+        }
+
+        .col-title .secret,
+        .col-title .answered {
+            font-weight: 700;
+            color: var(--grey-text-color);
+            margin-left: 8px;
+        }
+
+        .board-footer {
+            margin-top: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page-num {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 14px;
+            color: var(--black-color);
+        }
+
+        .page-num.active {
+            background-color: var(--black-color);
+            color: var(--white-color);
+        }
+
+        .page-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-arrow img {
+            transform: rotate(90deg);
+        }
+
+        @media (max-width: 992px) {
+            .board-controls {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .search-area {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .search-area input {
+                width: 100%;
+            }
+
+            .qna-table {
+                font-size: 14px;
+            }
+
+            .table-header {
+                display: none;
+            }
+
+            .table-row {
+                flex-direction: column;
+                padding: 15px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-color-light);
+                border-radius: 5px;
+            }
+
+            .table-row>div {
+                padding: 5px 0;
+                text-align: left;
+                justify-content: flex-start !important;
+                width: 100%;
+            }
+
+            .table-row>div::before {
+                font-weight: 700;
+                margin-right: 10px;
+                width: 80px;
+                display: inline-block;
+            }
+
+            .col-serial::before {
+                content: '일련번호:';
+            }
+
+            .col-type::before {
+                content: '문의 유형:';
+            }
+
+            .col-title::before {
+                content: '제목:';
+            }
+
+            .col-author::before {
+                content: '글쓴이:';
+            }
+
+            .col-date::before {
+                content: '등록일:';
+            }
+
+            .board-footer {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .write-btn {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-tabs {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .filter-btn {
+                font-size: 16px;
+                padding: 8px 20px;
+            }
+        }
+
+        /* CSS for section section:footer */
+        .site-footer {
+            background-color: var(--dark-blue-color);
+            color: var(--white-color);
+            padding: 57px 0;
+        }
+
+        .site-footer .content-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-info h3 {
+            font-size: 24px;
+            font-weight: 400;
+            margin: 0 0 16px 0;
+        }
+
+        .footer-info p {
+            font-size: 16px;
+            line-height: 25px;
+            margin: 0;
+        }
+
+        .social-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .social-links img {
+            width: 25px;
+            height: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .site-footer .content-wrapper {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+        }
+    </style>
+    <script src="askList.js" defer></script>
+</head>
+
+<body>
+    <section id="section-header" class="header-hero-section">
+        <div class="header-top-bar">
+            <div class="content-wrapper">
+                <div class="user-actions">
+                    <a href="#">로그인</a>
+                    <a href="#">회원가입</a>
+                    <button class="lang-btn">
+                        <img src="images/askImages/I271_312_271_308.svg" alt="Language Selector">
+                    </button>
+                </div>
+            </div>
+        </div>
+        <header class="main-header">
+            <div class="content-wrapper">
+                <a href="#" class="logo">부3갈매기</a>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="#">소개</a></li>
+                        <li><a href="#">차항지 예측</a></li>
+                        <li><a href="#">부가정보</a></li>
+                        <li><a href="#">뉴스룸</a></li>
+                        <li><a href="#">문의</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <div class="hero-content">
+            <h1>Q & A</h1>
+            <p>궁금하신 내용을 남겨주시면 빠르게 답변 드리겠습니다.</p>
+        </div>
+    </section>
+    <main id="section-board" class="qna-board-section">
+        <div class="content-wrapper">
+            <div class="filter-tabs">
+                <button class="filter-btn active">전체</button>
+                <button class="filter-btn">회원가입</button>
+                <button class="filter-btn">서비스 이용</button>
+                <button class="filter-btn">기타</button>
+            </div>
+
+            <div class="board-controls">
+                <div class="total-count">전체 <strong>00</strong>건</div>
+                <div class="search-area">
+                    <div class="select-wrapper">
+                        <select>
+                            <option>선택</option>
+                        </select>
+                    </div>
+                    <input type="text" placeholder="검색어를 입력하세요">
+                    <button class="search-btn">검색</button>
+                </div>
+            </div>
+
+            <div class="qna-table">
+                <div class="table-header">
+                    <div class="col-serial">일련번호</div>
+                    <div class="col-type">문의 유형</div>
+                    <div class="col-title">제목</div>
+                    <div class="col-author">글쓴이</div>
+                    <div class="col-date">등록일</div>
+                </div>
+                <div class="table-body">
+                    <div class="table-row">
+                        <div class="col-serial">60</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">59</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">58</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">57</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">56</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">55</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">54</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">53</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">52</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                    <div class="table-row">
+                        <div class="col-serial">51</div>
+                        <div class="col-type">서비스 이용</div>
+                        <div class="col-title">차항지 예측 서비스 이용 관련 문의드립니다. <span class="secret">[비밀글]</span> <span
+                                class="answered">[답변 완료]</span></div>
+                        <div class="col-author">배시원</div>
+                        <div class="col-date">2024-05-26</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="board-footer">
+                <nav class="pagination">
+                    <a href="#" class="page-num active">1</a>
+                    <a href="#" class="page-num">2</a>
+                    <a href="#" class="page-num">3</a>
+                    <a href="#" class="page-num">4</a>
+                    <a href="#" class="page-num">5</a>
+                    <a href="#" class="page-arrow">
+                        <img src="images/askImages/I280_861_280_110.svg" alt="Next Page">
+                    </a>
+                </nav>
+                <a href="/ask/write" class="write-btn">글쓰기</a>
+            </div>
+        </div>
+    </main>
+    <footer id="section-footer" class="site-footer">
+        <div class="content-wrapper">
+            <div class="footer-info">
+                <h3>부3갈매기</h3>
+                <p>서울 강남구 삼성동 159 무역아카데미<br>wta.kdt3@gmail.com</p>
+            </div>
+            <div class="social-links">
+                <a href="#"><img src="images/askImages/263_154.svg" alt="Facebook"></a>
+                <a href="#"><img src="images/askImages/263_155.svg" alt="YouTube"></a>
+                <a href="#"><img src="images/askImages/263_158.svg" alt="Instagram"></a>
+            </div>
+        </div>
+    </footer>
+>>>>>>> backend/ask
+</body>
+
+</html>

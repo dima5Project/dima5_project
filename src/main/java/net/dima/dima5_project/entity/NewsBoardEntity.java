@@ -10,14 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import net.dima.dima5_project.dto.NewsBoardDTO;
 
 @Entity
 @Table(name = "news_board")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,7 +25,7 @@ public class NewsBoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "news_seq")
-    private Integer newsSeq;
+    private long newsSeq;
 
     @Column(name = "publisher")
     private String publisher;
@@ -42,4 +41,15 @@ public class NewsBoardEntity {
 
     @Column(name = "news_url")
     private String newsUrl;
+
+    public static NewsBoardEntity toEntity(NewsBoardDTO newsboardDTO) {
+        return NewsBoardEntity.builder()
+            .newsSeq(newsboardDTO.getNewsSeq())
+            .publisher(newsboardDTO.getPublisher())
+            .newsTitle(newsboardDTO.getNewsTitle())
+            .registerDate(newsboardDTO.getRegisterDate())
+            .imgUrl(newsboardDTO.getImgUrl())
+            .newsUrl(newsboardDTO.getNewsUrl())
+            .build();
+    }
 }

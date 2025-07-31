@@ -12,14 +12,14 @@ import net.dima.dima5_project.entity.AskBoardEntity;
 public interface AskBoardRepository extends JpaRepository<AskBoardEntity, Long> {
 
     // 검색어를 이용한 조회
-    List<AskBoardEntity> findByAskWriterContains(String searchWord, Sort by);
+    List<AskBoardEntity> findByWriterContains(String searchWord, Sort by);
 
     List<AskBoardEntity> findByAskTitleContains(String searchWord, Sort by);
 
     List<AskBoardEntity> findByAskContentContains(String searchWord, Sort by);
 
     // 페이징을 위한
-    Page<AskBoardEntity> findByAskWriterContains(String searchWord, PageRequest of);
+    Page<AskBoardEntity> findByWriterContains(String searchWord, PageRequest of);
 
     Page<AskBoardEntity> findByAskTitleContains(String searchWord, PageRequest of);
 
