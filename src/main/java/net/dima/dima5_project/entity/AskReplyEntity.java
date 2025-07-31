@@ -25,15 +25,12 @@ import net.dima.dima5_project.dto.AskReplyDTO;
 public class AskReplyEntity {
 
     @Id
-    @Column(name = "reply_num")
-    private Integer replyNum;
+    @Column(name = "ask_seq")
+    private Long askSeq; // AskBoard와 동일한 ID 사용
 
     @OneToOne
-    @JoinColumn(name = "reply_num", referencedColumnName = "ask_seq")
+    @JoinColumn(name = "ask_seq")
     private AskBoardEntity askBoard;
-
-    @Column(name = "ask_title")
-    private String askTitle;
 
     @Column(name = "reply_content")
     private String replyContent;
@@ -43,9 +40,8 @@ public class AskReplyEntity {
 
     public static AskReplyEntity toEntity(AskReplyDTO askReplyDTO, AskBoardEntity askBoardEntity) {
         return AskReplyEntity.builder()
-                .replyNum(askReplyDTO.getReplyNum())
+                .askSeq(askReplyDTO.getAskSeq())
                 .askBoard(askBoardEntity)
-                .askTitle(askReplyDTO.getAskTitle())
                 .replyContent(askReplyDTO.getReplyContent())
                 .replyDate(askReplyDTO.getReplyDate())
                 .build();

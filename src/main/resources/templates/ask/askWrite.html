@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form action="/ask/write" method="post" enctype="multipart/form-data">
+        <input type="text" name="askTitle" placeholder="제목">
+        <textarea name="askContent" placeholder="내용"></textarea>
+        <input name="writerId" value="testUser">
+        <input type="password" name="askPwd" placeholder="비밀번호">
+        <input type="file" name="uploadFile">
+        <button type="submit">등록</button>
+    </form>
+</body>
+
+</html>

@@ -1,5 +1,6 @@
 package net.dima.dima5_project.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
@@ -15,13 +16,16 @@ import net.dima.dima5_project.util.PageNavigator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequestMapping("/ask")
 @Slf4j
 @RequiredArgsConstructor
 public class AskController {
+
     private final AskService askService;
 
     // 한페이지에 보여줄 글 갯수
@@ -31,9 +35,6 @@ public class AskController {
     @Value("${spring.servlet.multipart.location}")
     String uploadPath;
 
-    /**
-     * 글쓰기 페이지로 로딩이 됨... 하아
-     */
     @GetMapping("")
     public String ask(
             @PageableDefault(page = 1) Pageable pageable,
@@ -56,7 +57,7 @@ public class AskController {
         model.addAttribute("searchWord", searchWord);
         model.addAttribute("navi", navi);
 
-        return "ask";
+        return "ask/askList";
     }
 
     /**
@@ -66,7 +67,34 @@ public class AskController {
      */
     @GetMapping("/write")
     public String write() {
-        return "ask/write";
+        return "ask/askwrite";
+    }
+
+    /**
+     * 글쓰고 나서 DB에 저장 후 목록으로 리다이렉트 부분
+     */
+    @PostMapping("/write")
+    public String askwrite(@ModelAttribute AskBoardDTO askBoardDTO) {
+        askService.insertAskBoard(askBoardDTO);
+        return "redirect:/ask";
+    }
+
+    /**
+     * Ajax 요청 처리 - 문의 상세 내용만 fragment로 반환하는 것
+     * 토글로 보여주는.. 그것을 쓴 것이긴 함
+     * 
+     * @param param
+     * @return
+     */
+    @GetMapping("/askDetail")
+    public String askDetail(@RequestParam("askSeq") Long askSeq,
+            @RequestParam(name = "searchItem", defaultValue = "boardTitle") String searchItem,
+            @RequestParam(name = "searchWord", defaultValue = "") String searchWord, Model model) {
+        AskBoardDTO askBoardDTO = askService.checkOne(askSeq); // 서비스에서 문의 하나 가져오기
+        model.addAttribute("ask", askBoardDTO);
+        model.addAttribute("searchItem", searchItem);
+        model.addAttribute("searchWord", searchWord);
+        return "board/boardDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
     }
 
 }

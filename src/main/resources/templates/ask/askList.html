@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 게시판</title>
+    <link rel="stylesheet" href="/css/askList.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo"><strong>부3갈매기</strong></div>
+        <nav>
+            <ul>
+                <li><a href="#">소개</a></li>
+                <li><a href="#">차량지 예약</a></li>
+                <li><a href="#">부가정보</a></li>
+                <li><a href="#">뉴스룸</a></li>
+                <li><a href="#">문의</a></li>
+            </ul>
+        </nav>
+        <div class="top-menu">
+            <a href="#">로그인</a> | <a href="#">회원가입</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h2>Q & A</h2>
+        <p>궁금하신 내용을 남겨주시면 빠르게 도와드리겠습니다.</p>
+        <div class="filter-buttons">
+            <button>전체</button>
+            <button>회원가입</button>
+            <button>서비스 이용</button>
+            <button>기타</button>
+        </div>
+    </section>
+
+    <section class="search-bar">
+        <select>
+            <option>전체</option>
+            <option>회원가입</option>
+            <option>서비스 이용</option>
+            <option>기타</option>
+        </select>
+        <select>
+            <option>선택</option>
+            <option>제목</option>
+            <option>작성자</option>
+        </select>
+        <input type="text" placeholder="검색어를 입력해주세요">
+        <button>검색</button>
+    </section>
+
+    <section class="table-wrap">
+        <table>
+            <tbody>
+                <tr th:each="ask : ${askList}">
+                    <td th:text="${ask.askSeq}"></td>
+                    <td th:text="${ask.askType}"></td>
+                    <td>
+                        <span th:text="${ask.askTitle}"></span>
+                        <span th:if="${ask.replyStatus}" class="reply-link">[답변 완료]</span>
+                    </td>
+                    <td th:text="${ask.writer.userName}"></td>
+                    <td th:text="${#temporals.format(ask.createDate, 'yyyy-MM-dd')}"></td>
+                </tr>
+            </tbody>
+
+        </table>
+    </section>
+
+    <div class="pagination">
+        <button>&laquo;</button>
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>&raquo;</button>
+    </div>
+
+    <a href="/ask/write" class="post-btn">글쓰기</a>
+
+    <footer class="footer">
+        <div>부3갈매기</div>
+        <div>서울 강남구 강남동 159 카워커타워<br>vha.kita987@gmail.com</div>
+    </footer>
+</body>
+
+</html>

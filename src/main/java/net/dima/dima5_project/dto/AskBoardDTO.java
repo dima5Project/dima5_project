@@ -4,20 +4,24 @@ import java.time.LocalDateTime;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import net.dima.dima5_project.entity.AskBoardEntity;
 import net.dima.dima5_project.entity.AskReplyEntity;
 import net.dima.dima5_project.entity.PredictUserEntity;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AskBoardDTO {
     private Long askSeq;
     private String askType;
     private String askTitle;
     private String askContent;
-    private PredictUserEntity writer;
+    private PredictUserEntity writer; // DB에서 Entity로 뽑아 쓰기용
     private LocalDateTime createDate;
     private String originalFilename;
     private String savedFilename;
