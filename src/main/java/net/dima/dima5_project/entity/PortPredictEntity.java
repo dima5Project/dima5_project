@@ -73,7 +73,7 @@ public class PortPredictEntity {
 
     // 단방향 참조: PortInfo
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "port_id")
+    @JoinColumn(name = "port_id", insertable = false, updatable = false)
     private PortInfoEntity portInfo;
 
     // 단방향 참조: PortName
