@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../static/css/join.css">
+  <link rel="stylesheet" th:href="@{/css/join.css}">
   <style id="sections-styles">
-  /* CSS for section section:signup */
-  .signup-header {
+    /* CSS for section section:signup */
+    .signup-header {
       margin-bottom: 68px;
     }
 
@@ -156,7 +157,7 @@
       color: var(--placeholder-color);
       cursor: pointer;
     }
-    
+
     .select-value {
       color: var(--text-color);
       opacity: 0.3;
@@ -199,7 +200,7 @@
       font-weight: 400;
     }
 
-    .radio-option input[type="radio"]:checked + label {
+    .radio-option input[type="radio"]:checked+label {
       /* Add styles for selected state if any */
     }
 
@@ -212,33 +213,43 @@
         text-align: center;
         margin-bottom: 40px;
       }
+
       .form-container {
         align-items: center;
       }
+
       .back-link {
         align-self: flex-start;
       }
+
       .form-title {
         text-align: center;
       }
+
       .email-group {
         flex-wrap: wrap;
         gap: 10px;
       }
-      .email-local-input, .custom-select, .btn-auto-width {
+
+      .email-local-input,
+      .custom-select,
+      .btn-auto-width {
         width: 100%;
       }
+
       .email-at {
         display: none;
       }
+
       .radio-group {
         flex-direction: column;
         align-items: flex-start;
       }
     }
   </style>
-  <script src="../static/js/join.js" defer></script>
+  <script src="/js/join.js" defer></script>
 </head>
+
 <body>
   <section id="signup-section" class="page-container">
     <header class="signup-header">
@@ -342,4 +353,5 @@
     </main>
   </section>
 </body>
+
 </html>

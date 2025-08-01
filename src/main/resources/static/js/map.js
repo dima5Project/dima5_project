@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
-    console.log("✅ map.js 로딩됨");
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
