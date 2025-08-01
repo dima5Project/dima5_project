@@ -2,23 +2,26 @@ package net.dima.dima5_project.dto;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import net.dima.dima5_project.entity.PredictUserEntity;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PredictResultSaveDTO {
     private Integer resultSeq;
-    private PredictUserEntity user; // user → ID로 축소
+    // private PredictUserEntity user; // user → ID로 축소
     private String vesselAlias;
-    private Double lat;
-    private Double lon;
-    private Double cog;
-    private Double heading;
+    private double lat;
+    private double lon;
+    private double cog;
+    private double heading;
     private String top1Port;
-    private Double top1Prob;
+    private double top1Prob;
     private LocalDateTime eta;
 
     // public static PredictResultSaveDTO toDTO(PredictResultSaveEntity

@@ -28,6 +28,7 @@ public class SecurityConfig {
                                 .requestMatchers(
                                                 "/",
                                                 "/main",
+                                                "/map",
                                                 "/intro/init",
                                                 "/user/login",
                                                 "/user/join",
@@ -35,6 +36,7 @@ public class SecurityConfig {
                                                 "/user/confirmId",
                                                 "/news/main",
                                                 "/api/port/**",
+
                                                 "/mypage/**",
                                                 "/images/**", // static/../ 안의 하위 디렉토리 접근 가능하도록
                                                 "/js/**",

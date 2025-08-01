@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
 
     <!-- 직접 만든 전역 CSS
      전체 레이아웃, 폰트, 마진 등 공통 스타일 넣는 곳 -->
-    <link rel="stylesheet" href="/css/map.css">
+    <link rel="stylesheet" th:href="@{/css/map.css}">
 
     <!-- Mapbox CSS 지도 UI 스타일 적용
      줌 버튼, 로딩 스피너, 지도 로고 등에 필요-->
@@ -28,9 +28,40 @@
      지도 기능용 JavaScript. 지도를 생성하고 조작하는 기능 제공하는 Mapbox JavaScript 라이브러리 -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
     <!-- 사용자 정의 지도 생성 스크립트 -->
-    <script defer src="/js/map.js"></script>
+    <script defer th:src="@{/js/map.js}"></script>
 
+    <!-- 비동기로 지도에 올릴 데이터 요청  -->
+    <script>
+        $(function () {
+            $("#search").on('click', searchFunc)
+            init();   // 지도위에 올릴 데이터 요청하는 함수 실행
+        });
+
+        // 지도위에 올릴 데이터 요청하는 함수 실행
+        function searchFunc() {
+            let lat_input = $('#lat_input').val();
+            let lon_input = $('#lon_input').val();
+            let cog_input = $('#cog_input').val();
+            let heading_input = $('#heading_input').val();
+
+            // 검증작업을 한다.
+
+
+            let sendData = { "lat": lat_input, "lon": lon_input, "cog": cog_input, "heading": heading_input };
+            $.ajax({
+                url: '/api/port/pso',
+                method: 'get',
+                data: sendData,
+                success: marker
+            })
+        }
+
+        function marker(resp) {
+            alert(JSON.stringify(resp));
+        }
+    </script>
     <style>
         #map {
             width: 100%;
@@ -564,7 +595,7 @@
             /* This section is empty as per the design. */
         }
     </style>
-    <script src="js/map.js" defer></script>
+    <script th:src="@{/js/map.js}" defer></script>
 </head>
 
 <body>
@@ -608,24 +639,24 @@
                     </div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="lat-input">위도 (LAT)</label>
-                            <input type="text" id="lat-input" placeholder="소수점 6자리까지 입력">
+                            <label for="lat_input">위도 (LAT)</label>
+                            <input type="text" id="lat_input" placeholder="소수점 6자리까지 입력">
                         </div>
                         <div class="form-group">
-                            <label for="lon-input">경도 (LON)</label>
-                            <input type="text" id="lon-input" placeholder="소수점 6자리까지 입력">
+                            <label for="lon_input">경도 (LON)</label>
+                            <input type="text" id="lon_input" placeholder="소수점 6자리까지 입력">
                         </div>
                         <div class="form-group">
-                            <label for="cog-input">COG</label>
-                            <input type="text" id="cog-input">
+                            <label for="cog_input">COG</label>
+                            <input type="text" id="cog_input">
                         </div>
                         <div class="form-group">
-                            <label for="heading-input">HEADING</label>
-                            <input type="text" id="heading-input">
+                            <label for="heading_input">HEADING</label>
+                            <input type="text" id="heading_input">
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">검색</button>
+                        <button type="submit" class="btn btn-primary" id="search">검색</button>
                         <button type="reset" class="btn btn-secondary">초기화</button>
                     </div>
                 </form>

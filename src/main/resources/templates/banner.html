@@ -414,7 +414,7 @@
       }
     }
   </style>
-  <script src="banner.js" defer></script>
+  <script src="banner.js" th:src="@{/js/banner.js}" defer></script>
 </head>
 
 <body>
@@ -426,7 +426,7 @@
           <a th:href="@{/user/join}">회원가입</a>
         </div>
         <button class="lang-switcher" aria-label="Language switcher">
-          <img th:src="@{./images/bannerImages/I226_321_162_213.svg}" alt="Language icon">
+          <img th:src="@{/images/bannerImages/I226_321_162_213.svg}" alt="Language icon">
         </button>
       </div>
       <div class="header-main">
