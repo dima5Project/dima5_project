@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    mapboxgl.accessToken = 'pk.eyJ1IjoieW9oaSIsImEiOiJjbWRrYm1lcG4weWU5Mm1vbmJlY3MzeTBoIn0.Zf8ePNNwYUwVe7sITbx9Ew';
-
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
+    console.log("✅ map.js 로딩됨");
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
         center: [126.9780, 37.5665], // 서울 좌표 (예시)
         zoom: 4
+
     });
 
     // 마커 테스트

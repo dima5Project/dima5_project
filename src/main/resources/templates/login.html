@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/static/css/login.css}">
+  <link rel="stylesheet" th:href="@{./css/login.css}">
 
-  <script src="../static/js/login.js" defer></script>
+  <script src="./js/login.js" defer></script>
   <style id="sections-styles">
     /* CSS for section section:login */
     .login-page {
@@ -177,6 +178,7 @@
         padding: 0;
         align-items: flex-start;
       }
+
       .login-container {
         max-width: 100%;
         height: 100vh;
@@ -185,25 +187,30 @@
         padding: 40px 20px;
         justify-content: center;
       }
+
       .logo-text {
         font-size: 26px;
       }
+
       .form-label {
         font-size: 18px;
       }
+
       .form-input::placeholder,
       .error-message,
       .form-link,
       .signup-prompt {
         font-size: 16px;
       }
+
       .login-button {
         font-size: 18px;
       }
     }
   </style>
-    
+
 </head>
+
 <body>
   <section id="section-login">
     <main class="login-page">
@@ -248,4 +255,5 @@
     </main>
   </section>
 </body>
+
 </html>

@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dima.dima5_project.dto.PredictUserDTO;
 
 @Entity
 @Table(name = "predict_user")
@@ -43,4 +44,16 @@ public class PredictUserEntity {
 
     @Column(name = "user_role")
     private String userRole;
+
+    public static PredictUserEntity toEntity(PredictUserDTO predictUserDTO) {
+        return PredictUserEntity.builder()
+                .userSeq(predictUserDTO.getUserSeq())
+                .userName(predictUserDTO.getUserName())
+                .userId(predictUserDTO.getUserId())
+                .userPwd(predictUserDTO.getUserPwd())
+                .userEmail(predictUserDTO.getUserEmail())
+                .userType(predictUserDTO.getUserType())
+                .userRole(predictUserDTO.getUserRole())
+                .build();
+    }
 }

@@ -28,7 +28,7 @@ public class UserService {
         log.info("회원가입 처리되는지?: {}", userDTO.toString());
 
         // 해당 아이디가 있는지 체크
-        boolean isExistUser = repository.existsById(userDTO.getUserId());
+        boolean isExistUser = repository.existsByUserId(userDTO.getUserId());
         if (isExistUser)
             return false; // 이것은 if의 return문
 
@@ -49,7 +49,7 @@ public class UserService {
      * @param
      */
     public PredictUserDTO selectOne(String userId) {
-        Optional<PredictUserEntity> temp = repository.findById(userId);
+        Optional<PredictUserEntity> temp = repository.findByUserId(userId);
         PredictUserDTO dto = null;
 
         if (temp.isPresent()) {

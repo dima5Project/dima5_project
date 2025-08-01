@@ -18,7 +18,7 @@
 
     <!-- 직접 만든 전역 CSS
      전체 레이아웃, 폰트, 마진 등 공통 스타일 넣는 곳 -->
-    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="./css/map.css">
 
     <!-- Mapbox CSS 지도 UI 스타일 적용
      줌 버튼, 로딩 스피너, 지도 로고 등에 필요-->
@@ -29,7 +29,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
     <!-- 사용자 정의 지도 생성 스크립트 -->
-    <script defer src="js/map.js"></script>
+    <script defer src="/js/map.js"></script>
 
     <style>
         #map {
@@ -454,7 +454,8 @@
         .map-background {
             position: absolute;
             inset: 0;
-            /* In a real app, a map library like Leaflet or Mapbox would render here */
+            height: 100%;
+            /* 실제 map에서 사용하는 부분과ㅠ 높이 동일하게 설정해야 함 */
         }
 
         .map-marker,
@@ -563,7 +564,7 @@
             /* This section is empty as per the design. */
         }
     </style>
-    <script src="js/global.js" defer></script>
+    <script src="js/map.js" defer></script>
 </head>
 
 <body>
@@ -574,7 +575,8 @@
                 <a href="#">회원가입</a>
             </div>
             <button class="lang-switcher">
-                <img src="images/predictImages/I420_901_162_213.svg" alt="Language">
+                <img src="/images/PortPredictImages/I420_901_162_213.svg"
+                    th:src="@{/images/PortPredictImages/I420_901_162_213.svg}" alt="Language">
             </button>
         </div>
         <div class="main-navigation">
@@ -595,11 +597,13 @@
             <div class="sidebar-container">
                 <form class="sidebar-form">
                     <div class="form-group">
-                        <label for="timepoint-select">시점 선택 <img src="images/predictImages/I420_957_190_584.svg"
-                                alt="info" class="info-icon"></label>
+                        <img for="timepoint-select">시점 선택 <img src="/images/PortPredictImages/I420_957_190_584.svg"
+                            th:src="@{/images/PortPredictImages/I420_957_190_584.svg}" alt="info"
+                            class="info-icon"></label>
                         <div class="custom-select">
                             <span>선 택</span>
-                            <img src="images/predictImages/I420_961_139_246.svg" alt="dropdown arrow">
+                            <img src="/images/PortPredictImages/I420_961_139_246.svg"
+                                th:src="@{/images/PortPredictImages/I420_961_139_246.svg}" alt="dropdown arrow">
                         </div>
                     </div>
                     <div class="form-grid">
@@ -637,7 +641,8 @@
                                     <span class="code">KRBUS</span>
                                     <span class="name">한국 / 부산</span>
                                 </div>
-                                <img src="images/predictImages/420_935.svg" alt="arrow" class="route-arrow">
+                                <img src="/images/PortPredictImages/420_935.svg"
+                                    th:src="@{/images/PortPredictImages/420_935.svg}" alt="arrow" class="route-arrow">
                                 <div class="location">
                                     <span class="code-primary">CNSHA</span>
                                     <span class="name">중국 / 상하이</span>
@@ -655,7 +660,8 @@
                                     <span class="code">KRBUS</span>
                                     <span class="name">한국 / 부산</span>
                                 </div>
-                                <img src="images/predictImages/420_950.svg" alt="arrow" class="route-arrow">
+                                <img src="/images/PortPredictImages/420_950.svg"
+                                    th:src="@{/images/PortPredictImages/420_950.svg}" alt="arrow" class="route-arrow">
                                 <div class="location">
                                     <span class="code-primary">HKHKG</span>
                                     <span class="name">홍콩 / 홍콩</span>
@@ -665,17 +671,21 @@
                         </article>
                     </div>
                     <div class="custom-scrollbar">
-                        <img src="images/predictImages/420_963.svg" alt="scroll up">
+                        <img src="/images/PortPredictImages/420_963.svg"
+                            th:src="@{/images/PortPredictImages/420_963.svg}" alt="scroll up">
                         <div class="scrollbar-thumb"></div>
-                        <img src="images/predictImages/420_965.svg" alt="scroll down"
+                        <img src="/images/PortPredictImages/420_965.svg"
+                            th:src="@{/images/PortPredictImages/420_965.svg}" alt="scroll down"
                             style="transform: rotate(-180deg);">
                     </div>
                 </div>
 
                 <div class="alias-section">
-                    <img src="images/predictImages/420_967.svg" class="alias-bg" alt="">
+                    <img src="/images/PortPredictImages/420_967.svg" th:src="@{/images/PortPredictImages/420_967.svg}"
+                        class="alias-bg" alt="">
                     <form class="alias-form">
-                        <label for="alias-input">별칭 <img src="images/predictImages/I420_968_328_417.svg" alt="info"
+                        <label for="alias-input">별칭 <img src="/images/PortPredictImages/I420_968_328_417.svg"
+                                th:src="@{/images/PortPredictImages/I420_968_328_417.svg}" alt="info"
                                 class="info-icon"></label>
                         <input type="text" id="alias-input" placeholder="별칭 또는 선박명">
                         <button type="submit" class="btn btn-primary">저장</button>
@@ -683,7 +693,8 @@
                 </div>
             </div>
             <button class="sidebar-toggle">
-                <img src="images/predictImages/420_917.svg" alt="toggle sidebar">
+                <img src="/images/PortPredictImages/420_917.svg" th:src="@{/images/PortPredictImages/420_917.svg}"
+                    alt="toggle sidebar">
             </button>
         </aside>
 
@@ -692,22 +703,26 @@
                 <div id="map"></div>
             </div>
             <div class="map-marker" style="left: 903px; top: 253px;">
-                <img src="images/predictImages/420_907.svg" alt="map marker">
+                <img src="/images/PortPredictImages/420_907.svg" th:src="@{/images/PortPredictImages/420_907.svg}"
+                    alt="map marker">
                 <span>KRBUS</span>
             </div>
             <div class="map-marker" style="left: 580px; top: 820px;">
-                <img src="images/predictImages/420_904.svg" alt="map marker">
+                <img src="/images/PortPredictImages/420_904.svg" th:src="@{/images/PortPredictImages/420_904.svg}"
+                    alt="map marker">
                 <div class="marker-label">
                     Top - 1 71.8%<br>CNSHA
                 </div>
             </div>
             <div class="map-ship-marker" style="left: 756px; top: 485px;">
-                <img src="images/predictImages/420_910.svg" alt="ship position">
+                <img src="/images/PortPredictImages/420_910.svg" th:src="@{/images/PortPredictImages/420_910.svg}"
+                    alt="ship position">
             </div>
             <div class="map-popup" style="left: 623px; top: 899px;">
                 <div class="popup-header">
                     <span>CNSHA</span>
-                    <img src="images/predictImages/420_978.svg" alt="weather icon">
+                    <img src="/images/PortPredictImages/420_978.svg" th:src="@{/images/PortPredictImages/420_978.svg}"
+                        alt="weather icon">
                 </div>
                 <div class="popup-body">
                     환율<br>목적항 부가정보 내용<br>날씨 정보
@@ -715,10 +730,12 @@
             </div>
             <div class="map-controls">
                 <button class="map-control-btn">
-                    <img src="images/predictImages/420_981.svg" alt="map outline">
+                    <img src="/images/PortPredictImages/420_981.svg" th:src="@{/images/PortPredictImages/420_981.svg}"
+                        alt="map outline">
                 </button>
                 <button class="faq-btn">
-                    <img src="images/predictImages/420_983.svg" alt="FAQ">
+                    <img src="/images/PortPredictImages/420_983.svg" th:src="@{/images/PortPredictImages/420_983.svg}"
+                        alt="FAQ">
                 </button>
             </div>
         </div>

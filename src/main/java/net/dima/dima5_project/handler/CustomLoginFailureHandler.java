@@ -9,8 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class CustomLoginFailureHandler implements AuthenticationFailureHandler{
-    
+public class CustomLoginFailureHandler implements
+        AuthenticationFailureHandler {
+
     @Override
     public void onAuthenticationFailure(
             HttpServletRequest request,
@@ -24,5 +25,5 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler{
         // 로그인 페이지로 포워딩 (리다이렉트도 가능함)
         request.getRequestDispatcher("/login").forward(request, response);
     }
-    
+
 }
