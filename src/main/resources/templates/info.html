@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>항구 부가정보</title>
+    <link rel="stylesheet" href="/css/port_info.css" />
+</head>
+
+<body>
+    <h1>항구 부가정보 (Thymeleaf)</h1>
+
+    <div class="slider">
+        <div class="port-card" th:each="port : ${portList}">
+            <h3 th:text="${port.portName} + ' (' + ${port.portId} + ')'"></h3>
+            <p><strong>국가:</strong> <span th:text="${port.country}"></span></p>
+
+            <hr>
+            <p><strong>현재 온도:</strong> <span th:text="${port.weather.temperature}"></span></p>
+            <img th:src="'https://openweathermap.org/img/wn/' + ${port.weather.icon} + '@2x.png'" alt="날씨 아이콘"
+                width="60" height="60" />
+
+            <hr>
+            <p><strong>정박 선박 수:</strong> <span th:text="${port.shipsInPort}"></span></p>
+            <p><strong>입항 예정:</strong> <span th:text="${port.expectedShips}"></span></p>
+
+            <hr>
+            <h4>환율 정보</h4>
+            <div class="exchange-box" th:each="ex : ${port.exchanges}">
+                <p><strong th:text="${ex.currencyName + ' (' + ex.currency + ')'}"></strong></p>
+                <p>기준가: <span th:text="${ex.baseRate}"></span></p>
+                <p>전일대비: <span th:text="${ex.exchangeRateChange}"></span></p>
+                <p>살 때: <span th:text="${ex.buyRate}"></span></p>
+                <p>팔 때: <span th:text="${ex.sellRate}"></span></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

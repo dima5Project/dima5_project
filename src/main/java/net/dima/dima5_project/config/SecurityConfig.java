@@ -36,12 +36,11 @@ public class SecurityConfig {
                                                 "/user/confirmId",
                                                 "/news/main",
                                                 "/api/port/**",
-
                                                 "/mypage/**",
-                                                "/images/**", // static/../ 안의 하위 디렉토리 접근 가능하도록
-                                                "/js/**",
-                                                "/css/**")
-                                .permitAll() // 모든 사람들에게 주어지는 경로
+                                                "/images/**",
+                                                "/css/**",
+                                                "/api/info/**" // static/../ 안의 하위 디렉토리 접근 가능하도록
+                                ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
                                 .anyRequest().authenticated() // 가장 마지막에. 기타 다른 경로는 로그인해야 접근 가능
