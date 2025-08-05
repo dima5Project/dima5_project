@@ -1,78 +1,82 @@
 package net.dima.dima5_project.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dima.dima5_project.dto.PortInfoResponseDTO.ExchangeDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.RequiredArgsConstructor;
-import net.dima.dima5_project.dto.PortInfoResponseDTO.ExchangeDTO;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ExchangeService {
 
-    @Value("${exchange.api.url}")
-    private String apiUrl;
-
-    @Value("${exchange.api.authkey}")
-    private String apiKey;
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    private final List<String> targetCurrencies = List.of(
-            "USD", "HKD", "JPY(100)", "CNH", "RUB", "VND", "PHP", "TWD");
+    private static final String API_URL = "https://api.frankfurter.app/latest";
+    private static final String BASE = "USD";
+    private static final String[] SYMBOLS = { "USD", "HKD", "JPY", "CNY", "RUB", "VND", "PHP", "TWD" };
 
     public List<ExchangeDTO> getExchangeInfoList() {
-        String url = apiUrl + "?authkey=" + apiKey + "&data=AP01";
+        RestTemplate restTemplate = new RestTemplate();
 
-        List<ExchangeDTO> resultList = new ArrayList<>();
+        // symbols 파라미터 구성
+        String symbolsParam = String.join(",", SYMBOLS);
+
+        // URL 완성
+        String url = String.format("%s?base=%s&symbols=%s", API_URL, BASE, symbolsParam);
+        log.info("📌 Frankfurter API 호출: {}", url);
 
         try {
-            // User-Agent 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("User-Agent", "Mozilla/5.0");
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+            // API 응답 받기
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            Map<String, Object> responseBody = response.getBody();
 
-            // exchange()를 사용해 API 호출
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    String.class);
+            String date = (String) responseBody.get("date");
+            Map<String, Double> rates = (Map<String, Double>) responseBody.get("rates");
 
-            String json = response.getBody();
-            JSONArray jsonArr = new JSONArray(json);
+            // DTO 리스트 구성
+            List<ExchangeDTO> result = new ArrayList<>();
 
-            for (int i = 0; i < jsonArr.length(); i++) {
-                JSONObject obj = jsonArr.getJSONObject(i);
-                String curUnit = obj.getString("cur_unit");
+            for (String currency : SYMBOLS) {
+                Double rate = rates.get(currency);
+                if (rate == null)
+                    continue;
 
-                if (targetCurrencies.contains(curUnit)) {
-                    resultList.add(new ExchangeDTO(
-                            curUnit,
-                            obj.getString("cur_nm"), // 통화 이름
-                            obj.getString("date"), // 기준 시각
-                            obj.getString("deal_bas_r"), // 기준 환율
-                            obj.getString("sign") + obj.getString("chnge"), // 전일 대비
-                            obj.getString("tts"), // 살 때 (고객이 사는 가격)
-                            obj.getString("ttb") // 팔 때 (고객이 파는 가격)
-                    ));
-                }
+                ExchangeDTO dto = new ExchangeDTO();
+                dto.setCurrency(currency);
+                dto.setCurrencyName(getCurrencyName(currency)); // 필요 시 한글명 매핑
+                dto.setCurrentTime(date);
+                dto.setBaseRate(String.valueOf(rate));
+                dto.setExchangeRateChange("정보 없음");
+                dto.setBuyRate("정보 없음");
+                dto.setSellRate("정보 없음");
+
+                result.add(dto);
             }
 
+            return result;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("❌ Frankfurter API 호출 중 오류 발생", e);
+            return Collections.emptyList();
         }
+    }
 
-        return resultList;
+    private String getCurrencyName(String code) {
+        return switch (code) {
+            case "USD" -> "미국 달러";
+            case "HKD" -> "홍콩 달러";
+            case "JPY" -> "일본 엔";
+            case "CNY" -> "중국 위안";
+            case "RUB" -> "러시아 루블";
+            case "VND" -> "베트남 동";
+            case "PHP" -> "필리핀 페소";
+            case "TWD" -> "대만 달러";
+            default -> code;
+        };
     }
 }

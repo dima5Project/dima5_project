@@ -20,16 +20,15 @@ public class PortNameDTO {
     private String countryNameJp;
     private String portNameJp;
 
-
     public static PortNameDTO toDTO(PortNameEntity portNameEntity) {
         return PortNameDTO.builder()
-            .portId(portNameEntity.getPortId())
-            .countryNameKr(portNameEntity.getCountryNameKr())
-            .portNameKr(portNameEntity.getPortNameKr())
-            .countryNameEn(portNameEntity.getCountryNameEn())
-            .portNameEn(portNameEntity.getPortNameEn())
-            .countryNameJp(portNameEntity.getCountryNameJp())
-            .portNameJp(portNameEntity.getPortNameJp())
-            .build();
+                .portId(portNameEntity.getPortId())
+                .countryNameKr(portNameEntity.getCountryNameKr())
+                .portNameKr(portNameEntity.getPortNameKr())
+                .countryNameEn(portNameEntity.getCountryNameEn())
+                .portNameEn(portNameEntity.getPortNameEn())
+                .countryNameJp(portNameEntity.getCountryNameJp())
+                .portNameJp(portNameEntity.getPortNameJp())
+                .build();
     }
 }

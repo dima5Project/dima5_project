@@ -147,4 +147,16 @@ CREATE TABLE IF NOT EXISTS port_pso
 SELECT * FROM port_pso;
 COMMIT;
 
+-- 7. 부가정보
+CREATE TABLE port_docking (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp DATETIME NOT NULL,
+    port_name VARCHAR(10) NOT NULL,
+    expected_ships INT,
+    ships_in_port INT
+);
+
+SELECT * FROM predict_result_save;
+COMMIT;
+
 -- DELETE FROM port_pso;

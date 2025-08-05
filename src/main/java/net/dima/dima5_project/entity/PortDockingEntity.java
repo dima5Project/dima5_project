@@ -22,8 +22,8 @@ public class PortDockingEntity {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
-    @Column(name = "port_name")
-    private String portName;
+    @Column(name = "port_id")
+    private String portId;
 
     @Column(name = "expected_ships")
     private Integer expectedShips;

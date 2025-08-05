@@ -28,9 +28,8 @@ public class WeatherService {
      * @return WeatherDTO
      */
     public WeatherDTO getWeatherInfo(String portName, double lat, double lon) {
-        String url = String.format(
-                "%s?lat=%.6f&lon=%.6f&units=metric&lang=kr&appid=%s",
-                apiUrl, lat, lon, apiKey);
+        String url = apiUrl + "?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey
+                + "&units=metric&lang=kr";
 
         try {
             String response = restTemplate.getForObject(url, String.class);

@@ -20,6 +20,9 @@ public class PortInfoResponseDTO {
     private List<ExchangeDTO> exchanges; // 여러 국가 통화에 대한 환율 리스트
     private WeatherDTO weather; // 날씨 정보
 
+    private double locLat;
+    private double locLon;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

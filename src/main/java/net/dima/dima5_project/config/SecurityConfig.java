@@ -39,7 +39,10 @@ public class SecurityConfig {
                                                 "/mypage/**",
                                                 "/images/**",
                                                 "/css/**",
-                                                "/api/info/**" // static/../ 안의 하위 디렉토리 접근 가능하도록
+                                                "/js/**",
+                                                "/api/info/**",
+                                                "/api/**",
+                                                "/port/info"// static/../ 안의 하위 디렉토리 접근 가능하도록
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
