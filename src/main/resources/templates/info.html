@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>부가정보 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/info.css}">
+    <script th:src="@{/js/info.js}" defer></script>
+    <style>
+        .card-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+            min-height: 250px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .card-item {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            margin-left: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>부가정보 페이지</h1>
+
+    <!-- 국가/항구 선택 -->
+    <div>
+        <label>국가:
+            <select id="countrySelect" onchange="updatePortsByCountry(this.value)">
+                <option value="">국가 선택</option>
+                <option value="">중국촘</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+                <option value="">국가 선택</option>
+
+            </select>
+        </label>
+
+        <label>항구:
+            <select id="portSelect">
+                <option value="">항구 선택</option>
+            </select>
+        </label>
+
+        <button onclick="searchPortInfo()">검색</button>
+    </div>
+
+    <hr>
+
+    <!-- 카드 3개 고정 영역 -->
+    <div class="card-container">
+        <div class="info-card" id="weatherCard"></div>
+        <div class="info-card" id="exchangeCard"></div>
+        <div class="info-card" id="dockingCard"></div>
+    </div>
+
+    <!-- 포트 이름 JSON 주입 -->
+    <script th:inline="javascript">
+        const portNameList = /*[[${portNameListJson}]]*/[];
+        console.log("✅ portNameList:", portNameList);
+    </script>
+
+</body>
+
+</html>

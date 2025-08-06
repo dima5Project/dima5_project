@@ -24,13 +24,8 @@ public class PortInfoPageController {
     @GetMapping("/port/info")
     public String showPortInfoPage(Model model) throws JsonProcessingException {
         List<PortNameDTO> portNameList = portInfoService.getAllPortNames();
-
-        // JSON 문자열로 변환
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(portNameList);
-
-        // 모델에 담기
-        model.addAttribute("portNameListJson", json);
-        return "info"; // templates/info.html
+        String json = new ObjectMapper().writeValueAsString(portNameList);
+        model.addAttribute("portNameListJson", json); // 반드시 있음!
+        return "info";
     }
 }

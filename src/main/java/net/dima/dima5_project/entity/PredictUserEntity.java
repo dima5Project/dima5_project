@@ -25,7 +25,7 @@ public class PredictUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_seq")
-    private Integer userSeq;
+    private Long userSeq;
 
     @Column(name = "user_name")
     private String userName;
