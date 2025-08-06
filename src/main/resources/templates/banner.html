@@ -7,141 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <script defer th:src="@{/js/header.js}"></script>
   <title>부3갈매기 - Next Port, First Insight</title>
   <link rel="stylesheet" href="./css/banner.css">
 
   <style id="sections-styles">
-    /* CSS for section section:header */
-    .site-header {
-      position: absolute;
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 10;
-      padding-top: 25px;
-    }
-
-    .header-container {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 0 80px;
-    }
-
-    .header-top-bar {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 25px;
-      margin-bottom: 25px;
-    }
-
-    .user-auth-links {
-      display: flex;
-      gap: 25px;
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--color-secondary);
-    }
-
-    .lang-switcher {
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    .header-main {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: var(--color-background-header);
-      height: 90px;
-      padding: 0 60px;
-      border-radius: 5px;
-    }
-
-    .logo {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--color-primary);
-    }
-
-    .main-nav ul {
-      display: flex;
-      gap: 120px;
-    }
-
-    .main-nav a {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--color-text-dark);
-      position: relative;
-      padding-bottom: 8px;
-    }
-
-    .main-nav a::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 3px;
-      background-color: var(--color-primary);
-      transition: width 0.3s ease;
-    }
-
-    .main-nav a:hover::after {
-      width: 100%;
-    }
-
-    @media (max-width: 1200px) {
-      .header-container {
-        padding: 0 40px;
-      }
-
-      .main-nav ul {
-        gap: 60px;
-      }
-    }
-
-    @media (max-width: 992px) {
-      .header-main {
-        padding: 0 30px;
-      }
-
-      .main-nav ul {
-        gap: 30px;
-      }
-
-      .main-nav a {
-        font-size: 18px;
-      }
-
-      .logo {
-        font-size: 28px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .header-main {
-        flex-direction: column;
-        height: auto;
-        padding: 20px;
-      }
-
-      .main-nav ul {
-        flex-direction: column;
-        gap: 20px;
-        align-items: center;
-        margin-top: 20px;
-      }
-
-      .header-top-bar {
-        padding: 0 20px;
-      }
-    }
-
     /* CSS for section section:hero */
     .hero-section {
       display: flex;
@@ -418,31 +290,7 @@
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="header-container">
-      <div class="header-top-bar">
-        <div class="user-auth-links">
-          <a th:href="@{/user/login}">로그인</a>
-          <a th:href="@{/user/join}">회원가입</a>
-        </div>
-        <button class="lang-switcher" aria-label="Language switcher">
-          <img th:src="@{/images/bannerImages/I226_321_162_213.svg}" alt="Language icon">
-        </button>
-      </div>
-      <div class="header-main">
-        <a href="#hero" class="logo">부3갈매기</a>
-        <nav class="main-nav">
-          <ul>
-            <li><a href="#features">소개</a></li>
-            <li><a href="#features">차항지 예측</a></li>
-            <li><a href="#features">부가정보</a></li>
-            <li><a th:href="@{/news/main}">뉴스룸</a></li>
-            <li><a href="#">문의</a></li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </header>
+  <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
 
   <section id="hero" class="hero-section">
     <div class="hero-content">

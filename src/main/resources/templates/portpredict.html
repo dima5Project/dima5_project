@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
     <title>부3갈매기 - 차항지 예측</title>
 
     <!-- 구글 폰트 연결용 preconnect
@@ -599,30 +602,8 @@
 </head>
 
 <body>
-    <header class="site-header">
-        <div class="header-top-bar">
-            <div class="user-auth">
-                <a href="#">로그인</a>
-                <a href="#">회원가입</a>
-            </div>
-            <button class="lang-switcher">
-                <img src="/images/PortPredictImages/I420_901_162_213.svg"
-                    th:src="@{/images/PortPredictImages/I420_901_162_213.svg}" alt="Language">
-            </button>
-        </div>
-        <div class="main-navigation">
-            <a href="#" class="logo">부3갈매기</a>
-            <nav class="nav-menu">
-                <ul>
-                    <li><a href="#section-intro">소개</a></li>
-                    <li><a href="#section-prediction">차항지 예측</a></li>
-                    <li><a href="#section-info">부가정보</a></li>
-                    <li><a href="#section-news">뉴스룸</a></li>
-                    <li><a href="#section-contact">문의</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+
     <main class="main-content" id="section-prediction">
         <aside class="sidebar">
             <div class="sidebar-container">

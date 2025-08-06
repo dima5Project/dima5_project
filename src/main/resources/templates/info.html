@@ -3,6 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
     <title>부가정보 페이지</title>
     <link rel="stylesheet" th:href="@{/css/info.css}">
     <script th:src="@{/js/info.js}" defer></script>
@@ -48,6 +52,8 @@
 </head>
 
 <body>
+    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+
     <h1>부가정보 페이지</h1>
 
     <!-- 국가/항구 선택 -->

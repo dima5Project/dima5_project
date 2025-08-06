@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
     <title>부3갈매기 - 뉴스룸</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,8 +62,10 @@
             justify-content: flex-end;
             align-items: center;
             gap: 25px;
-            padding-top: 31.5px; /* 2679.5 - 2648 */
-            padding-bottom: 26.5px; /* 2726 - (2679.5 + 20) */
+            padding-top: 31.5px;
+            /* 2679.5 - 2648 */
+            padding-bottom: 26.5px;
+            /* 2726 - (2679.5 + 20) */
         }
 
         .user-actions {
@@ -81,7 +87,7 @@
             color: var(--text-dark);
             height: 90px;
         }
-        
+
         .main-nav-container {
             display: flex;
             justify-content: space-between;
@@ -114,7 +120,8 @@
             align-items: center;
             text-align: center;
             flex-grow: 1;
-            padding-top: 90px; /* To push content below header */
+            padding-top: 90px;
+            /* To push content below header */
         }
 
         .hero-subtitle {
@@ -147,7 +154,7 @@
             font-size: 20px;
             color: var(--text-dark);
         }
-        
+
         .search-input::placeholder {
             color: var(--text-dark);
             opacity: 0.3;
@@ -166,7 +173,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .search-button img {
             width: 28px;
             height: 28px;
@@ -174,37 +181,43 @@
 
         @media (max-width: 1200px) {
             .nav-links {
-            gap: 60px;
+                gap: 60px;
             }
         }
 
         @media (max-width: 992px) {
             .nav-links {
-            display: none; /* Simple hide for mobile, would need JS for hamburger */
+                display: none;
+                /* Simple hide for mobile, would need JS for hamburger */
             }
+
             .main-nav-container {
-            justify-content: center;
+                justify-content: center;
             }
         }
-        
+
         @media (max-width: 768px) {
             .hero-section {
-            height: auto;
-            min-height: 550px;
-            padding-bottom: 40px;
+                height: auto;
+                min-height: 550px;
+                padding-bottom: 40px;
             }
+
             .top-bar {
-            padding-top: 15px;
-            padding-bottom: 15px;
+                padding-top: 15px;
+                padding-bottom: 15px;
             }
+
             .hero-content {
-            padding-top: 120px;
+                padding-top: 120px;
             }
+
             .hero-title {
-            font-size: 24px;
+                font-size: 24px;
             }
+
             .hero-subtitle {
-            font-size: 18px;
+                font-size: 18px;
             }
         }
 
@@ -225,7 +238,7 @@
             box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        
+
         .news-card:hover {
             transform: translateY(-5px);
             box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.1);
@@ -246,7 +259,8 @@
             font-size: 20px;
             font-weight: 700;
             line-height: 1.2;
-            height: 48px; /* 2 lines */
+            height: 48px;
+            /* 2 lines */
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
@@ -264,7 +278,7 @@
         .source {
             font-weight: 500;
         }
-        
+
         .source::after {
             content: ' ' attr(data-source);
             font-weight: 400;
@@ -273,7 +287,7 @@
         .date {
             font-weight: 500;
         }
-        
+
         .date::after {
             content: ' ' attr(data-date);
             font-weight: 400;
@@ -301,7 +315,7 @@
             font-weight: 400;
             transition: background-color 0.2s, color 0.2s;
         }
-        
+
         .page-link:hover,
         .page-link.active {
             background-color: var(--brand-primary);
@@ -315,7 +329,7 @@
             width: 30px;
             height: 30px;
         }
-        
+
         .page-link-arrow img {
             width: 7.5px;
             height: 12.5px;
@@ -323,20 +337,22 @@
 
         @media (max-width: 992px) {
             .news-grid {
-            grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
+
             .news-section {
-            padding-top: 80px;
+                padding-top: 80px;
             }
         }
 
         @media (max-width: 768px) {
             .news-grid {
-            grid-template-columns: 1fr;
+                grid-template-columns: 1fr;
             }
+
             .news-section {
-            padding-top: 60px;
-            padding-bottom: 50px;
+                padding-top: 60px;
+                padding-bottom: 50px;
             }
         }
 
@@ -377,72 +393,54 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            padding-top: 10px; /* Visual alignment */
+            padding-top: 10px;
+            /* Visual alignment */
         }
-        
+
         .footer-social a {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
+
         .footer-social img {
             transition: opacity 0.2s;
         }
-        
+
         .footer-social a:hover img {
             opacity: 0.8;
         }
 
         @media (max-width: 768px) {
             .site-footer {
-            padding: 40px 0;
+                padding: 40px 0;
             }
+
             .footer-container {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 30px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 30px;
             }
+
             .footer-social {
-            padding-top: 0;
+                padding-top: 0;
             }
         }
     </style>
     <script src="../static/js/news.js" defer></script>
 </head>
+
 <body>
+    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+
     <section id="section-hero" class="hero-section">
         <div class="hero-background">
-            <img src="images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png"  
-                th:src="@{/images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png}" 
+            <img src="images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png"
+                th:src="@{/images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png}"
                 alt="Port background with cranes and cargo ships." class="hero-bg-image">
             <div class="hero-bg-overlay"></div>
         </div>
-
-        <header class="site-header">
-            <div class="top-bar container">
-            <div class="user-actions">
-                <a th:href="@{/user/login}">로그인</a>
-                <a th:href="@{/user/join}">회원가입</a>
-            </div>
-            <button class="lang-btn" aria-label="Change language">
-                <img th:src="@{/images/newsImages/I373_639_162_213.svg}" alt="Language icon">
-            </button>
-            </div>
-            <nav class="main-nav">
-            <div class="main-nav-container container">
-                <a href="/" class="logo">부3갈매기</a>
-                <ul class="nav-links">
-                    <li><a href="#">소개</a></li>
-                    <li><a href="#">차항지 예측</a></li>
-                    <li><a href="#">부가정보</a></li>
-                    <li><a th:href="@{/news/main}" class="active">뉴스룸</a></li>
-                    <li><a href="#">문의</a></li>
-                </ul>
-            </div>
-            </nav>
-        </header>
 
         <div class="hero-content">
             <p class="hero-subtitle">For Those Who Move the World</p>
@@ -451,7 +449,7 @@
                 <input type="search" class="search-input" placeholder="검색어를 입력하세요">
                 <button type="submit" class="search-button" aria-label="Search">
                     <img th:src="@{/images/newsImages/316_422.svg}" alt="Search Icon">
-            </button>
+                </button>
             </form>
         </div>
     </section>
@@ -462,18 +460,18 @@
 
                 <article class="news-card" th:each="news: ${newsList}">
                     <a th:href="${news.newsUrl}" target="_blank">
-                    <img th:src="${news.imgUrl}" class="news-card-image">
-                    <div class="news-card-content">
-                        <h3 class="news-card-title" th:text="${news.newsTitle}">뉴스 제목</h3>
-                        <div class="news-card-meta">
-                            <span class="source" th:text="${news.publisher}">출처</span>
-                            <span class="date" th:datetime="${news.registerDate}" 
-                                th:text="'등록일 ' + ${#temporals.format(news.registerDate, 'yyyy/MM/dd')}">등록일</span>
+                        <img th:src="${news.imgUrl}" class="news-card-image">
+                        <div class="news-card-content">
+                            <h3 class="news-card-title" th:text="${news.newsTitle}">뉴스 제목</h3>
+                            <div class="news-card-meta">
+                                <span class="source" th:text="${news.publisher}">출처</span>
+                                <span class="date" th:datetime="${news.registerDate}"
+                                    th:text="'등록일 ' + ${#temporals.format(news.registerDate, 'yyyy/MM/dd')}">등록일</span>
+                            </div>
                         </div>
-                    </div>
                     </a>
                 </article>
-                
+
                 <!--
                 <article class="news-card">
                     <a href="#">
@@ -584,7 +582,7 @@
                     </a>
                 </article>
                 -->
-                
+
             </div>
             <nav class="pagination" aria-label="Page navigation">
                 <ul class="pagination-list">
@@ -603,26 +601,27 @@
         </div>
     </section>
     <footer id="section-footer" class="site-footer">
-    <div class="container footer-container">
-        <div class="footer-info">
-            <p class="footer-logo">부3갈매기</p>
-            <address class="footer-address">
-                서울 강남구 삼성동 159 무역아카데미<br>
-                wta.kdt3@gmail.com
-            </address>
+        <div class="container footer-container">
+            <div class="footer-info">
+                <p class="footer-logo">부3갈매기</p>
+                <address class="footer-address">
+                    서울 강남구 삼성동 159 무역아카데미<br>
+                    wta.kdt3@gmail.com
+                </address>
+            </div>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook">
+                    <img th:src="@{/images/newsImages/381_859.svg}" alt="Facebook icon">
+                </a>
+                <a href="#" aria-label="YouTube">
+                    <img th:src="@{/images/newsImages/381_860.svg}" alt="YouTube icon">
+                </a>
+                <a href="#" aria-label="Instagram">
+                    <img th:src="@{/images/newsImages/381_863.svg}" alt="Instagram icon">
+                </a>
+            </div>
         </div>
-        <div class="footer-social">
-            <a href="#" aria-label="Facebook">
-                <img th:src="@{/images/newsImages/381_859.svg}" alt="Facebook icon">
-            </a>
-            <a href="#" aria-label="YouTube">
-                <img th:src="@{/images/newsImages/381_860.svg}" alt="YouTube icon">
-            </a>
-            <a href="#" aria-label="Instagram">
-                <img th:src="@{/images/newsImages/381_863.svg}" alt="Instagram icon">
-            </a>
-        </div>
-    </div>
     </footer>
 </body>
+
 </html>
