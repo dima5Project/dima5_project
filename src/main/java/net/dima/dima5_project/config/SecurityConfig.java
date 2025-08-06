@@ -36,12 +36,15 @@ public class SecurityConfig {
                                                 "/user/confirmId",
                                                 "/news/main",
                                                 "/api/port/**",
-
                                                 "/mypage/**",
-                                                "/images/**", // static/../ 안의 하위 디렉토리 접근 가능하도록
+                                                "/images/**",
+                                                "/css/**",
                                                 "/js/**",
-                                                "/css/**")
-                                .permitAll() // 모든 사람들에게 주어지는 경로
+                                                "/api/info/**",
+                                                "/api/**",
+                                                "/port/info",
+                                                "/ask/**" // static/../ 안의 하위 디렉토리 접근 가능하도록
+                                ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
                                 .anyRequest().authenticated() // 가장 마지막에. 기타 다른 경로는 로그인해야 접근 가능
@@ -57,7 +60,7 @@ public class SecurityConfig {
                                                                                        // 받아서 처리(컨트롤러에서는 처리하지 않음)
                                                 .usernameParameter("userId") // security가 사용하는 파라미터 대신 개발자가 설정한 파라미터 사용
                                                 .passwordParameter("userPwd")
-                                                // .defaultSuccessUrl("/") // 로그인 성공 시 루트로 이동
+                                                .defaultSuccessUrl("/") // 로그인 성공 시 루트로 이동
                                                 // .successHandler(loginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
                                                 // .failureHandler(loginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
                                                 // .failureUrl("/login?error=true") // 로그인 에러가 나면 다시 로그인 페이지로 이동, 에러를

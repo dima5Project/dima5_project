@@ -7,7 +7,7 @@ import net.dima.dima5_project.entity.PredictUserEntity;
 @Data
 @Builder
 public class PredictUserDTO {
-    private Integer userSeq;
+    private Long userSeq;
     private String userName;
     private String userId;
     private String userPwd;
