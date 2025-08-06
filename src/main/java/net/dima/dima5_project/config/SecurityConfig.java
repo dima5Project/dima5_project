@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 import net.dima.dima5_project.handler.CustomLogoutSuccessHandler;
 
 @Configuration // 이 파일이 설정파일임을 알려주는 어노테이션
-@EnableWebSecurity // 이 웹프로젝트가 스트링 시큐리티로 관리됨을 알려주는 어노테이션
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 

@@ -1,0 +1,227 @@
+/* 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+/* 네비게이션 바 전체 외곽. 초기 상태 */
+.navbar {
+    background-color: #fcfcfd;
+    height: 68px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-width: 1280px;
+    margin: 20px auto 0 auto;
+    transition: all 0.3s ease;
+}
+
+.navbar.expended {
+    max-width: 100%;
+    margin-top: 0;
+    border-radius: 0;
+    background-color: #fcfcfd;
+    transition: all 0.3s ease;
+}
+
+/* 네비게이션 바 내부 컨테이너. 확장된 상태 */
+.navbar_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 30px;
+}
+
+/* 왼쪽 로고 */
+.navbar_logo img {
+    height: 40px;
+}
+
+/* 가운데 메뉴 영역 */
+.navbar_menu {
+    display: flex;
+    gap: 80px;
+}
+
+/* 각 메뉴 항목 (드롭다운의 위치 기준) */
+.nav_item {
+    position: relative;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 각 메뉴 항목 (예: 소개, 예측 서비스 등) */
+.nav_link {
+    font-weight: bold;
+    font-size: 18px;
+    color: black;
+    text-decoration: none;
+    padding: 10px;
+    transition: color 0.2s ease-in-out;
+}
+
+/* hover 시 파란색으로 변경 */
+.nav_link:hover {
+    color: #013895;
+}
+
+/* 서브메뉴 (기본적으로 숨김) */
+.submenu_wrapper {
+    position: absolute;
+    display: none;
+    z-index: 1000;
+    /* 드롭다운 위치 조정 */
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* 서브메뉴 드롭다운 박스 */
+.submenu {
+    background-color: #fcfcfd;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.04);
+    padding: 10px 0;
+    min-width: 80px;
+    width: auto;
+    box-sizing: border-box;
+}
+
+/* 서브메뉴 항목 */
+.submenu_item {
+    display: block;
+    text-align: center;
+    padding: 8px 16px;
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+/* hover 시 서브메뉴 배경색 변경 */
+.submenu_item:hover {
+    background-color: #f0f0f0;
+}
+
+/* hover 시 서브메뉴 보여줌 */
+.nav_item.has_submenu:hover>.submenu_wrapper {
+    display: block;
+}
+
+/* 파란 점 */
+.submenu_wrapper .circle {
+    width: 12px;
+    height: 12px;
+    background-color: #013895;
+    border-radius: 50%;
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+}
+
+/* 오른쪽 영역 (로그인 + 언어 선택) */
+.navbar_right {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+    height: 68px;
+}
+
+/* 로그인/회원가입 버튼 */
+.login_button {
+    background-color: #013895;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.user-icon {
+    color: white;
+}
+
+.login_button:hover {
+    background-color: #337ed9;
+    width: 80px;
+    height: 30px;
+    display: flex;
+}
+
+/* 언어 선택 드롭다운 (버튼의 기준) */
+.lang_selector {
+    position: relative;
+    /* 드롭다운 위치 기준 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 100%;
+    cursor: pointer;
+}
+
+.lang_icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.arrow_icon {
+    transition: transform 0.3s ease;
+    width: 12px;
+    height: 12px;
+}
+
+/* 언어 선택 드롭다운 박스에만 개별적인 스타일 적용 */
+#submenu_lang_wrapper {
+    /* 언어 선택 드롭다운의 너비를 작게 설정 */
+    width: 80px;
+}
+
+/* 열렸을 때 화살표 회전 */
+.lang_selector.active .arrow_icon {
+    transform: rotate(180deg);
+}
+
+/* 드롭다운 항목 */
+.lang_item {
+    display: block;
+    padding: 8px 16px;
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+    text-align: center;
+}
+
+/* hover 효과 */
+.lang_item:hover {
+    background-color: #f0f0f0;
+}
+
+/* 언어 드롭다운을 보이게 */
+.lang_selector.active>.submenu_wrapper {
+    display: block;
+}

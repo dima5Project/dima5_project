@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
+    <title>Navigation(배너)</title>
+</head>
+
+<body>
+    <nav th:fragment="bu3_navigation" class="navbar">
+        <div class="navbar_container">
+
+            <div class="navbar_logo">
+                <a href="/">
+                    <img th:src="@{/images/header/logo.png}" alt="로고">
+                </a>
+            </div>
+
+            <div class="navbar_menu">
+                <div class="nav_item has_submenu" data-submenu-id="submenu_intro_wrapper">
+                    <a href="/introduce" class="nav_link">소개</a>
+                    <div id="submenu_intro_wrapper" class="submenu_wrapper">
+                        <div class="circle" aria-hidden="true"></div>
+                        <div id="submenu_intro" class="submenu">
+                            <a href="/introduceService" class="submenu_item">서비스 소개</a>
+                            <a href="/introduceTeam" class="submenu_item">팀 소개</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav_item">
+                    <a href="/portpredict" class="nav_link">예측 서비스</a>
+                </div>
+
+                <div class="nav_item has_submenu" data-submenu-id="submenu_info_wrapper">
+                    <a href="/info" class="nav_link">부가정보</a>
+                    <div id="submenu_info_wrapper" class="submenu_wrapper">
+                        <div class="circle" aria-hidden="true"></div>
+                        <div id="submenu_info" class="submenu">
+                            <a href="/info" class="submenu_item">날씨</a>
+                            <a href="/info" class="submenu_item">환율</a>
+                            <a href="/info" class="submenu_item">기타 정보</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav_item">
+                    <a href="/news" class="nav_link">뉴스룸</a>
+                </div>
+                <div class="nav_item">
+                    <a href="/contact" class="nav_link">문의</a>
+                </div>
+            </div>
+
+            <div class="navbar_right">
+                <a href="/login" class="login_button">로그인</a>
+                <div id="langToggle" class="lang_selector">
+                    <img th:src="@{/images/header/lang_icon.png}" alt="언어 선택" class="lang_icon">
+                    <img th:src="@{/images/header/arrow_down.svg}" alt="화살표" class="arrow_icon">
+                    <div id="submenu_lang_wrapper" class="submenu_wrapper">
+                        <div id="submenu_lang" class="submenu">
+                            <div class="lang_item">KOR</div>
+                            <div class="lang_item">ENG</div>
+                            <div class="lang_item">JPN</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+
+</html>
