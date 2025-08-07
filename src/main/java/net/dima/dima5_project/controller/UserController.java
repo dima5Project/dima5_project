@@ -56,7 +56,7 @@ public class UserController {
      * 중복 아이디각 존재하는지 확인
      */
     @ResponseBody
-    @PostMapping("/confirmId")
+    @PostMapping("/user/confirmId")
     public boolean confirmId(@RequestParam(name = "userId") String userId) {
         PredictUserDTO dto = userService.selectOne(userId);
 
