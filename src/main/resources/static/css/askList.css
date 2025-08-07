@@ -1,41 +1,141 @@
-:root {
-    --primary-color: #4483ef;
-    --dark-blue-color: #0f1035;
-    --brand-color: #013895;
-    --white-color: #ffffff;
-    --black-color: #000000;
-    --grey-text-color: #6a6a6a;
-    --light-grey-bg: #fafafa;
-    --border-color-light: #cccccc;
-    --border-color-dark: #333333;
-}
+/* 문의게시판 css */
+
+@charset "UTF-8";
 
 body {
-    margin: 0;
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--white-color);
-    color: var(--black-color);
+    margin: 0;
+    background-color: #fff;
+    color: #000;
 }
 
-* {
-    box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.page-container {
-    max-width: 1440px;
-    margin: 0 auto;
-    background-color: var(--white-color);
-    overflow: hidden;
-}
-
-.content-wrapper {
-    width: 100%;
-    max-width: 1288px;
-    margin: 0 auto;
+main {
+    max-width: 1040px;
+    margin: 60px auto;
+    /*위아래 60px 여백, 좌우는 auto → 가로 가운데 정렬*/
     padding: 0 20px;
+    /*콘텐츠 내부 좌우 여백 20px*/
+}
+
+.qna-header-bg {
+    background-color: #0f1035;
+    /* 진한 파랑 */
+    height: 350px;
+    /* 고정 높이 */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.qna-header {
+    padding-top: 20vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+}
+
+.qna-header h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.qna-header p {
+    font-size: 16px;
+    color: #ddd;
+}
+
+.qna-category {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.qna-category button {
+    padding: 8px 16px;
+    margin: 5px;
+    border: 1px solid #aaa;
+    background: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.qna-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.qna-search input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.qna-search select {
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.search-btn {
+    background-color: #3366cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.qna-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.qna-table th,
+.qna-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+}
+
+.answered {
+    color: #0066ff;
+    margin-left: 5px;
+}
+
+.pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.page-btn {
+    background: none;
+    border: none;
+    margin: 0 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.write-btn-wrap {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.write-btn {
+    background-color: #3366cc;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
