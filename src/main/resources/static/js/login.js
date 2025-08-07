@@ -81,9 +81,5 @@ loginForm.addEventListener('submit', (event) => {
     // 버튼 비활성화 상태에는 폼 제출 막음
     if (!isFormValid) {
         event.preventDefault();
-    } else { // 버튼 활성화시 폼 제출 가능
-        alert('로그인 시도!');
-        // If you want to actually submit the form, you would do:
-        // document.querySelector('.login_form').submit();
     }
 });
