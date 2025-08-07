@@ -1,6 +1,5 @@
 package net.dima.dima5_project.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,50 +11,45 @@ import lombok.NoArgsConstructor;
 import net.dima.dima5_project.dto.PortNameDTO;
 
 @Entity
-@Table(name="port_name")
+@Table(name = "port_name")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PortNameEntity {
-    
+
     @Id
-    @Column(name="port_id")
+    @Column(name = "port_id")
     private String portId;
 
-    @Column(name="country_name_kr")
+    @Column(name = "country_name_kr")
     private String countryNameKr;
 
-    @Column(name="port_name_kr")
+    @Column(name = "port_name_kr")
     private String portNameKr;
 
-    @Column(name="country_name_en")
+    @Column(name = "country_name_en")
     private String countryNameEn;
 
-    @Column(name="port_name_en")
+    @Column(name = "port_name_en")
     private String portNameEn;
 
-    @Column(name="country_name_jp")
+    @Column(name = "country_name_jp")
     private String countryNameJp;
 
-    @Column(name="port_name_jp")
+    @Column(name = "port_name_jp")
     private String portNameJp;
-
-    
 
     public static PortNameEntity toEntity(PortNameDTO portNameDTO) {
         return PortNameEntity.builder()
-            .portId(portNameDTO.getPortId())
-            .countryNameKr(portNameDTO.getCountryNameKr())
-            .portNameEn(portNameDTO.getPortNameKr())
-            .countryNameEn(portNameDTO.getCountryNameEn())
-            .portNameJp(portNameDTO.getPortNameJp())
-            .countryNameJp(portNameDTO.getCountryNameJp())
-            .portNameKr(portNameDTO.getPortNameKr())
-            .build();
+                .portId(portNameDTO.getPortId())
+                .portNameKr(portNameDTO.getPortNameKr())
+                .countryNameKr(portNameDTO.getCountryNameKr())
+                .portNameEn(portNameDTO.getPortNameEn())
+                .countryNameEn(portNameDTO.getCountryNameEn())
+                .portNameJp(portNameDTO.getPortNameJp())
+                .countryNameJp(portNameDTO.getCountryNameJp())
+                .build();
     }
-
-
-    
 
 }

@@ -31,23 +31,23 @@ public class SecurityConfig {
                                 "/",
                                 "/lang",
                                 "/main",
-                                "/intro/init",
-                                "/predict/**", // 나중에 주석 처리
+                                "/intro/**",
+                                "/predict/**", // 차항지 예측 - 나중에 삭제
                                 "/user/**",
                                 "/news/**",
                                 "/api/port/**",
-                                "/mypage/**", // 나중에 주석 처리
+                                "/mypage/**", // 마이페이지 - 나중에 삭제
                                 "/images/**",
                                 "/css/**",
                                 "/js/**",
-                                "/api/info/**",
+                                "/api/info/**", // 부가정보 - 나중에 삭제
                                 "/api/**",
                                 "/port/info",
-                                "/ask/**" 
+                                "/ask/**"  // 문의 - 나중에 삭제
                 ).permitAll() // 모든 사람들에게 주어지는 경로
                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
-                .anyRequest().authenticated() // 가장 마지막에. 기타 다른 경로는 로그인해야 접근 가능
+                .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 
                 // security가 제공하는 기본 폼을 사용하지 않고, 개발자가 만든 폼 사용

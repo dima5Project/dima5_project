@@ -2,398 +2,91 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/header.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" th:href="@{/css/footer.css}">
   <script defer th:src="@{/js/header.js}"></script>
-  <title>부3갈매기 - Next Port, First Insight</title>
-  <link rel="stylesheet" href="./css/banner.css">
 
-  <style id="sections-styles">
-    /* CSS for section section:hero */
-    .hero-section {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-image: url('images/cda50cdccd81cc3b58cc73a4d85d29dfac9a3eab.png');
-      background-size: cover;
-      background-position: center;
-      padding: 150px 20px 50px;
-      text-align: center;
-      position: relative;
-    }
+  <title>부3갈매기</title>
 
-    .hero-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 60px;
-      color: var(--color-text-dark);
-    }
-
-    .hero-text {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-    }
-
-    .hero-text .subtitle {
-      font-size: 40px;
-      font-weight: 400;
-      line-height: 1.2;
-      margin: 0;
-    }
-
-    .hero-text .title {
-      font-size: 64px;
-      font-weight: 700;
-      line-height: 1.25;
-      margin: 0;
-    }
-
-    .cta-button {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      width: 260px;
-      height: 70px;
-      background-color: var(--color-secondary);
-      color: var(--color-text-light);
-      font-size: 26px;
-      font-weight: 500;
-      border-radius: 10px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .cta-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .scroll-indicator {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      color: var(--color-secondary);
-      font-size: 24px;
-      font-weight: 350;
-    }
-
-    @media (max-width: 768px) {
-      .hero-text .subtitle {
-        font-size: 28px;
-      }
-
-      .hero-text .title {
-        font-size: 48px;
-      }
-
-      .cta-button {
-        width: 220px;
-        height: 60px;
-        font-size: 22px;
-      }
-    }
-
-    /* CSS for section section:features */
-    .features-section {
-      padding: 100px 0;
-      background-color: var(--color-background-light);
-    }
-
-    .service-intro {
-      text-align: center;
-      max-width: 1030px;
-      margin: 0 auto 80px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 29px;
-    }
-
-    .separator-line {
-      width: 70px;
-      height: 2px;
-      background-color: var(--color-primary);
-    }
-
-    .service-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--color-primary);
-      margin: 0;
-    }
-
-    .service-description {
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 1.5;
-      color: var(--color-secondary);
-      margin: 0;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 40px;
-    }
-
-    .feature-card {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-image-link {
-      display: block;
-      overflow: hidden;
-    }
-
-    .card-image-wrapper {
-      position: relative;
-    }
-
-    .card-image {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .card-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(30, 30, 30, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    .discover-more {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--color-text-light);
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .discover-more img {
-      transform: rotate(-180deg);
-    }
-
-    .feature-card:hover .card-overlay {
-      opacity: 1;
-    }
-
-    .feature-card:hover .card-image {
-      transform: scale(1.05);
-    }
-
-    .card-content {
-      padding: 24px;
-    }
-
-    .card-content h3 {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-    }
-
-    .card-content p {
-      font-size: 14px;
-      font-weight: 700;
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    @media (max-width: 992px) {
-      .features-grid {
-        grid-template-columns: 1fr;
-        gap: 50px;
-      }
-
-      .service-description {
-        font-size: 20px;
-      }
-    }
-
-    /* CSS for section section:footer */
-    .site-footer {
-      background-color: var(--color-secondary);
-      color: var(--color-text-light);
-      padding: 57px 0;
-    }
-
-    .footer-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-info {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .footer-logo {
-      font-size: 24px;
-      font-weight: 400;
-      margin: 0;
-    }
-
-    .footer-info address {
-      font-style: normal;
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 1.5;
-    }
-
-    .footer-socials {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .footer-socials a img {
-      width: 25px;
-      height: 25px;
-      transition: opacity 0.2s ease;
-    }
-
-    .footer-socials a:hover {
-      opacity: 0.8;
-    }
-
-    @media (max-width: 768px) {
-      .footer-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 40px;
-      }
-    }
-  </style>
-  <script src="banner.js" th:src="@{/js/banner.js}" defer></script>
+  <link rel="stylesheet" th:href="@{/css/banner.css}">
+  <script th:src="@{/js/banner.js}" defer></script>
+  </script>
 </head>
 
 <body>
   <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+  <div class="container">
 
-  <section id="hero" class="hero-section">
-    <div class="hero-content">
+    <!-- Hero Section -->
+    <section class="hero">
+      <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image">
       <div class="hero-text">
-        <p class="subtitle">Next Port, First Insight.</p>
-        <h1 class="title">차기 정박항을 예측하는<br>가장 똑똑한 방법</h1>
+        <p class="subheading">Next Port, First Insight.</p>
+        <h1>차기 정박항을 예측하는<br />가장 똑똑한 방법</h1>
+        <a href="/predict/init">
+          <button class="start-btn">시작하기</button>
+        </a>
+        <div class="scroll-indicator">
+          SCROLL
+          <img th:src="@{/images/bannerImages/arrow_scroll.png}" alt="스크롤 화살표" class="scroll-arrow">
+        </div>
       </div>
-      <a href="/predict/init" class="cta-button">시작하기</a>
-      <a href="#features" class="scroll-indicator">
-        <span>SCROLL</span>
-        <img th:src="@{/static/images/bannerImages/226_305.svg}" alt="Scroll down arrow">
-      </a>
-    </div>
-  </section>
-  <section id="features" class="features-section">
-    <div class="container">
-      <div class="service-intro">
-        <div class="separator-line"></div>
-        <h2 class="service-title">OUR SERVICE</h2>
-        <p class="service-description">
-          “ AIS 데이터를 기반으로 선박의 차기 정박항 정보를 실시간 제공하며, 물류 예측과 전략 수립을 위한 통합 의사결정 지원 도구로 활용할 수 있습니다. 더불어 예측 정보를 기반으로 항만 스케줄
-          조정, 하역 준비, 통관 업무, 물류 운용 최적화 등을 지원합니다. “
-        </p>
-      </div>
-      <div class="features-grid">
-        <article class="feature-card">
-          <!--merged image-->
-          <a href="#" class="card-image-link">
-            <div class="card-image-wrapper">
-              <img th:src="@{static/images/bannerImages/522304ab9efa94349e1f5f67ed1a97fd603949d7.png}" alt="팀 소개"
-                class="card-image">
-              <div class="card-overlay">
-                <div class="discover-more">
-                  <span>DISCOVER MORE</span>
-                  <img th:src="@{static/images/bannerImages/I226_336_109_149.svg}" alt="arrow icon">
-                </div>
-              </div>
-            </div>
-          </a>
-          <div class="card-content">
-            <h3>팀 소개</h3>
-            <p>무역아카데미의 팀 부3갈매기에 대해 자세히 알아보세요.</p>
+    </section>
+
+    <!-- Service Section -->
+    <section class="service">
+      <h3>OUR SERVICE</h3>
+      <p class="service-description">
+        “ AIS 데이터를 기반으로 선박의 차기 정박항 정보를 실시간 제공합니다,<br />
+        물류 예측과 전략 수립을 위한 통합 의사결정 지원 도구로 활용할 수 있습니다.<br />
+        더불어 예측 정보를 기반으로 항만 스케줄 조정, 하역 준비, 통관 업무, 물류 운용 최적화 등을 지원합니다. ”
+      </p>
+
+      <div class="service-cards">
+        <div class="card" id="team-card">
+          <div class="card-image-wrapper">
+            <a href="/intro/team">
+              <img th:src="@{/images/bannerImages/card1.png}" alt="팀 소개">
+            </a>
+            <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-        </article>
-        <article class="feature-card">
-          <!--merged image-->
-          <a href="#" class="card-image-link">
-            <div class="card-image-wrapper">
-              <img th:src="@{static/images/bannerImages/bb6eacb258d486f429aa122b5cc7b97a9a5087ae.png}" alt="서비스 소개"
-                class="card-image">
-              <div class="card-overlay">
-                <div class="discover-more">
-                  <span>DISCOVER MORE</span>
-                  <img th:src="@{static/images/bannerImages/I226_337_109_128.svg}" alt="arrow icon">
-                </div>
-              </div>
-            </div>
-          </a>
-          <div class="card-content">
-            <h3>서비스 소개</h3>
-            <p>우리 팀의 차항지 예측 서비스를 안내합니다.</p>
+          
+          <h4>팀 소개</h4>
+          <p>팀 부3갈매기에 대해 자세히 알아보세요.</p>
+        </div>
+        <div class="card" id="service-card">
+          <div class="card-image-wrapper">
+            <a href="/intro/service"> <!--intro 페이지가 있으면 실행됨-->
+              <img th:src="@{/images/bannerImages/card2.png}" alt="서비스 소개">
+            </a>
+            <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-        </article>
-        <article class="feature-card">
-          <!--merged image-->
-          <a href="#" class="card-image-link">
-            <div class="card-image-wrapper">
-              <img th:src="@{static/images/bannerImages/5a92fd1da190f48f53dc756e94db8b560af0add9.png}" alt="뉴스룸"
-                class="card-image">
-              <div class="card-overlay">
-                <div class="discover-more">
-                  <span>DISCOVER MORE</span>
-                  <img th:src="@{static/images/bannerImages/I226_338_109_170.svg}" alt="arrow icon">
-                </div>
-              </div>
-            </div>
-          </a>
-          <div class="card-content">
-            <h3>뉴스룸</h3>
-            <p>물류 관련 최신 동향 및 이슈들을 확인해보세요.</p>
+          
+          <h4>서비스 소개</h4>
+          <p>우리 팀의 핵심 서비스를 안내합니다.</p>
+        </div>
+        <div class="card" id="news-card">
+          <div class="card-image-wrapper">
+            <a href="/news/main">
+              <img th:src="@{/images/bannerImages/card3.png}" alt="뉴스룸">
+            </a>
+            <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-        </article>
+          
+          <h4>뉴스룸</h4>
+          <p>물류 관련 최신 이슈들을 확인하세요.</p>
+        </div>
       </div>
-    </div>
-  </section>
-  <footer id="footer" class="site-footer">
-    <div class="container footer-container">
-      <div class="footer-info">
-        <h4 class="footer-logo">부3갈매기</h4>
-        <address>
-          서울 강남구 삼성동 159 무역아카데미<br>
-          wta.kdt3@gmail.com
-        </address>
-      </div>
-      <div class="footer-socials">
-        <a href="#" aria-label="Facebook"><img th:src="@{static/images/bannerImages/226_327.svg}"
-            alt="Facebook icon"></a>
-        <a href="#" aria-label="YouTube"><img th:src="@{static/images/bannerImages/226_328.svg}" alt="YouTube icon"></a>
-        <a href="#" aria-label="Instagram"><img th:src="@{static/images/bannerImages/226_331.svg}"
-            alt="Instagram icon"></a>
-      </div>
-    </div>
-  </footer>
+    </section>
+
+  </div>
+  <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 </body>
 
 </html>
