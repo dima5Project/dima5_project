@@ -13,6 +13,7 @@ import net.dima.dima5_project.entity.PortDockingEntity;
 @AllArgsConstructor
 @Builder
 public class PortDockingDTO {
+    private Long dockingId;
     private String portId;
     private Integer shipsInPort;
     private Integer expectedShips;
@@ -20,6 +21,7 @@ public class PortDockingDTO {
 
     public static PortDockingDTO toDTO(PortDockingEntity portDockingEntity) {
         return PortDockingDTO.builder()
+                .dockingId(portDockingEntity.getDockingId())
                 .portId(portDockingEntity.getPortId())
                 .shipsInPort(portDockingEntity.getShipsInPort())
                 .expectedShips(portDockingEntity.getExpectedShips())
