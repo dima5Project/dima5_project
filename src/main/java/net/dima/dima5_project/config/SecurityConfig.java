@@ -32,15 +32,15 @@ public class SecurityConfig {
                                 "/lang",
                                 "/main",
                                 "/intro/init",
-                                "/predict/**", // 나중에 주석 처리
+                                "/predict/**", // 나중에 삭제
                                 "/user/**",
                                 "/news/**",
                                 "/api/port/**",
-                                "/mypage/**", // 나중에 주석 처리
+                                "/mypage/**", // 마이페이지 - 나중에 삭제
                                 "/images/**",
                                 "/css/**",
                                 "/js/**",
-                                "/api/info/**",
+                                "/api/info/**", // 부가정보 - 나중에 삭제
                                 "/api/**",
                                 "/port/info",
                                 "/ask/**" 
