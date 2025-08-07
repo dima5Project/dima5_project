@@ -22,40 +22,19 @@
 <body>
   <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
   <div class="container">
-<<<<<<< HEAD
 
-
-=======
-    
-    <!-- Navigation 
-    <nav class="navbar">
-      <div class="navbar-background"></div>
-      <div class="logo">부3갈매기</div>
-      <ul class="nav-links">
-        <li>소개</li>
-        <li>차항지 예측</li>
-        <li>부가정보</li>
-        <li>뉴스룸</li>
-        <li>문의</li>
-      </ul>
-      <div class="auth-links">
-        <a href="#">로그인</a> |
-        <a href="#">회원가입</a>
-      </div>
-    </nav>
-    -->
-    
->>>>>>> 9ffcf930f6bf2d1961f951e66a45e3dbad8fb0a2
     <!-- Hero Section -->
     <section class="hero">
-      <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image" />
+      <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image">
       <div class="hero-text">
         <p class="subheading">Next Port, First Insight.</p>
         <h1>차기 정박항을 예측하는<br />가장 똑똑한 방법</h1>
-        <button class="start-btn">시작하기</button>
+        <a href="/predict/init">
+          <button class="start-btn">시작하기</button>
+        </a>
         <div class="scroll-indicator">
           SCROLL
-          <img th:src="@{/images/bannerImages/arrow_scroll.png}" alt="스크롤 화살표" class="scroll-arrow" />
+          <img th:src="@{/images/bannerImages/arrow_scroll.png}" alt="스크롤 화살표" class="scroll-arrow">
         </div>
       </div>
     </section>
@@ -72,25 +51,34 @@
       <div class="service-cards">
         <div class="card" id="team-card">
           <div class="card-image-wrapper">
-            <img th:src="@{/images/bannerImages/card1.png}" alt="팀 소개" />
+            <a href="/intro/team">
+              <img th:src="@{/images/bannerImages/card1.png}" alt="팀 소개">
+            </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
+          
           <h4>팀 소개</h4>
           <p>팀 부3갈매기에 대해 자세히 알아보세요.</p>
         </div>
         <div class="card" id="service-card">
           <div class="card-image-wrapper">
-            <img th:src="@{/images/bannerImages/card2.png}" alt="서비스 소개" />
+            <a href="/intro/service"> <!--intro 페이지가 있으면 실행됨-->
+              <img th:src="@{/images/bannerImages/card2.png}" alt="서비스 소개">
+            </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
+          
           <h4>서비스 소개</h4>
           <p>우리 팀의 핵심 서비스를 안내합니다.</p>
         </div>
         <div class="card" id="news-card">
           <div class="card-image-wrapper">
-            <img th:src="@{/images/bannerImages/card3.png}" alt="뉴스룸" />
+            <a href="/news/main">
+              <img th:src="@{/images/bannerImages/card3.png}" alt="뉴스룸">
+            </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
+          
           <h4>뉴스룸</h4>
           <p>물류 관련 최신 이슈들을 확인하세요.</p>
         </div>
