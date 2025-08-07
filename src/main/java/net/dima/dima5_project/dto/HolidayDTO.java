@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class HolidayDTO {
-    private Long holiday_seq;
+    private Long holidaySeq;
     private String holidayDate;
-    private String holidayName;
     private String countryNameKr;
-
+    private String holidayName;
 }

@@ -16,7 +16,8 @@ public class PortDockingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "dockingId")
+    private Long dockingId;;
 
     // 데이터 기준 시각 (최신값만 뽑는 데 유용)
     @Column(name = "timestamp")
