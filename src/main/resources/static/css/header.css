@@ -15,7 +15,7 @@ body {
 /* 네비게이션 바 전체 외곽. 초기 상태 */
 .navbar {
     background-color: #fcfcfd;
-    height: 68px;
+    height: 80px;
     width: 100%;
     position: fixed;
     top: 0;
