@@ -1,66 +1,248 @@
 /*banner.html 과 연동되는 CSS*/
 
-:root {
-  --color-primary: #013895;
-  --color-secondary: #0f1035;
-  --color-text-dark: #000000;
-  --color-text-light: #ffffff;
-  --color-background-light: #ffffff;
-  --color-background-header: #fcfcfd;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
+/* 기본 세팅 */
+html,
 body {
+  width: 100%;
+  height: 100%;
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   font-family: 'Noto Sans KR', sans-serif;
-  background-color: var(--color-background-light);
-  color: var(--color-text-dark);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #000;
 }
 
 .container {
   width: 100%;
   max-width: 1440px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 80px;
-  padding-right: 80px;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
+/* 히어로 섹션 */
+.hero {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  height: 1024px;
 }
 
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
+.hero-image {
+  width: 100%;
+  height: 1024px;
+  /*화면 높이에 맞춤 : height : 100vh*/
+  object-fit: cover;
   display: block;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .container {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
+.hero-text {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  text-align: center;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
+.hero-text .subheading {
+  font-size: 34px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.hero-text h1 {
+  color: #000;
+  font-size: 56px;
+  font-weight: 700;
+  margin: 0 0 100px 0;
+  line-height: 1.5;
+}
+
+
+.start-btn {
+  display: flex;
+  /*버튼 안의 내용을 정렬할 수 있도록 flexbox 레이아웃을 사용하겠다는 의미야. (보통 아이콘+텍스트 같이 들어갈 때 유용)*/
+  justify-content: center;
+  /*버튼 안의 내용을 가로 방향으로 가운데 정렬*/
+  align-items: center;
+  /*버튼 안의 내용을 세로 방향으로 가운데 정렬*/
+  width: 200px;
+  height: 60px;
+  gap: 10px;
+  flex-shrink: 0;
+  /*버튼이 다른 요소 때문에 너비가 줄어들지 않도록 고정*/
+  background-color: #0F1035;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 22px;
+  cursor: pointer;
+  /*버튼 위에 마우스를 올리면 손가락 모양 포인터가 나오게 설정*/
+  margin: 0 auto;
+}
+
+.start-btn:hover {
+  background: #013895;
+}
+
+.scroll-indicator {
+  margin-top: 16px;
+  font-size: 20px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.scroll-indicator img.scroll-arrow {
+  width: 24px;
+  height: auto;
+  transform: rotate(90deg);
+  cursor: pointer;
+}
+
+/* 서비스 섹션 */
+.service {
+  padding: 40px 60px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.service h3 {
+  color: #1a2c77;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.service-description {
+  font-size: 20px;
+  color: #222;
+  line-height: 1.7;
+  max-width: 1000px;
+  margin: 0 auto 60px;
+  align-self: stretch;
+  line-height: normal;
+}
+
+.service-cards {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+
+.card {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  /*카드 내부 요소들(이미지, 텍스트 등)을 수직 방향(위→아래) 으로 배치*/
+  align-items: center;
+  /*텍스트 가운데 정렬*/
+  position: relative;
+  /*이 카드를 기준으로 자식 요소를 절대 위치(position: absolute)로 배치할 수 있게 함. → DISCOVER MORE>텍스트 위치 설정에서 중요하게 작용함 !*/
+  overflow: hidden;
+  /*카드 영역을 벗어난 요소는 잘려서 보이지 않게 처리, hover시 벗어난 이미지 안보이게*/
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  /*transform 속성이 바뀔 때 0.3초 동안 부드럽게(ease) 변화, filter 속성이 바뀔 때도 부드럽게 변화*/
+}
+
+.card-image-wrapper {
+  position: relative;
+  /* overlay-text 기준점 */
+  width: 100%;
+  overflow: hidden;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+  /*1.05배 확대*/
+  filter: brightness(70%);
+}
+
+.card h4 {
+  font-size: 18px;
+  margin: 10px 0 6px;
+  font-weight: bold;
+}
+
+.card p {
+  font-size: 14px;
+  color: #555;
+}
+
+.card .overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /*텍스트의 기준점을 카드 가로 세로 50% 지점(가운데) 으로 설정*/
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  opacity: 0;
+  /*기본 상태에서는 투명하게 숨김.*/
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+  /*오버레이 텍스트가 이미지보다 위에 보이게 설정*/
+}
+
+.card:hover .overlay-text {
+  opacity: 1;
+  /*사용자가 .card에 마우스를 올리면 overlay-text가 나타남*/
+}
+
+/* 푸터 */
+footer {
+  background-color: #0d1033;
+  color: #fff;
+  padding: 40px 60px;
+  margin-top: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.footer-logo {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sns-icons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.sns-icons img {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  cursor: pointer;
 }
