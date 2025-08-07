@@ -31,8 +31,8 @@ public class SecurityConfig {
                                 "/",
                                 "/lang",
                                 "/main",
-                                "/intro/init",
-                                "/predict/**", // 나중에 삭제
+                                "/intro/**",
+                                "/predict/**", // 차항지 예측 - 나중에 삭제
                                 "/user/**",
                                 "/news/**",
                                 "/api/port/**",
@@ -47,7 +47,7 @@ public class SecurityConfig {
                 ).permitAll() // 모든 사람들에게 주어지는 경로
                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
-                .anyRequest().authenticated() // 가장 마지막에. 기타 다른 경로는 로그인해야 접근 가능
+                .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 
                 // security가 제공하는 기본 폼을 사용하지 않고, 개발자가 만든 폼 사용
