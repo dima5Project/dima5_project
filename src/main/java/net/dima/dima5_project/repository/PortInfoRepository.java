@@ -7,5 +7,5 @@ import net.dima.dima5_project.entity.PortInfoEntity;
 
 @Repository
 public interface PortInfoRepository extends JpaRepository<PortInfoEntity, String> {
-    PortInfoEntity findByPortId(String portId);
+
 }

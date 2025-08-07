@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dima.dima5_project.entity.PortInfoEntity;
+import net.dima.dima5_project.entity.PortNameEntity;
 
 @Data
 @AllArgsConstructor
@@ -17,4 +19,14 @@ public class PortInfoDTO {
 
     // port_name 테이블 정보 전체를 포함
     private PortNameDTO portNameInfo;
+
+    public static PortInfoDTO toDTO(PortInfoEntity infoEntity, PortNameEntity nameEntity) {
+        return PortInfoDTO.builder()
+                .portId(infoEntity.getPortId())
+                .locLat(infoEntity.getLocLat())
+                .locLon(infoEntity.getLocLon())
+                .portNameInfo(PortNameDTO.toDTO(nameEntity)) // PortNameEntity → PortNameDTO
+                .build();
+    }
+
 }

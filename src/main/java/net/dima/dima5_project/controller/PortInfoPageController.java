@@ -19,13 +19,4 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PortInfoPageController {
 
-    private final PortInfoService portInfoService;
-
-    @GetMapping("/port/info")
-    public String showPortInfoPage(Model model) throws JsonProcessingException {
-        List<PortNameDTO> portNameList = portInfoService.getAllPortNames();
-        String json = new ObjectMapper().writeValueAsString(portNameList);
-        model.addAttribute("portNameListJson", json); // 반드시 있음!
-        return "info";
-    }
 }
