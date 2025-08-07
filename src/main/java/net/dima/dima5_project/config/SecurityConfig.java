@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 "/api/info/**", // 부가정보 - 나중에 삭제
                                 "/api/**",
                                 "/port/info",
-                                "/ask/**" 
+                                "/ask/**"  // 문의 - 나중에 삭제
                 ).permitAll() // 모든 사람들에게 주어지는 경로
                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                 // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
