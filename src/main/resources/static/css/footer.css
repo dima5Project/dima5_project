@@ -1,0 +1,40 @@
+/*footer에 적용되는 css*/
+
+@charset "UTF-8";
+
+footer {
+    background-color: #0d1033;
+    color: #fff;
+    padding: 57px 80px;
+    /* 이 값은 유지 */
+    height: 214px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    /* absolute 자식 위치 기준점 */
+    box-sizing: border-box;
+}
+
+.footer-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer-logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.sns-icons {
+    position: absolute;
+    right: 80px;
+    /* 오른쪽 여백 */
+    bottom: 57px;
+    /* 하단 기준에서 57px 위로 */
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}

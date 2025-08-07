@@ -9,45 +9,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/header.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" th:href="@{/css/footer.css}">
   <script defer th:src="@{/js/header.js}"></script>
 
   <title>부3갈매기</title>
 
   <link rel="stylesheet" th:href="@{/css/banner.css}">
-  <script src=" banner.js" th:src="@{/js/banner.js}" defer>
+  <script th:src="@{/js/banner.js}" defer></script>
   </script>
 </head>
 
 <body>
   <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
   <div class="container">
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="navbar-background"></div>
-      <div class="logo">부3갈매기</div>
-      <ul class="nav-links">
-        <li>소개</li>
-        <li>차항지 예측</li>
-        <li>부가정보</li>
-        <li>뉴스룸</li>
-        <li>문의</li>
-      </ul>
-      <div class="auth-links">
-        <a href="#">로그인</a> |
-        <a href="#">회원가입</a>
-      </div>
-    </nav>
+
 
     <!-- Hero Section -->
     <section class="hero">
-      <img src="./images/main_bg.png" alt="컨테이너선" class="hero-image" />
+      <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image" />
       <div class="hero-text">
         <p class="subheading">Next Port, First Insight.</p>
         <h1>차기 정박항을 예측하는<br />가장 똑똑한 방법</h1>
         <button class="start-btn">시작하기</button>
         <div class="scroll-indicator">
           SCROLL
-          <img src="./images/arrow_scroll.png" alt="스크롤 화살표" class="scroll-arrow" />
+          <img th:src="@{/images/bannerImages/arrow_scroll.png}" alt="스크롤 화살표" class="scroll-arrow" />
         </div>
       </div>
     </section>
@@ -64,7 +50,7 @@
       <div class="service-cards">
         <div class="card" id="team-card">
           <div class="card-image-wrapper">
-            <img src="./images/card1.png" alt="팀 소개" />
+            <img th:src="@{/images/bannerImages/card1.png}" alt="팀 소개" />
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
           <h4>팀 소개</h4>
@@ -72,7 +58,7 @@
         </div>
         <div class="card" id="service-card">
           <div class="card-image-wrapper">
-            <img src="./images/card2.png" alt="서비스 소개" />
+            <img th:src="@{/images/bannerImages/card2.png}" alt="서비스 소개" />
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
           <h4>서비스 소개</h4>
@@ -80,7 +66,7 @@
         </div>
         <div class="card" id="news-card">
           <div class="card-image-wrapper">
-            <img src="./images/card3.png" alt="뉴스룸" />
+            <img th:src="@{/images/bannerImages/card3.png}" alt="뉴스룸" />
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
           <h4>뉴스룸</h4>
@@ -89,19 +75,8 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-      <div class="footer-info">
-        <div class="footer-logo">부3갈매기</div>
-        <p>서울 강남구 삼성동 159 무역아카데미<br />wta.kdi3@gmail.com</p>
-      </div>
-      <div class="sns-icons">
-        <img src="./images/facebook.svg" alt="facebook" />
-        <img src="./images/youtube 1.svg" alt="youtube" />
-        <img src="./images/instagram.svg" alt="instagram" />
-      </div>
-    </footer>
   </div>
+  <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 </body>
 
 </html>
