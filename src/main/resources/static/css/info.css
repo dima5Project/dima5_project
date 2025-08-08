@@ -1,21 +1,235 @@
-/* .card-container {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    justify-content: center;
+:root {
+    --bg: #fafafa;
+    --card: #fff;
+    --border: #e9e9ec;
+    --ink: #1e1e1e;
+    --blue: #2b6ef2;
+    --green: #15a86b;
+    --orange: #ff9f40;
+    --red: #f24646;
+    --muted: #6b7280;
 }
 
-.info-card {
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-    font-size: 15px;
+* {
+    box-sizing: border-box
 }
 
-.card-grid {
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, Segoe UI, Apple SD Gothic Neo, Roboto, Arial, AppleGothic, Malgun Gothic, sans-serif
+}
+
+.banner {
+    padding: 18px 24px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700
+}
+
+.hero {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 15px;
-} */
+    grid-template-columns: 240px 1fr;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border)
+}
+
+.hero__thumb {
+    height: 120px;
+    background: #dfe7ff;
+    border: 1px dashed #bcd;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.hero__desc {
+    display: flex;
+    align-items: center
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border)
+}
+
+.toolbar__selectors {
+    display: flex;
+    gap: 10px
+}
+
+.select {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    min-width: 220px
+}
+
+.btn {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer
+}
+
+.btn.primary {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue)
+}
+
+.btn.icon {
+    font-size: 20px;
+    width: 44px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.btn:active {
+    transform: translateY(1px)
+}
+
+.topgrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 16px 24px
+}
+
+.bottomgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 0 24px 24px
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04)
+}
+
+.card h3 {
+    margin: 0 0 10px
+}
+
+.map {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted)
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start
+}
+
+.stat__title {
+    color: var(--muted);
+    font-weight: 600
+}
+
+.stat__value {
+    font-size: 28px;
+    font-weight: 800
+}
+
+.cong__row {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.cong__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ccc;
+    border: 2px solid #ccc
+}
+
+.cong__legend {
+    margin-top: 8px;
+    color: var(--muted);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block
+}
+
+.dot--green {
+    background: var(--green)
+}
+
+.dot--orange {
+    background: var(--orange)
+}
+
+.dot--red {
+    background: var(--red)
+}
+
+.chart {
+    margin: 0 24px 16px
+}
+
+.chart-container {
+    position: relative;
+    height: 340px;
+    width: 100%
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 8px 6px
+}
+
+.calendar th {
+    color: var(--muted);
+    font-weight: 700
+}
+
+.calendar td {
+    height: 28px;
+    width: 28px;
+    text-align: center
+}
+
+.calendar .today {
+    outline: 3px solid rgba(242, 70, 70, .25);
+    border-radius: 50%
+}
+
+.calendar .holiday::after {
+    content: "•";
+    display: block;
+    color: #888;
+    margin-top: -2px;
+    font-size: 20px;
+    line-height: 8px
+}

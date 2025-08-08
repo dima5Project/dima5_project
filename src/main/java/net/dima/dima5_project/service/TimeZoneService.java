@@ -4,10 +4,14 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import net.dima.dima5_project.dto.TimeZoneDTO;
 import net.dima.dima5_project.repository.PortNameRepository;
 
 // 시차 관련 Service
@@ -15,34 +19,31 @@ import net.dima.dima5_project.repository.PortNameRepository;
 @RequiredArgsConstructor
 public class TimeZoneService {
 
-    private final PortNameRepository portNameRepository;
+    // 국가명 기준으로 TimezoneDTO 반환
+    private static final Map<String, String> TIMEZONES = Map.of(
+            "한국", "Asia/Seoul",
+            "일본", "Asia/Tokyo",
+            "중국", "Asia/Shanghai",
+            "홍콩", "Asia/Hong_Kong",
+            "대만", "Asia/Taipei",
+            "러시아", "Asia/Vladivostok",
+            "필리핀", "Asia/Manila",
+            "베트남", "Asia/Ho_Chi_Minh");
 
-    // portId로 DB에서 국가명을 꺼내오고 → 국가명으로 ZoneId를 찾아오는 과정
-    public String getCurrentTimeByCountry(String portId) {
-        // 1. portId로 PortNameEntity 조회
-        String country = portNameRepository.findById(portId)
-                .orElseThrow(() -> new RuntimeException("국가 정보 없음"))
-                .getCountryNameEn();
+    public TimeZoneDTO getTimezone(String countryName) {
+        String zoneId = TIMEZONES.getOrDefault(countryName, "UTC");
+        ZonedDateTime zoned = ZonedDateTime.now(ZoneId.of(zoneId));
 
-        // 2. 국가명 기반 타임존 매핑
-        String timezoneId = switch (country) {
-            case "South Korea" -> "Asia/Seoul";
-            case "Japan" -> "Asia/Tokyo";
-            case "China" -> "Asia/Shanghai";
-            case "Vietnam" -> "Asia/Ho_Chi_Minh";
-            case "Russia" -> "Europe/Moscow";
-            case "Philippines" -> "Asia/Manila";
-            case "Taiwan" -> "Asia/Taipei";
-            default -> "UTC"; // 기본값
-        };
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+        String currentTime = zoned.format(formatter);
+        String utcOffset = zoned.getOffset().toString(); // +09:00
+        String dayOfWeek = zoned.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN); // 요일 -> 기준 국가 바꿀수 잇음...?
 
-        // 3. 현재 시각 반환
-        try {
-            ZonedDateTime nowUtc = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime local = nowUtc.withZoneSameInstant(ZoneId.of(timezoneId));
-            return local.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        } catch (Exception e) {
-            return "알 수 없음";
-        }
+        return TimeZoneDTO.builder()
+                .countryName(countryName)
+                .currentTime(currentTime)
+                .utcOffset(utcOffset)
+                .dayOfWeek(dayOfWeek)
+                .build();
     }
 }

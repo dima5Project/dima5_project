@@ -22,7 +22,7 @@ public class HolidayService {
      * @param countryNameKr
      * @return
      */
-    private HolidayDTO getTodayHolidayByCountry(String countryNameKr) {
+    public HolidayDTO getTodayHolidayByCountry(String countryNameKr) {
         String today = LocalDate.now().toString();
         return holidayRepository.findByCountryNameKrAndHolidayDate(countryNameKr, today)
                 .map(HolidayDTO::fromEntity)
@@ -36,7 +36,7 @@ public class HolidayService {
      * @return
      */
     public List<HolidayDTO> getAllHolidaysByCountry(String countryNameKr) {
-        return holidayRepository.findByCountryNamekr(countryNameKr)
+        return holidayRepository.findByCountryNameKr(countryNameKr)
                 .stream()
                 .map(HolidayDTO::fromEntity)
                 .collect(Collectors.toList());

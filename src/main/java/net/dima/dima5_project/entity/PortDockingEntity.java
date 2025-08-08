@@ -20,8 +20,8 @@ public class PortDockingEntity {
     private Long dockingId;;
 
     // 데이터 기준 시각 (최신값만 뽑는 데 유용)
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    @Column(name = "time_stamp")
+    private LocalDateTime timeStamp;
 
     @Column(name = "port_id")
     private String portId;
@@ -29,6 +29,6 @@ public class PortDockingEntity {
     @Column(name = "expected_ships")
     private Integer expectedShips;
 
-    @Column(name = "ships_in_port")
-    private Integer shipsInPort;
+    @Column(name = "current_ships")
+    private Integer currentShips;
 }

@@ -17,15 +17,7 @@ public class WeatherService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String apiKey = "29b693ca66574e538caf98ecfb2d4722";
 
-    private final PortInfoService portInfoService; // 위경도 조회용
-
-    public WeatherDTO getWeatherByPortId(String portId) {
-        // portId로 위경도 조회
-        double lat = portInfoService.getLatitudeByPortId(portId);
-        double lon = portInfoService.getLongitudeByPortId(portId);
-
-        return getWeatherByCoords(lat, lon); // 기존 방식 그대로 사용
-    }
+    // PortInfoService 의존 제거
 
     public WeatherDTO getWeatherByCoords(double lat, double lon) {
         String url = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon +
@@ -37,13 +29,19 @@ public class WeatherService {
 
             String mainWeather = ((Map<String, Object>) ((List<?>) body.get("weather")).get(0)).get("main").toString();
             double temp = Double.parseDouble(((Map<String, Object>) body.get("main")).get("temp").toString());
-
-            // 여기부터 바람 관련 추가
             double windSpeed = Double.parseDouble(((Map<String, Object>) body.get("wind")).get("speed").toString());
             int windDeg = ((Number) ((Map<String, Object>) body.get("wind")).get("deg")).intValue();
             String windDirLabel = mapWindDegToLabel(windDeg);
-
             String emoji = mapWeatherToEmoji(mainWeather);
+
+            // 강수량
+            Double rainVolume = null;
+            if (body.containsKey("rain")) {
+                Map<String, Object> rainMap = (Map<String, Object>) body.get("rain");
+                if (rainMap.containsKey("1h")) {
+                    rainVolume = Double.parseDouble(rainMap.get("1h").toString());
+                }
+            }
 
             return WeatherDTO.builder()
                     .mainWeather(mainWeather)
@@ -52,6 +50,7 @@ public class WeatherService {
                     .windSpeed(windSpeed)
                     .windDeg(windDeg)
                     .windDirLabel(windDirLabel)
+                    .rainVolume(rainVolume)
                     .build();
 
         } catch (Exception e) {
@@ -62,6 +61,7 @@ public class WeatherService {
                     .windSpeed(0)
                     .windDeg(0)
                     .windDirLabel("정보 없음")
+                    .rainVolume(null)
                     .build();
         }
     }
@@ -78,20 +78,20 @@ public class WeatherService {
 
     private String mapWindDegToLabel(int deg) {
         if (deg >= 337.5 || deg < 22.5)
-            return "북풍";
-        else if (deg >= 22.5 && deg < 67.5)
-            return "북동풍";
-        else if (deg >= 67.5 && deg < 112.5)
-            return "동풍";
-        else if (deg >= 112.5 && deg < 157.5)
-            return "남동풍";
-        else if (deg >= 157.5 && deg < 202.5)
-            return "남풍";
-        else if (deg >= 202.5 && deg < 247.5)
-            return "남서풍";
-        else if (deg >= 247.5 && deg < 292.5)
-            return "서풍";
+            return "N";
+        else if (deg < 67.5)
+            return "NE";
+        else if (deg < 112.5)
+            return "E";
+        else if (deg < 157.5)
+            return "SE";
+        else if (deg < 202.5)
+            return "S";
+        else if (deg < 247.5)
+            return "SW";
+        else if (deg < 292.5)
+            return "W";
         else
-            return "북서풍";
+            return "NW";
     }
 }

@@ -3,99 +3,89 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-    <script defer th:src="@{/js/header.js}"></script>
-    <title>부가정보 페이지</title>
-    <link rel="stylesheet" th:href="@{/css/info.css}">
-    <script th:src="@{/js/info.js}" defer></script>
+    <title>항구 부가정보</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/info.js"></script> <!-- info.js 경로 맞게 수정 -->
+
     <style>
-        .card-container {
-            display: flex;
-            gap: 1rem;
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .select-boxes {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 200px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
             margin-top: 20px;
         }
 
-        .info-card {
-            flex: 1;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-            min-height: 250px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .card-item {
-            padding: 0.5rem;
+        .card {
             border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fdfdfd;
         }
 
-        .nav-buttons {
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-
-        button {
-            margin-left: 4px;
+        .chart-container {
+            margin-top: 40px;
         }
     </style>
 </head>
 
 <body>
-    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
 
-    <h1>부가정보 페이지</h1>
+    <h1>항구 부가정보 조회</h1>
 
-    <!-- 국가/항구 선택 -->
-    <div>
-        <label>국가:
-            <select id="countrySelect" onchange="updatePortsByCountry(this.value)">
-                <option value="">국가 선택</option>
-                <option value="">중국촘</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
-                <option value="">국가 선택</option>
+    <div class="select-boxes">
+        <select id="countrySelect">
+            <option disabled selected>국가 선택</option>
+        </select>
 
-            </select>
-        </label>
-
-        <label>항구:
-            <select id="portSelect">
-                <option value="">항구 선택</option>
-            </select>
-        </label>
-
-        <button onclick="searchPortInfo()">검색</button>
+        <select id="portSelect">
+            <option disabled selected>항구 선택</option>
+        </select>
     </div>
 
-    <hr>
+    <div class="cards-container">
+        <div class="card" id="weatherCard">
+            <h3>🌤 날씨</h3>
+            <p>국가와 항구를 선택하세요.</p>
+        </div>
 
-    <!-- 카드 3개 고정 영역 -->
-    <div class="card-container">
-        <div class="info-card" id="weatherCard"></div>
-        <div class="info-card" id="exchangeCard"></div>
-        <div class="info-card" id="dockingCard"></div>
+        <div class="card" id="timezoneCard">
+            <h3>🕓 시차</h3>
+            <p>국가를 선택하세요.</p>
+        </div>
+
+        <!-- 공휴일 카드 -->
+        <div class="info-card" id="holidayCard">
+            <h3>오늘의 공휴일</h3>
+            <div id="todayText"></div> <!-- 오늘 날짜 텍스트 -->
+            <div id="holidayCalendarContainer"></div> <!-- 달력 들어갈 부분 -->
+        </div>
+
+
+        <div class="card" id="dockingCard">
+            <h3>⚓ 혼잡도</h3>
+            <p>항구를 선택하세요.</p>
+        </div>
     </div>
 
-    <!-- 포트 이름 JSON 주입 -->
-    <script th:inline="javascript">
-        const portNameList = /*[[${portNameListJson}]]*/[];
-        console.log("✅ portNameList:", portNameList);
-    </script>
+    <div class="chart-container">
+        <canvas id="graphCanvas" width="300" height="300"></canvas>
+    </div>
 
 </body>
 

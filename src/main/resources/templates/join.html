@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
+<!doctype html>
+<html lang="ko">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원가입</title>
@@ -11,9 +11,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/join.css}">
   <script th:src="@{/js/join.js}" defer></script>
+=======
+  <meta charset="utf-8" />
+  <title>항구 부가정보 조회</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/css/info.css">
+  <script src="/js/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+>>>>>>> e3c090f23fdc14f03eb723ecf536d394979c9ee3
 </head>
-
 <body>
+<<<<<<< HEAD
   <section id="signup_section" class="page_container"> <!-- section 으로 전체 페이지 구조 감싸기. -->
 
     <header class="signup_header"> <!-- 상단 로고 영역. 홈으로 돌아가는 로고 영역 -->
@@ -125,5 +133,85 @@
   </section>
   <p> 이게 진짜 join.html임. !!!! </p>
 </body>
+=======
+  <!-- 배너 -->
+  <header class="banner">부가정보 페이지</header>
 
+  <!-- 페이지 설명 영역 -->
+  <section class="hero">
+    <div class="hero__thumb">[구성 미리보기 이미지 자리]</div>
+    <div class="hero__desc">
+      선택한 국가/항구의 날씨·시차·공휴일·혼잡도를 한 화면에서 조회합니다.
+    </div>
+  </section>
+>>>>>>> e3c090f23fdc14f03eb723ecf536d394979c9ee3
+
+  <!-- 컨트롤 바 -->
+  <section class="toolbar">
+    <div class="toolbar__selectors">
+      <select id="countrySelect" class="select"></select>
+      <select id="portSelect" class="select"><option disabled selected>항구 선택</option></select>
+    </div>
+    <div class="toolbar__actions">
+      <button id="searchBtn" class="btn primary">검색</button>
+      <button id="saveBtn" class="btn icon" title="즐겨찾기"><span id="starIcon">☆</span></button>
+    </div>
+  </section>
+
+  <!-- 상단 3열: 지도(자리), 현재/예상/혼잡도 카드 -->
+  <section class="topgrid">
+    <div class="card map" id="mapPlaceholder">지도(추가 예정)</div>
+
+    <div class="card stat" id="currentDockCard">
+      <div class="stat__title">현재 접안수</div>
+      <div class="stat__value" id="currentShips">-</div>
+    </div>
+
+    <div class="card stat" id="expectedDockCard">
+      <div class="stat__title">예상 접안수</div>
+      <div class="stat__value" id="expectedShips">-</div>
+    </div>
+
+    <div class="card stat" id="congCard">
+      <div class="stat__title">혼잡도</div>
+      <div class="cong__row">
+        <span class="cong__dot" id="congDot"></span>
+        <span class="cong__label" id="congestionLabel">-</span>
+      </div>
+      <div class="cong__legend">
+        <span class="dot dot--green"></span> 원활
+        <span class="dot dot--orange"></span> 혼잡
+        <span class="dot dot--red"></span> 매우 혼잡
+      </div>
+    </div>
+  </section>
+
+  <!-- 혼잡도 그래프 -->
+  <section class="card chart">
+    <h3>항구 혼잡도 그래프</h3>
+    <div class="chart-container">
+      <canvas id="congestionChart"></canvas>
+    </div>
+  </section>
+
+  <!-- 하단 3열: 날씨 / 시차 / 공휴일(달력) -->
+  <section class="bottomgrid">
+    <div class="card" id="weatherCard">
+      <h3>🌤 날씨</h3>
+      <p>국가와 항구를 선택하세요.</p>
+    </div>
+
+    <div class="card" id="timezoneCard">
+      <h3>🕓 시차</h3>
+      <p>국가를 선택하세요.</p>
+    </div>
+
+    <div class="card" id="holidayCard">
+      <h3>🎌 오늘의 공휴일</h3>
+      <div id="calendarWrap"></div>
+    </div>
+  </section>
+
+  <script src="/js/info.js"></script>
+</body>
 </html>
