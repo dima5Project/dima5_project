@@ -34,6 +34,15 @@ public class WeatherService {
             String windDirLabel = mapWindDegToLabel(windDeg);
             String emoji = mapWeatherToEmoji(mainWeather);
 
+            // 강수량
+            Double rainVolume = null;
+            if (body.containsKey("rain")) {
+                Map<String, Object> rainMap = (Map<String, Object>) body.get("rain");
+                if (rainMap.containsKey("1h")) {
+                    rainVolume = Double.parseDouble(rainMap.get("1h").toString());
+                }
+            }
+
             return WeatherDTO.builder()
                     .mainWeather(mainWeather)
                     .temperature(temp)
@@ -41,6 +50,7 @@ public class WeatherService {
                     .windSpeed(windSpeed)
                     .windDeg(windDeg)
                     .windDirLabel(windDirLabel)
+                    .rainVolume(rainVolume)
                     .build();
 
         } catch (Exception e) {
@@ -51,6 +61,7 @@ public class WeatherService {
                     .windSpeed(0)
                     .windDeg(0)
                     .windDirLabel("정보 없음")
+                    .rainVolume(null)
                     .build();
         }
     }
@@ -67,20 +78,20 @@ public class WeatherService {
 
     private String mapWindDegToLabel(int deg) {
         if (deg >= 337.5 || deg < 22.5)
-            return "북풍";
+            return "N";
         else if (deg < 67.5)
-            return "북동풍";
+            return "NE";
         else if (deg < 112.5)
-            return "동풍";
+            return "E";
         else if (deg < 157.5)
-            return "남동풍";
+            return "SE";
         else if (deg < 202.5)
-            return "남풍";
+            return "S";
         else if (deg < 247.5)
-            return "남서풍";
+            return "SW";
         else if (deg < 292.5)
-            return "서풍";
+            return "W";
         else
-            return "북서풍";
+            return "NW";
     }
 }

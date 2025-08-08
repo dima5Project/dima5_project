@@ -10,6 +10,8 @@ import net.dima.dima5_project.entity.PortNameEntity;
 
 @Repository
 public interface PortNameRepository extends JpaRepository<PortNameEntity, String> {
+    List<PortNameEntity> findByCountryNameKr(String countryNameKr);
+
     List<PortNameEntity> findByCountryNameEn(String countryNameEn);
 
     // 국가명 중복 제거 후 전체 조회

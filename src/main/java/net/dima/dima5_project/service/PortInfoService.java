@@ -24,7 +24,7 @@ public class PortInfoService {
 
         private final PortNameRepository portNameRepository;
         private final PortInfoRepository portInfoRepository;
-        private final PortDokingService portDokingService;
+        private final PortDockingService portDokingService;
         private final TimeZoneService timezoneService;
         private final HolidayService holidayService;
 
@@ -61,21 +61,8 @@ public class PortInfoService {
                 return portNameRepository.findDistinctCountryNames();
         }
 
-        public List<PortNameDTO> getPortsByCountry(String country) {
-                List<PortNameEntity> portNames = portNameRepository.findByCountryNameEn(country);
-                return portNames.stream()
-                                .map(PortNameDTO::toDTO)
-                                .toList();
-        }
-
-        private String getDockingStatus(PortDockingDTO dockingDTO) {
-                int count = dockingDTO.getShipsInPort();
-                if (count >= 80)
-                        return "혼잡";
-                else if (count >= 40)
-                        return "적당";
-                else
-                        return "여유";
+        public List<PortNameEntity> getPortsByCountry(String countryNameKr) {
+                return portNameRepository.findByCountryNameKr(countryNameKr);
         }
 
         // 주요 메서드: 날씨 제외한 항구 부가정보 전부 반환

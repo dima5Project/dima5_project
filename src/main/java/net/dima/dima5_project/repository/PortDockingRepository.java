@@ -1,5 +1,6 @@
 package net.dima.dima5_project.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +10,8 @@ import net.dima.dima5_project.entity.PortDockingEntity;
 
 @Repository
 public interface PortDockingRepository extends JpaRepository<PortDockingEntity, Long> {
-    // 가장 최근 데이터 1건을 timestamp 기준으로 조회
-    Optional<PortDockingEntity> findTopByPortIdOrderByTimestampDesc(String portId);
+    Optional<PortDockingEntity> findTopByPortIdOrderByTimeStampDesc(String portId);
+
+    List<PortDockingEntity> findTop5ByPortIdOrderByTimeStampDesc(String portId); // 그래프용
 
 }

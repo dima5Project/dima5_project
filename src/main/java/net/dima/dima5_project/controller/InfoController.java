@@ -1,26 +1,14 @@
 package net.dima.dima5_project.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import lombok.RequiredArgsConstructor;
-import net.dima.dima5_project.dto.HolidayDTO;
-import net.dima.dima5_project.dto.PortDockingDTO;
-import net.dima.dima5_project.dto.PortInfoDTO;
-import net.dima.dima5_project.dto.PortInfoResponseDTO;
-import net.dima.dima5_project.dto.PortNameDTO;
-import net.dima.dima5_project.dto.TimeZoneDTO;
-import net.dima.dima5_project.dto.WeatherDTO;
-import net.dima.dima5_project.service.HolidayService;
-import net.dima.dima5_project.service.PortDokingService;
-import net.dima.dima5_project.service.PortInfoService;
-import net.dima.dima5_project.service.TimeZoneService;
-import net.dima.dima5_project.service.WeatherService;
+import net.dima.dima5_project.dto.*;
+import net.dima.dima5_project.entity.PortNameEntity;
+import net.dima.dima5_project.service.*;
+
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/info")
@@ -29,51 +17,49 @@ public class InfoController {
 
     private final WeatherService weatherService;
     private final TimeZoneService timeZoneService;
-    private final PortDokingService portDokingService;
-    private final PortInfoService portInfoService;
+    private final PortDockingService portDockingService;
     private final HolidayService holidayService;
+    private final PortInfoService portInfoService;
 
-    // InfoController.java
-    @GetMapping("/all")
-    public List<PortInfoResponseDTO> getAllPortInfo() {
-        return portInfoService.getAllPortsInfoWithoutWeather(); // 여기가 List<PortInfoResponseDTO>
+    // 1. 혼잡도 (정박 + 입항 예정)
+    @GetMapping("/docking/{portId}")
+    public PortDockingDTO getDocking(@PathVariable String portId) {
+        return portDockingService.getLatestDockingInfo(portId);
     }
 
-    // 1. 국가명 리스트 반환
-    @GetMapping("/countries")
-    public List<String> getAllCountries() {
-        return portInfoService.getAllCountryNames(); // 새로운 메서드 만들기
+    // 2. 날씨 (위경도 직접 받기)
+    @GetMapping("/weather/direct")
+    public WeatherDTO getWeatherByCoords(@RequestParam double lat, @RequestParam double lon) {
+        return weatherService.getWeatherByCoords(lat, lon);
     }
 
-    // 1 - 1. 항구 리스트 (국가 기준) / 선택 국가의 항구 정보
-    @GetMapping("/country/{country}")
-    public List<PortNameDTO> getPortsByCountry(@PathVariable String country) {
-        return portInfoService.getPortsByCountry(country);
-    }
-
-    // 2. 날씨 정보 (항구 기준)
-    @GetMapping("/weather/{portId}")
-    public WeatherDTO getWeather(@PathVariable String portId) {
-        double lat = portInfoService.getLatitudeByPortId(portId);
-        double lon = portInfoService.getLongitudeByPortId(portId);
-        return weatherService.getWeatherByCoords(lat, lon); // 위경도 직접 전달
-    }
-
-    // 3 . 시차 정보 (국가 기준)
+    // 3. 시차
     @GetMapping("/timezone/{country}")
     public TimeZoneDTO getTimezone(@PathVariable String country) {
         return timeZoneService.getTimezone(country);
     }
 
-    // 4. 항만 혼잡도 (항구 기준)
-    @GetMapping("/docking/{portId}")
-    public PortDockingDTO getDockingInfo(@PathVariable String portId) {
-        return portDokingService.getLatestDockingInfo(portId);
+    @GetMapping("/holiday/{country}")
+    public List<HolidayDTO> getHolidaysByCountry(@PathVariable String country) {
+        return holidayService.getAllHolidaysByCountry(country);
     }
 
-    // 6. 공휴일 정보 (국가 기준)
-    @GetMapping("/holiday/{country}")
-    public HolidayDTO getHoliday(@PathVariable String country) {
-        return holidayService.getTodayHolidayByCountry(country);
+    // 5. 그래프 데이터 (DTO 없이 Map으로 반환)
+    @GetMapping("/dock-graph/{portId}")
+    public List<Map<String, Object>> getDockingGraph(@PathVariable String portId) {
+        return portDockingService.getDockingGraphData(portId);
     }
+
+    // 6. 전체 국가 목록
+    @GetMapping("/countries")
+    public List<String> getCountryList() {
+        return portInfoService.getAllCountryNames();
+    }
+
+    // 7. 특정 국가의 항구 목록
+    @GetMapping("/ports/{country}")
+    public List<PortNameEntity> getPortsByCountry(@PathVariable String country) {
+        return portInfoService.getPortsByCountry(country);
+    }
+
 }

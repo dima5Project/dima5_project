@@ -1,34 +1,92 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>항구 부가정보 페이지</title>
-    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <title>항구 부가정보</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/info.js"></script> <!-- info.js 경로 맞게 수정 -->
+
     <style>
-        .port-card {
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .select-boxes {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 200px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
             border: 1px solid #ccc;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fdfdfd;
+        }
+
+        .chart-container {
+            margin-top: 40px;
         }
     </style>
 </head>
 
 <body>
-    <h1>항구 부가정보</h1>
 
-    <label for="countrySelect">국가 선택: </label>
-    <select id="countrySelect">
-        <option value="all">전체 보기</option>
-        <!-- JS로 국가 옵션 추가됨 -->
-    </select>
+    <h1>항구 부가정보 조회</h1>
 
-    <div id="port-container"></div>
+    <div class="select-boxes">
+        <select id="countrySelect">
+            <option disabled selected>국가 선택</option>
+        </select>
 
-    <script src="/js/info.js"></script>
+        <select id="portSelect">
+            <option disabled selected>항구 선택</option>
+        </select>
+    </div>
+
+    <div class="cards-container">
+        <div class="card" id="weatherCard">
+            <h3>🌤 날씨</h3>
+            <p>국가와 항구를 선택하세요.</p>
+        </div>
+
+        <div class="card" id="timezoneCard">
+            <h3>🕓 시차</h3>
+            <p>국가를 선택하세요.</p>
+        </div>
+
+        <!-- 공휴일 카드 -->
+        <div class="info-card" id="holidayCard">
+            <h3>오늘의 공휴일</h3>
+            <div id="todayText"></div> <!-- 오늘 날짜 텍스트 -->
+            <div id="holidayCalendarContainer"></div> <!-- 달력 들어갈 부분 -->
+        </div>
+
+
+        <div class="card" id="dockingCard">
+            <h3>⚓ 혼잡도</h3>
+            <p>항구를 선택하세요.</p>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="graphCanvas" width="300" height="300"></canvas>
+    </div>
+
 </body>
-
 
 </html>
