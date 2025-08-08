@@ -1,85 +1,235 @@
-.calendar {
-    width: 100%;
-    border-collapse: collapse;
+:root {
+    --bg: #fafafa;
+    --card: #fff;
+    --border: #e9e9ec;
+    --ink: #1e1e1e;
+    --blue: #2b6ef2;
+    --green: #15a86b;
+    --orange: #ff9f40;
+    --red: #f24646;
+    --muted: #6b7280;
 }
 
-.calendar th,
-.calendar td {
-    width: 14%;
-    padding: 6px;
-    text-align: center;
-    vertical-align: middle;
+* {
+    box-sizing: border-box
 }
 
-.today .circle {
-    background-color: red;
-    color: white;
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, Segoe UI, Apple SD Gothic Neo, Roboto, Arial, AppleGothic, Malgun Gothic, sans-serif
+}
+
+.banner {
+    padding: 18px 24px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 16px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border)
+}
+
+.hero__thumb {
+    height: 120px;
+    background: #dfe7ff;
+    border: 1px dashed #bcd;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.hero__desc {
+    display: flex;
+    align-items: center
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border)
+}
+
+.toolbar__selectors {
+    display: flex;
+    gap: 10px
+}
+
+.select {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    min-width: 220px
+}
+
+.btn {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer
+}
+
+.btn.primary {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue)
+}
+
+.btn.icon {
+    font-size: 20px;
+    width: 44px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.btn:active {
+    transform: translateY(1px)
+}
+
+.topgrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 16px 24px
+}
+
+.bottomgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 0 24px 24px
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04)
+}
+
+.card h3 {
+    margin: 0 0 10px
+}
+
+.map {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted)
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start
+}
+
+.stat__title {
+    color: var(--muted);
+    font-weight: 600
+}
+
+.stat__value {
+    font-size: 28px;
+    font-weight: 800
+}
+
+.cong__row {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.cong__dot {
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    padding: 4px;
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
+    background: #ccc;
+    border: 2px solid #ccc
+}
+
+.cong__legend {
+    margin-top: 8px;
+    color: var(--muted);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
-    background-color: gray;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin: 0 auto;
-    margin-top: 2px;
+    display: inline-block
 }
 
-/* 공휴일 카드 안 달력 전체 스타일 */
-#holidayCalendarContainer table {
+.dot--green {
+    background: var(--green)
+}
+
+.dot--orange {
+    background: var(--orange)
+}
+
+.dot--red {
+    background: var(--red)
+}
+
+.chart {
+    margin: 0 24px 16px
+}
+
+.chart-container {
+    position: relative;
+    height: 340px;
+    width: 100%
+}
+
+.calendar {
     width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    margin-top: 10px;
-    font-size: 14px;
+    border-collapse: separate;
+    border-spacing: 8px 6px
 }
 
-#holidayCalendarContainer th {
-    padding: 6px 0;
-    font-weight: bold;
-    color: #333;
+.calendar th {
+    color: var(--muted);
+    font-weight: 700
 }
 
-#holidayCalendarContainer td {
-    height: 32px;
-    vertical-align: middle;
-}
-
-/* 오늘 날짜 강조 (⭕ 원) */
-#holidayCalendarContainer td div {
-    display: inline-block;
-    width: 28px;
+.calendar td {
     height: 28px;
-    line-height: 28px;
-    border-radius: 50%;
-    font-weight: bold;
+    width: 28px;
+    text-align: center
 }
 
-/* 오늘만 해당 (연한 빨간색 배경) */
-#holidayCalendarContainer td div:contains('⭕') {
-    background-color: #ffe0e0;
+.calendar .today {
+    outline: 3px solid rgba(242, 70, 70, .25);
+    border-radius: 50%
 }
 
-/* 공휴일만 해당 (● 표시, 빨간색) */
-#holidayCalendarContainer td div:contains('●') {
-    color: red;
-}
-
-/* 오늘이면서 공휴일인 경우 */
-#holidayCalendarContainer td div:contains('⭕●') {
-    background-color: #ffbdbd;
-    color: white;
-}
-
-/* 오늘 날짜 텍스트 */
-#todayText {
-    font-size: 15px;
-    margin-top: 4px;
-    margin-bottom: 4px;
+.calendar .holiday::after {
+    content: "•";
+    display: block;
+    color: #888;
+    margin-top: -2px;
+    font-size: 20px;
+    line-height: 8px
 }
