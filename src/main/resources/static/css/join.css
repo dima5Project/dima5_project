@@ -50,25 +50,25 @@ input {
   /* 전체 페이지 감쌈. */
   max-width: 1440px;
   margin: 0 auto;
-  padding: 50px;
+  padding: 20px 200px 60px 200px;
 }
 
 .signup_header {
   /* 로고 등 상단 여백*/
-  margin-bottom: 68px;
+  margin: 0 50px 20px 0;
 }
 
 /* 로고 영역 */
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
 }
 
 .logo_text {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
-  line-height: 36px;
+  line-height: 1.5;
 }
 
 /* 메인 영역 구조 */
@@ -81,7 +81,7 @@ input {
 .form_container {
   /* 입력 폼을 감싸는 박스 */
   width: 100%;
-  max-width: 557px;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
 }
@@ -89,17 +89,17 @@ input {
 .back_link {
   /* 뒤로 가기 아이콘의 사이즈와 위치 조정 */
   width: 27px;
-  height: 13.35px;
-  margin-bottom: 39.65px;
+  height: 10px;
+  margin-bottom: 18px;
 }
 
 /* 제목 */
 .form_title {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1;
   /* 줄 간격인데 보통은 %로 많이 쓴다고 합니다.*/
-  margin: 0 0 67px 0;
+  margin: 0 0 30px 0;
 }
 
 /* 입력 폼 전체 */
@@ -107,7 +107,7 @@ input {
   display: flex;
   /* 각 입력 요소들을 세로로 나열 */
   flex-direction: column;
-  gap: 45px;
+  gap: 15px;
 }
 
 /* 폼 요소들 (input, label 등) */
@@ -115,26 +115,28 @@ input {
   display: flex;
   /* 라벨과 input 세로 정렬 */
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form_label {
   /* 각  입력 라벨의 기본 스타일 */
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1;
 }
 
 .form_input {
   /* input 높이, 안쪽, 여백, 테두리 설정 */
-  height: 60px;
-  padding: 0 21px;
+  height: 35px;
+  padding: 0 10px;
   border: 1px solid var(--border-color);
   border-radius: 5px;
   background-color: var(--background-color);
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 400;
   color: var(--text-color);
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .form_input::placeholder {
@@ -147,7 +149,7 @@ input {
 .input_group {
   display: flex;
   /* input_group 안의 자식 요소들(input, button 등)을 가로로 나란히 배치 (기본 정렬 방향이 row. 가로) */
-  gap: 12px;
+  gap: 6px;
   /* 자식 요소들 간의 간격 */
 }
 
@@ -164,14 +166,20 @@ input {
   justify-content: center;
   align-items: center;
   border-radius: 5px;
-  box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25);
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 20px;
-  height: 60px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  height: 35px;
 }
 
-.btn_dark {
+/* 비활성화된 버튼 스타일 */
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn_dark,
+.btn:disabled {
   /* 어두운 배경, 흰 글자 버튼 스타일 */
   background-color: var(--primary-color);
   color: var(--background-color);
@@ -180,110 +188,130 @@ input {
 .input_group .btn {
   width: 100px;
   flex-shrink: 0;
+  /* 요소가 줄어드는 걸 방지하는 속성. 부모가 공간이 부족할 때, 이 요소는 줄이지 말라고 하는 것.*/
 }
 
-/* 오류 메세지 */
-.error_message {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 20px;
-  color: var(--error-color);
+/* 입력창과 메세지 사이 간격 조정 */
+.form_group .error_message,
+.form_group .success_message {
+  min-height: 18px;
+  /* 메시지가 없어도 공간을 차지하여 레이아웃 흔들림 방지 */
+}
+
+/* 메세지 */
+.error_message,
+.success_message {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
   margin: 0;
-  min-height: 20px;
   /* 항상 공간 확보되도록 함 */
+  display: none;
 }
 
-/* 이메일 입력 구조 */
+.error_message {
+  color: var(--error-color);
+}
+
+.success_message {
+  color: green;
+}
+
+/* 이메일 전체 그룹 */
 .email_group {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  /* 입력칸 간격 */
 }
 
 .email_local_input {
-  width: 240px;
+  flex: 1;
+  /* 기본은 콘텐츠 크기만큼 차지하지만, 공간이 남으면 늘어나고, 부족하면 줄어들 수 있음 */
+  min-width: 120px;
 }
 
+/* 도메인 select */
+.email_domain_select,
+.email_domain_input {
+  width: 150px;
+}
+
+/* '@' 기호 스타일 */
 .email_at {
-  font-size: 20px;
-  font-weight: 500;
-  padding: 0 10px;
+  font-size: 15px;
 }
 
-/* 도메인 선택 드롭다운 */
-.custom_select {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 60px;
-  width: 136px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  padding: 0 14px;
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--placeholder-color);
-  cursor: pointer;
-}
-
-.select_value {
-  color: var(--text-color);
-  opacity: 0.3;
-}
-
-.select_arrow {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  opacity: 0.3;
-  width: 15px;
-  height: 11px;
+/* 직접입력용 input 숨김 기본 */
+#email_domain_input {
+  display: none;
+  width: 150px;
 }
 
 /* 버튼 스타일 */
 .btn_auto_width {
   /* 고정 너비 대신 컨텐츠에 맞춰 넓어짐 */
   width: auto;
-  padding: 20px 22px;
 }
 
-/* 사용자 유형 선택 */
+.form_radio {
+  padding-top: 10px;
+}
+
+/* 전체 라디오 그룹을 수평으로 배치 */
 .radio_group {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 0 10px;
 }
 
-.radio_option input[type="radio"] {
-  display: none;
-}
-
-.radio_option label {
+.custom_radio {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 20px;
-  font-weight: 400;
 }
 
-.radio_option input[type="radio"]:checked+label {
-  /*
-  선택된 상태에 스타일을 적용할 수 있음
-  input[type="radio"] -> 라디오 버튼 input 요소
-  :checked -> 체크된 상태일 때
-  +label -> 그 라디오 input 바로 다음 형제 요소인 label에게 적용
-  => 라디오 버튼이 선택된 상태이면 그 버튼 바로 뒤에 있는 label 요소에 스타일을 적용하겠다.
-  */
+/* 실제 radio는 숨기고 대신 가짜 원형을 ::before로 만들어서 표기 */
+.custom_radio input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 15px;
+  height: 15px;
+  border: 2px solid #0f1035;
+  border-radius: 50%;
+  outline: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* 가짜 원 만들기 */
+.custom_radio input[type="radio"]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: #0f1035;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* 체크 상태일 때 점 찍기 */
+.custom_radio input[type="radio"]:checked::before {
+  opacity: 1;
 }
 
 .btn_full_width {
   width: 100%;
   /* 부모 요소의 너비를 가득 채운다 */
+  margin: 10px 0;
 }
 
 /* 반응형 디자인 */
@@ -329,5 +357,21 @@ input {
 @media (max-width: 768px) {
   .page_container {
     padding: 20px;
+  }
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .email_group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .email_at {
+    display: none;
+  }
+
+  .form_input {
+    width: 100%;
   }
 }

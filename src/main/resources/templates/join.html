@@ -20,7 +20,7 @@
 
     <header class="signup_header"> <!-- 상단 로고 영역. 홈으로 돌아가는 로고 영역 -->
       <a th:href="@{/}" class="logo">
-        <img th:src="@{images/joinImages/shipLogo.png}" alt="logo">
+        <img th:src="@{/images/joinImages/shipLogo.png}" alt="logo">
         <span class="logo_text">Portcast</span>
       </a>
     </header>
@@ -28,95 +28,88 @@
     <main class="signup_main"> <!-- 메인 폼 영역. 회원가입 양식을 담고 있는 메인 콘텐츠. -->
       <div class="form_container"> <!-- 입력 폼을 감싸는 박스 -->
         <a href="#" id="backButton" class="back_link">
-          <img th:src="@{images/joinImages/backArrow.png}" alt="Back">
+          <img th:src="@{/images/joinImages/backArrow.png}" alt="Back">
         </a>
 
         <h1 class="form_title">회원가입</h1>
 
-        <form class="signup_form"> <!-- 폼 입력 영역 -->
+        <form class="signup_form" action="/user/joinProc" method="post"> <!-- 폼 입력 영역 -->
           <div class="form_group"> <!-- form_group: 하나의 입력 필드-->
             <label for="name" class="form_label">이름</label>
-            <input type="text" id="name" class="form_input" placeholder="실명 또는 회사명을 입력하세요">
+            <input type="text" id="name" name="name" class="form_input" placeholder="실명 또는 회사명을 입력하세요">
+            <p class="error_message" id="nameError">이름을 입력하세요</p>
           </div>
 
           <div class="form_group">
             <label for="user_id" class="form_label">아이디</label>
             <div class="input_group">
-              <input type="text" id="user_id" class="form_input" placeholder="영문 5~10자를 입력하세요">
+              <input type="text" id="user_id" name="userId" class="form_input" placeholder="영문 5~10자를 입력하세요">
               <button type="button" class="btn btn_dark">중복확인</button>
             </div>
-            <p class="error_message">존재하는 아이디입니다.</p>
+            <p class="error_message" id="idError">이미 존재하는 아이디입니다</p>
+            <p class="success_message" id="idSuccess">사용 가능한 아이디입니다</p>
           </div>
 
           <div class="form_group">
             <label for="password" class="form_label">비밀번호</label>
-            <input type="password" id="password" class="form_input" placeholder="영문 5~10자를 입력하세요.">
+            <input type="password" id="password" name="password" class="form_input" placeholder="영문 5~10자를 입력하세요.">
             <p class="error_message">영문자 5~10개를 입력하세요</p>
           </div>
 
           <div class="form_group">
             <label for="password_confirm" class="form_label">비밀번호 확인</label>
-            <input type="password" id="password_confirm" class="form_input" placeholder="비밀번호 확인">
-            <p class="error_message">일치하지 않는 비밀번호입니다.</p>
+            <input type="password" id="password_confirm" name="passwordConfirm" class="form_input"
+              placeholder="비밀번호 확인">
+            <p class="error_message">비밀번호가 일치하지 않습니다</p>
           </div>
 
+          <!-- 이메일 입력 -->
           <div class="form_group">
-            <label for="email_local" class="form_label">이메일</label>
+            <label for="email" class="form_label">이메일</label>
             <div class="email_group">
-              <input type="text" id="email_local" class="form_input email_local_input" placeholder="이메일 주소">
+              <input type="text" id="email_local" class="form_input email_local_input" placeholder="이메일 주소를 입력하세요">
               <span class="email_at">@</span>
-              <div class="custom_select">
-                <span class="select_value">naver.com</span>
-                <img th:src="@{images/joinImages/279_134.svg}" alt="dropdown arrow" class="select_arrow">
-              </div>
-              <button type="button" class="btn btn_dark btn_auto_width">인증번호 받기</button>
+
+              <select id="email_domain" class="form_input email_domain_select">
+                <option value="naver.com">naver.com</option>
+                <option value="gmail.com">gmail.com</option>
+                <option value="daum.net">daum.net</option>
+                <option value="custom">직접입력</option>
+              </select>
+
+              <input type="text" id="email_domain_input" class="form_input" style="display:none;"
+                placeholder="도메인을 입력하세요">
             </div>
-            <p class="error_message">존재하지 않는 이메일입니다.</p>
+            <input type="hidden" name="email" id="full_email">
+            <p class="error_message" id="emailError">올바른 이메일 주소를 입력하세요</p>
           </div>
 
           <div class="form_group">
-            <label for="auth_code" class="form_label">인증번호</label>
-            <input type="text" id="auth_code" class="form_input" placeholder="인증번호를 입력하세요.">
-            <p class="error_message">인증번호가 잘못되었습니다.</p>
-          </div>
-
-          <div class="form_group">
-            <label class="form_label">사용자 유형</label>
+            <label class="form_label form_radio">사용자 유형</label>
             <div class="radio_group">
 
-              <div class="radio_option">
-                <input type="radio" id="type_shipper" name="user_type" checked>
-                <label for="type_shipper">
-                  <img th:src="@{images/joinImages/I161_65_158_15.svg}" alt="radio icon">
-                  <span>화주</span>
-                </label>
-              </div>
+              <label class="custom_radio">
+                <input type="radio" name="userType" value="shipper">
+                <span class="radio_text">화주</span>
+              </label>
 
-              <div class="radio_option">
-                <input type="radio" id="type_carrier" name="user_type">
-                <label for="type_carrier">
-                  <img th:src="@{images/joinImages/I161_68_158_15.svg}" alt="radio icon">
-                  <span>선사</span>
-                </label>
-              </div>
+              <label class="custom_radio">
+                <input type="radio" name="userType" value="carrier">
+                <span class="radio_text">선사</span>
+              </label>
 
-              <div class="radio_option">
-                <input type="radio" id="type_port" name="user_type">
-                <label for="type_port">
-                  <img th:src="@{images/joinImages/I161_71_158_15.svg}" alt="radio icon">
-                  <span>항만사</span>
-                </label>
-              </div>
+              <label class="custom_radio">
+                <input type="radio" name="userType" value="port">
+                <span class="radio_text">항만사</span>
+              </label>
 
-              <div class="radio_option">
-                <input type="radio" id="type_general" name="user_type">
-                <label for="type_general">
-                  <img th:src="@{images/joinImages/I161_74_158_15.svg}" alt="radio icon">
-                  <span>일반 사용자</span>
-                </label>
-              </div>
+              <label class="custom_radio">
+                <input type="radio" name="userType" value="general">
+                <span class="radio_text">일반 사용자</span>
+              </label>
 
             </div>
+            <p class="error_message" id="userTypeError">사용자 유형을 선택하세요.</p>
           </div>
 
           <button type="submit" class="btn btn_dark btn_full_width">가입하기</button>
@@ -125,5 +118,6 @@
       </div>
     </main>
   </section>
-  <p> 이게 진짜 join.html임. !!!! </p>
 </body>
+
+</html>
