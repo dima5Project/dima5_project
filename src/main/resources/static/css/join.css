@@ -1,3 +1,4 @@
+/* css 변수 설정. 색상을 변수로 선언해서 전체 스타일에 반복적으로 사용할 수 있도록 함 */
 :root {
   --primary-color: #0f1035;
   --text-color: #000000;
@@ -7,24 +8,33 @@
   --border-color: #0f1035;
 }
 
+/* 전체 폰트 설정 및 기본 배경, 글자색 지정 */
 body {
   margin: 0;
   font-family: 'Noto Sans KR', sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
+
+  /*
+  폰트를 더 매끄럽고 부드럽게 보이도록 하는 css 
+  chrome, safari / firefox 대상
+  */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 모든 요소의 box-sizing을 border-box로 설정. 패딩, 보더 포함한 정확한 너비 계산 가능 */
 * {
   box-sizing: border-box;
 }
 
+/* a 태그 밑줄 제거 */
 a {
   text-decoration: none;
-  color: inherit;
+  color: #000000;
 }
 
+/* 버튼, 입력 기본 폰트 통일 */
 button {
   cursor: pointer;
   border: none;
@@ -35,14 +45,289 @@ input {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-.page-container {
+/* 페이지 레이아웃 */
+.page_container {
+  /* 전체 페이지 감쌈. */
   max-width: 1440px;
   margin: 0 auto;
   padding: 50px;
 }
 
+.signup_header {
+  /* 로고 등 상단 여백*/
+  margin-bottom: 68px;
+}
+
+/* 로고 영역 */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo_text {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+}
+
+/* 메인 영역 구조 */
+.signup_main {
+  display: flex;
+  /* 메인 영역 가운데 정렬 */
+  justify-content: center;
+}
+
+.form_container {
+  /* 입력 폼을 감싸는 박스 */
+  width: 100%;
+  max-width: 557px;
+  display: flex;
+  flex-direction: column;
+}
+
+.back_link {
+  /* 뒤로 가기 아이콘의 사이즈와 위치 조정 */
+  width: 27px;
+  height: 13.35px;
+  margin-bottom: 39.65px;
+}
+
+/* 제목 */
+.form_title {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  /* 줄 간격인데 보통은 %로 많이 쓴다고 합니다.*/
+  margin: 0 0 67px 0;
+}
+
+/* 입력 폼 전체 */
+.signup_form {
+  display: flex;
+  /* 각 입력 요소들을 세로로 나열 */
+  flex-direction: column;
+  gap: 45px;
+}
+
+/* 폼 요소들 (input, label 등) */
+.form_group {
+  display: flex;
+  /* 라벨과 input 세로 정렬 */
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form_label {
+  /* 각  입력 라벨의 기본 스타일 */
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.form_input {
+  /* input 높이, 안쪽, 여백, 테두리 설정 */
+  height: 60px;
+  padding: 0 21px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--background-color);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form_input::placeholder {
+  /* 플레이스홀더 색상 설정 */
+  color: var(--placeholder-color);
+  opacity: 0.5;
+}
+
+/* 아이디 입력 + 버튼 */
+.input_group {
+  display: flex;
+  /* input_group 안의 자식 요소들(input, button 등)을 가로로 나란히 배치 (기본 정렬 방향이 row. 가로) */
+  gap: 12px;
+  /* 자식 요소들 간의 간격 */
+}
+
+.input_group .form_input {
+  /* input_group은 input 태그에 해당하는 클래스 */
+  flex-grow: 1;
+  /* 가능한 한 남은 공간을 모두 차지하겠다. 남은 여백을 비율에 따라 나눠 갖는 설정. */
+}
+
+/* 버튼 스타일 */
+.btn {
+  display: flex;
+  /* 버튼 중앙 정렬*/
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.25);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 20px;
+  height: 60px;
+}
+
+.btn_dark {
+  /* 어두운 배경, 흰 글자 버튼 스타일 */
+  background-color: var(--primary-color);
+  color: var(--background-color);
+}
+
+.input_group .btn {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+/* 오류 메세지 */
+.error_message {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--error-color);
+  margin: 0;
+  min-height: 20px;
+  /* 항상 공간 확보되도록 함 */
+}
+
+/* 이메일 입력 구조 */
+.email_group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.email_local_input {
+  width: 240px;
+}
+
+.email_at {
+  font-size: 20px;
+  font-weight: 500;
+  padding: 0 10px;
+}
+
+/* 도메인 선택 드롭다운 */
+.custom_select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  width: 136px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 0 14px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--placeholder-color);
+  cursor: pointer;
+}
+
+.select_value {
+  color: var(--text-color);
+  opacity: 0.3;
+}
+
+.select_arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  opacity: 0.3;
+  width: 15px;
+  height: 11px;
+}
+
+/* 버튼 스타일 */
+.btn_auto_width {
+  /* 고정 너비 대신 컨텐츠에 맞춰 넓어짐 */
+  width: auto;
+  padding: 20px 22px;
+}
+
+/* 사용자 유형 선택 */
+.radio_group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.radio_option input[type="radio"] {
+  display: none;
+}
+
+.radio_option label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.radio_option input[type="radio"]:checked+label {
+  /*
+  선택된 상태에 스타일을 적용할 수 있음
+  input[type="radio"] -> 라디오 버튼 input 요소
+  :checked -> 체크된 상태일 때
+  +label -> 그 라디오 input 바로 다음 형제 요소인 label에게 적용
+  => 라디오 버튼이 선택된 상태이면 그 버튼 바로 뒤에 있는 label 요소에 스타일을 적용하겠다.
+  */
+}
+
+.btn_full_width {
+  width: 100%;
+  /* 부모 요소의 너비를 가득 채운다 */
+}
+
+/* 반응형 디자인 */
 @media (max-width: 768px) {
-  .page-container {
+  .signup_header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .form_container {
+    align-items: center;
+  }
+
+  .back_link {
+    align-self: flex-start;
+  }
+
+  .form_title {
+    text-align: center;
+  }
+
+  .email_group {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .email_local_input,
+  .custom_select,
+  .btn_auto_width {
+    width: 100%;
+  }
+
+  .email_at {
+    display: none;
+  }
+
+  .radio_group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .page_container {
     padding: 20px;
   }
 }

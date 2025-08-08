@@ -82,4 +82,4 @@ loginForm.addEventListener('submit', (event) => {
     if (!isFormValid) {
         event.preventDefault();
     }
-});
+}); 
