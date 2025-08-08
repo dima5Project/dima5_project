@@ -50,7 +50,8 @@ main {
 
 .qna-category {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    /*qna-search와 사이의 간격 조절*/
 }
 
 .qna-category button {
@@ -60,18 +61,37 @@ main {
     background: #fff;
     border-radius: 20px;
     cursor: pointer;
+    font-weight: 500;
+    color: #000;
+    transition: all 0.2s ease;
+}
+
+/*선택된 버튼 스타일*/
+.filter-btn.active {
+    background-color: #4483EF;
+    color: #fff;
+    border: none;
 }
 
 .qna-search {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    /* 좌우 정렬 */
+    margin-bottom: 30px;
+    /*qna-table과 사이의 간격 조절*/
+}
+
+.qna-search-right {
+    display: flex;
+    align-items: center;
     gap: 10px;
+    /* 검색 도구들 사이의 간격 */
 }
 
 .qna-search input {
-    flex-grow: 1;
+    width: 300px;
+    /* 고정 너비 지정 */
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -96,16 +116,95 @@ main {
     border-collapse: collapse;
 }
 
-.qna-table th,
-.qna-table td {
+.qna-table th {
+    font-weight: bold;
+    text-align: center;
+    /*셀 안의 텍스트를 가로 방향(center) 으로 가운데 정렬*/
+    vertical-align: middle;
+    /*셀 안의 텍스트를 세로 방향(middle) 으로 가운데 정렬*/
     padding: 12px;
     border-bottom: 1px solid #ccc;
-    text-align: left;
+    border-top: 1.5px solid #333;
+    /* 상단에만 굵은 테두리 */
+    background-color: #FAFAFA;
+    /*셀 배경색 추가*/
+}
+
+.qna-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px;
+    border-bottom: 1px solid #ccc;
 }
 
 .answered {
+    font-weight: bold;
     color: #0066ff;
     margin-left: 5px;
+}
+
+.secret {
+    font-weight: bold;
+}
+
+.toggle-password {
+    cursor: pointer;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.password-box {
+    background-color: #f9f9f9;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.password-box input[type="password"] {
+    padding: 6px;
+    margin-right: 8px;
+}
+
+.check-btn {
+    background-color: #3366cc;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.detail-box {
+    padding: 20px 0;
+    line-height: 1.5;
+    /* 줄 간격도 여유롭게 */
+}
+
+.answer-box {
+    background-color: #FAFAFA;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.answer-box strong {
+    display: block;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
 }
 
 .pagination {

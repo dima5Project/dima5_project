@@ -1,92 +1,54 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>항구 부가정보</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="/css/info.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/js/info.js"></script> <!-- info.js 경로 맞게 수정 -->
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .select-boxes {
-            margin-bottom: 20px;
-        }
-
-        select {
-            width: 200px;
-            padding: 8px;
-            margin-right: 10px;
-        }
-
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .card {
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            background-color: #fdfdfd;
-        }
-
-        .chart-container {
-            margin-top: 40px;
-        }
-    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script defer src="/js/info2.js"></script>
 </head>
 
 <body>
-
-    <h1>항구 부가정보 조회</h1>
-
-    <div class="select-boxes">
-        <select id="countrySelect">
-            <option disabled selected>국가 선택</option>
-        </select>
-
-        <select id="portSelect">
-            <option disabled selected>항구 선택</option>
-        </select>
+    <!-- 검색 선택 -->
+    <div style="margin-bottom: 100px;">
+        <select id="countrySelect"></select>
+        <select id="portSelect"></select>
+        <button id="searchBtn">검색</button>
     </div>
 
-    <div class="cards-container">
-        <div class="card" id="weatherCard">
-            <h3>🌤 날씨</h3>
-            <p>국가와 항구를 선택하세요.</p>
+    <!-- 부가정보 레이아웃 -->
+    <div class="extra-info-container">
+        <!-- 1행 -->
+        <div class="row">
+            <div class="map-box">
+                <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
+            </div>
+            <div class="info-card" id="dockingCard"></div>
         </div>
 
-        <div class="card" id="timezoneCard">
-            <h3>🕓 시차</h3>
-            <p>국가를 선택하세요.</p>
-        </div>
+        <!-- 2+3행 전체 -->
+        <div class="row content-row">
+            <!-- 날씨 카드 (2행+3행 통합 높이) -->
+            <div class="info-card tall-weather" id="weatherCard"></div>
 
-        <!-- 공휴일 카드 -->
-        <div class="info-card" id="holidayCard">
-            <h3>오늘의 공휴일</h3>
-            <div id="todayText"></div> <!-- 오늘 날짜 텍스트 -->
-            <div id="holidayCalendarContainer"></div> <!-- 달력 들어갈 부분 -->
-        </div>
+            <!-- 오른쪽 : 그래프 + 하단 2칸 -->
+            <div class="col-2">
+                <div class="info-card" id="chartCard">
+                    <canvas id="graphCanvas" height="180"></canvas>
+                </div>
 
-
-        <div class="card" id="dockingCard">
-            <h3>⚓ 혼잡도</h3>
-            <p>항구를 선택하세요.</p>
+                <div class="row inner-row">
+                    <div class="info-card" id="timezoneCard"></div>
+                    <div class="info-card" id="holidayCard">
+                        <div id="todayText"></div>
+                        <div id="holidayCalendarContainer"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="chart-container">
-        <canvas id="graphCanvas" width="300" height="300"></canvas>
-    </div>
-
 </body>
 
 </html>
