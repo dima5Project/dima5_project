@@ -16,21 +16,5 @@ public class PortInfoResponseDTO {
     private WeatherDTO weather; // 날씨 정보
     private String timezoneNow; // 현재 시각(UTC+0 기준)
     private String docking; // 혼잡, 적당, 여유로움
-
-    public static PortInfoResponseDTO toDTO(
-            PortNameDTO portNameDTO,
-            PortDockingDTO dockingDTO,
-            WeatherDTO weatherDTO,
-            String timezoneNow,
-            String docking) {
-        return PortInfoResponseDTO.builder()
-                .portNameDTO(portNameDTO)
-                .shipInPort(dockingDTO.getShipsInPort())
-                .expectedShips(dockingDTO.getExpectedShips())
-                .weather(weatherDTO)
-                .timezoneNow(timezoneNow)
-                .docking(docking)
-                .build();
-    }
-
+    // private HolidayDTO holiday;
 }

@@ -1,21 +1,85 @@
-/* .card-container {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-    justify-content: center;
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.info-card {
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+.calendar th,
+.calendar td {
+    width: 14%;
+    padding: 6px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.today .circle {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background-color: gray;
+    border-radius: 50%;
+    margin: 0 auto;
+    margin-top: 2px;
+}
+
+/* 공휴일 카드 안 달력 전체 스타일 */
+#holidayCalendarContainer table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+#holidayCalendarContainer th {
+    padding: 6px 0;
+    font-weight: bold;
+    color: #333;
+}
+
+#holidayCalendarContainer td {
+    height: 32px;
+    vertical-align: middle;
+}
+
+/* 오늘 날짜 강조 (⭕ 원) */
+#holidayCalendarContainer td div {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* 오늘만 해당 (연한 빨간색 배경) */
+#holidayCalendarContainer td div:contains('⭕') {
+    background-color: #ffe0e0;
+}
+
+/* 공휴일만 해당 (● 표시, 빨간색) */
+#holidayCalendarContainer td div:contains('●') {
+    color: red;
+}
+
+/* 오늘이면서 공휴일인 경우 */
+#holidayCalendarContainer td div:contains('⭕●') {
+    background-color: #ffbdbd;
+    color: white;
+}
+
+/* 오늘 날짜 텍스트 */
+#todayText {
     font-size: 15px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
-
-.card-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 15px;
-} */

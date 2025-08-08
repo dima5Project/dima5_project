@@ -16,6 +16,7 @@ public class WeatherDTO {
     private double windSpeed; // 바람 속도 (m/s)
     private int windDeg; // 바람 방향 (각도)
     private String windDirLabel; // 바람 방향 텍스트 (예: 북풍, 남서풍)
-    // 외부 API라 Entity 없음 -> build 건너 뜀
+    private Double rainVolume; // 강수량
 
+    // 외부 API라 Entity 없음 -> build 건너
 }

@@ -20,6 +20,10 @@ public class PortNameDTO {
     private String countryNameJp;
     private String portNameJp;
 
+    // 위경도 정보 추가
+    private double locLat;
+    private double locLon;
+
     public static PortNameDTO toDTO(PortNameEntity portNameEntity) {
         return PortNameDTO.builder()
                 .portId(portNameEntity.getPortId())

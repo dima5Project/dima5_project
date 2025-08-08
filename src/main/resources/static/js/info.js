@@ -1,199 +1,286 @@
-// ✅ info.js 전체 코드
+// ✅ 1. 항구명 기반 위경도 정의
+const portCoordinates = {
+    "다강": { lat: 23.11, lon: 113.28 },
+    "황화": { lat: 31.23, lon: 121.48 },
+    "롄윈강": { lat: 34.75, lon: 119.38 },
+    "닝보": { lat: 29.87, lon: 121.55 },
+    "난징": { lat: 32.06, lon: 118.79 },
+    "칭다오": { lat: 36.07, lon: 120.38 },
+    "르자오": { lat: 35.42, lon: 119.52 },
+    "상하이": { lat: 31.23, lon: 121.48 },
+    "톈진": { lat: 39.08, lon: 117.20 },
+    "탕구싱강": { lat: 39.02, lon: 117.72 },
+    "홍콩": { lat: 22.30, lon: 114.17 },
+    "히로시마": { lat: 34.39, lon: 132.46 },
+    "하카타": { lat: 33.59, lon: 130.40 },
+    "이마바리": { lat: 34.07, lon: 132.99 },
+    "이미즈": { lat: 36.91, lon: 137.09 },
+    "가고시마": { lat: 31.60, lon: 130.56 },
+    "마쓰야마": { lat: 33.83, lon: 132.77 },
+    "모지": { lat: 33.95, lon: 130.95 },
+    "나고야": { lat: 35.18, lon: 136.90 },
+    "나가사키": { lat: 32.75, lon: 129.87 },
+    "오사카": { lat: 34.69, lon: 135.50 },
+    "시미즈": { lat: 35.02, lon: 138.50 },
+    "도쿄": { lat: 35.68, lon: 139.76 },
+    "고베": { lat: 34.69, lon: 135.19 },
+    "와카야마": { lat: 34.23, lon: 135.17 },
+    "욧카이치": { lat: 34.97, lon: 136.62 },
+    "요코하마": { lat: 35.45, lon: 139.63 },
+    "인천": { lat: 37.45, lon: 126.60 },
+    "군산": { lat: 35.97, lon: 126.71 },
+    "포항": { lat: 36.03, lon: 129.37 },
+    "평택": { lat: 36.99, lon: 127.08 },
+    "여수": { lat: 34.76, lon: 127.66 },
+    "마닐라": { lat: 14.60, lon: 120.98 },
+    "나홋카": { lat: 42.81, lon: 132.88 },
+    "보스토치니": { lat: 42.74, lon: 133.05 },
+    "기륭": { lat: 25.13, lon: 121.74 },
+    "가오슝": { lat: 22.62, lon: 120.30 },
+    "하이퐁": { lat: 20.86, lon: 106.68 }
+};
 
-let allPortData = [];
-let portNameList = [];
+let congestionChart;
 
-let currentWeatherPage = 0;
-let currentExchangePage = 0;
-let currentDockingPage = 0;
+$(document).ready(function () {
+    const $countrySelect = $("#countrySelect");
+    const $portSelect = $("#portSelect");
 
-// 초기 실행４
-$(function () {
-    // --선텏상자 둘에 이벤트
-    $.ajax({
-
+    // ① 국가 목록
+    $.get("/api/info/countries", function (data) {
+        $countrySelect.empty().append(`<option disabled selected>국가 선택</option>`);
+        data.forEach(country => {
+            $countrySelect.append(`<option value="${country}">${country}</option>`);
+        });
     });
 
-});
-window.addEventListener("DOMContentLoaded", () => {
-    // 선택상자 두놈한테 이벤트 ｃｈａｎｇｅ 에０빈
-    fetch("/api/info/all")
-        .then(res => res.json())
-        .then(data => {
-            allPortData = data;
-            renderWeatherCard();
-            renderExchangeCard();
-            renderDockingCard();
+    // ② 국가 선택 시
+    $countrySelect.on("change", function () {
+        const selectedCountry = $(this).val();
+        $portSelect.empty().append(`<option disabled selected>항구 선택</option>`);
+
+        // 항구 목록
+        $.get(`/api/info/ports/${selectedCountry}`, function (data) {
+            data.forEach(port => {
+                $portSelect.append(`<option value="${port.portId}">${port.portNameKr}</option>`);
+            });
         });
 
-    fetch("/api/info/port-names")
-        .then(res => res.json())
-        .then(data => {
-            portNameList = data;
-            loadCountries();
+        // 시차 정보
+        $.get(`/api/info/timezone/${selectedCountry}`, function (data) {
+            const koreaTime = new Date().toLocaleString("ko-KR", {
+                timeZone: "Asia/Seoul",
+                weekday: 'long',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            $("#timezoneCard").html(`
+                <h3>🕓 시차 정보</h3>
+                <div style="margin-bottom:10px;">
+                    <strong>한국</strong><br/>
+                    ${koreaTime} (UTC+09:00)
+                </div>
+                <br><hr><br>
+                <div>
+                    <strong> ${data.countryName}</strong><br/>
+                    ${data.dayOfWeek}, ${data.currentTime} (UTC${data.utcOffset})
+                </div>
+            `);
         });
-});
 
-// 국가 옵션 구성
-function loadCountries() {
-    const countrySelect = document.getElementById("countrySelect");
-    const countrySet = [...new Set(portNameList.map(p => p.countryNameKr))];
+        // 공휴일
+        $.get(`/api/info/holiday/${selectedCountry}`, function (data) {
+            if (data && Array.isArray(data) && data.length > 0) {
+                drawHolidayCalendar(data);
+            } else {
+                $("#holidayCard").html(`
+                    <h3>오늘의 공휴일</h3>
+                    <p>등록된 공휴일이 없습니다.</p>
+                `);
+            }
+        });
 
-    countrySet.forEach(country => {
-        const opt = document.createElement("option");
-        opt.value = country;
-        opt.textContent = country;
-        countrySelect.appendChild(opt);
-    });
-}
+        // 이전에 등록된 이벤트 제거 후 재등록
+        $portSelect.off("change").on("change", function () {
+            const portId = $(this).val();
+            const portNameKr = $(this).find("option:selected").text();
+            const coords = portCoordinates[portNameKr];
 
-// 국가 선택 시 항구 목록 구성
-function updatePortsByCountry(country) {
-    const portSelect = document.getElementById("portSelect");
-    portSelect.innerHTML = '<option value="">항구 선택</option>';
+            // 날씨
+            if (coords) {
+                $.get("/api/info/weather/direct", { lat: coords.lat, lon: coords.lon }, function (data) {
+                    let rainVolume = parseFloat(data.rainVolume);
+                    if (isNaN(rainVolume)) rainVolume = 0;
 
-    const filtered = portNameList.filter(p => p.countryNameKr === country);
-    filtered.forEach(port => {
-        const opt = document.createElement("option");
-        opt.value = port.portId;
-        opt.textContent = port.portNameKr;
-        portSelect.appendChild(opt);
-    });
-    console.log(filtered)
-}
+                    $("#weatherCard").html(`
+                        <h3>🌤 날씨</h3>
+                        <p>온도: ${data.temperature}°C</p>
+                        <p>날씨: ${data.mainWeather} ${data.weatherEmoji}</p>
+                        <p>풍속: ${data.windSpeed} m/s</p>
+                        <p>풍향: ${data.windDirLabel} (${data.windDeg}°)</p>
+                        <p>💧 강수량: ${rainVolume} mm</p>
+                    `);
+                });
+            } else {
+                $("#weatherCard").html(`<p>위경도 정보가 없습니다.</p>`);
+            }
 
-// 검색 시 해당 항구 정보만 카드로 출력
-function searchPortInfo() {
-    const portId = document.getElementById("portSelect").value;
-    if (!portId) return;
+            // 혼잡도 카드
+            $.get(`/api/info/docking/${portId}`, function (data) {
+                const colorText = data.congestionStatus === "혼잡" ? "🟠 혼잡"
+                    : data.congestionStatus === "매우 혼잡" ? "🔴 매우 혼잡"
+                        : "🟢 원활";
 
-    const filtered = allPortData.filter(p => p.portNameInfo.portId === portId);
-    if (!filtered.length) return;
+                $("#dockingCard").html(`
+                    <h3>⚓ 혼잡도</h3>
+                    <p>정박 선박 수: ${data.currentShips}</p>
+                    <p>입항 예정 수: ${data.expectedShips}</p>
+                    <p>상태: ${colorText}</p>
+                `);
+            });
 
-    renderWeatherCard(filtered);
-    renderExchangeCard(filtered);
-    renderDockingCard(filtered);
-}
-
-// 카드 출력 공통 함수들
-function renderWeatherCard(data = allPortData) {
-    const card = document.getElementById("weatherCard");
-    card.innerHTML = `<h3>🌤️ 날씨 정보</h3><div class="card-grid" id="weatherGrid"></div>`;
-
-    const start = currentWeatherPage * 4;
-    const slice = data.slice(start, start + 4);
-
-    const grid = document.getElementById("weatherGrid");
-    slice.forEach(port => {
-        const item = document.createElement("div");
-        item.className = "card-item";
-        item.innerHTML = `
-            <strong>항구명:</strong> ${port.portNameInfo.portNameKr}<br>
-            <img src="https://openweathermap.org/img/wn/${port.weather.icon}.png" /><br>
-            기온: ${port.weather.temperature}<br>
-            강수량: ${port.weather.rain || "0 mm"}
-        `;
-        grid.appendChild(item);
+            // 혼잡도 그래프
+            $.get(`/api/info/dock-graph/${portId}`, function (data) {
+                drawChart(data);
+            });
+        });
     });
 
-    card.innerHTML += `
-        <div class="nav-buttons">
-            <button onclick="changeWeatherPage(-1)">←</button>
-            <button onclick="changeWeatherPage(1)">→</button>
-        </div>
-    `;
-}
+    // ③ 혼합 그래프 (bar + line)
+    function drawChart(data) {
+        const ctx = document.getElementById("graphCanvas").getContext("2d");
+        const labels = data.map(d => d.date);
+        const actualData = data.map(d => d.actual);
+        const expectedData = data.map(d => d.expected);
 
-function changeWeatherPage(dir) {
-    const max = Math.ceil(allPortData.length / 4) - 1;
-    currentWeatherPage = Math.min(Math.max(currentWeatherPage + dir, 0), max);
-    renderWeatherCard();
-}
+        if (congestionChart) congestionChart.destroy();
 
-function renderExchangeCard(data = allPortData) {
-    const card = document.getElementById("exchangeCard");
-    card.innerHTML = `<h3>💱 환율 정보</h3><div class="card-grid" id="exchangeGrid"></div>`;
-
-    const start = currentExchangePage * 4;
-    const slice = data.slice(start, start + 4);
-
-    const grid = document.getElementById("exchangeGrid");
-    slice.forEach(port => {
-        const code = getCurrencyCodeByCountry(port.portNameInfo.countryNameKr);
-        const ex = port.exchanges.find(e => e.currency === code);
-        const item = document.createElement("div");
-        item.className = "card-item";
-        item.innerHTML = ex ? `
-            <strong>국가:</strong> ${port.portNameInfo.countryNameKr}<br>
-            <strong>통화:</strong> ${ex.currency}<br>
-            환율: ${ex.baseRate}<br>
-            전일 대비: ${ex.exchangeRateChange || "정보 없음"}<br>
-            기준 시각: ${ex.currentTime}
-        ` : `
-            <strong>${port.portNameInfo.countryNameKr}</strong><br>
-            환율 정보 없음
-        `;
-        grid.appendChild(item);
-    });
-
-    card.innerHTML += `
-        <div class="nav-buttons">
-            <button onclick="changeExchangePage(-1)">←</button>
-            <button onclick="changeExchangePage(1)">→</button>
-        </div>
-    `;
-}
-
-function changeExchangePage(dir) {
-    const max = Math.ceil(allPortData.length / 4) - 1;
-    currentExchangePage = Math.min(Math.max(currentExchangePage + dir, 0), max);
-    renderExchangeCard();
-}
-
-function renderDockingCard(data = allPortData) {
-    const card = document.getElementById("dockingCard");
-    card.innerHTML = `<h3>⚓ 항구 접안 정보</h3><div class="card-grid" id="dockingGrid"></div>`;
-
-    const start = currentDockingPage * 4;
-    const slice = data.slice(start, start + 4);
-
-    const grid = document.getElementById("dockingGrid");
-    slice.forEach(port => {
-        const item = document.createElement("div");
-        item.className = "card-item";
-        item.innerHTML = `
-            <strong>항구명:</strong> ${port.portNameInfo.portNameKr}<br>
-            국가: ${port.portNameInfo.countryNameKr}<br>
-            접안 선박 수: ${port.shipsInPort}척<br>
-            입항 예정 수: ${port.expectedShips}척
-        `;
-        grid.appendChild(item);
-    });
-
-    card.innerHTML += `
-        <div class="nav-buttons">
-            <button onclick="changeDockingPage(-1)">←</button>
-            <button onclick="changeDockingPage(1)">→</button>
-        </div>
-    `;
-}
-
-function changeDockingPage(dir) {
-    const max = Math.ceil(allPortData.length / 4) - 1;
-    currentDockingPage = Math.min(Math.max(currentDockingPage + dir, 0), max);
-    renderDockingCard();
-}
-
-function getCurrencyCodeByCountry(countryKr) {
-    switch (countryKr) {
-        case "대한민국": return "KRdhzpdlW";
-        case "중국": return "CNY";
-        case "일본": return "JPY";
-        case "홍콩": return "HKD";
-        case "필리핀": return "PHP";
-        case "러시아": return "RUB";
-        case "대만": return "TWD";
-        case "베트남": return "VND";
-        default: return "USD";
+        congestionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '정박 선박 수',
+                        data: actualData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                        order: 2
+                    },
+                    {
+                        label: '입항 예정 수',
+                        data: expectedData,
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y',
+                        order: 2
+                    },
+                    {
+                        label: '정박 추이선',
+                        data: actualData,
+                        type: 'line',
+                        borderColor: 'blue',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: 'blue',
+                        tension: 0.4,
+                        yAxisID: 'y',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '최근 항만 혼잡도 추이'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '선박 수'
+                        }
+                    }
+                }
+            }
+        });
     }
-}
+
+    // ④ 공휴일 달력
+    function drawHolidayCalendar(holidays) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0-indexed
+        const todayDate = today.getDate();
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        const holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
+
+        let calendarHTML = `<table><thead><tr>`;
+        const days = ["일", "월", "화", "수", "목", "금", "토"];
+        days.forEach(d => calendarHTML += `<th>${d}</th>`);
+        calendarHTML += `</tr></thead><tbody><tr>`;
+
+        for (let i = 0; i < firstDay; i++) {
+            calendarHTML += `<td></td>`;
+        }
+
+        for (let d = 1; d <= lastDate; d++) {
+            let cell = "";
+
+            const isToday = d === todayDate;
+            const isHoliday = holidayDates.includes(d);
+
+            if (isToday && isHoliday) {
+                cell = `<div style="background-color:#ffefef; border-radius:50%; padding:4px;">⭕●</div>`;
+            } else if (isToday) {
+                cell = `<div style="background-color:#ffe0e0; border-radius:50%; padding:4px;">⭕</div>`;
+            } else if (isHoliday) {
+                cell = `<div style="color:red;">●</div>`;
+            } else {
+                cell = d;
+            }
+
+            calendarHTML += `<td style="text-align:center">${cell}</td>`;
+
+            if ((firstDay + d) % 7 === 0) {
+                calendarHTML += `</tr><tr>`;
+            }
+        }
+
+        calendarHTML += `</tr></tbody></table>`;
+
+        // 달력 렌더링
+        $("#holidayCalendarContainer").html(calendarHTML);
+
+        // 오늘 날짜 텍스트 추가
+        const todayText = `${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
+        $("#todayText").html(`<p style="margin-bottom: 10px;"><strong>📅 오늘 날짜:</strong> ${todayText}</p>`);
+    }
+
+    drawHolidayCalendar([]); // 그냥 기본 달력 출력
+});
