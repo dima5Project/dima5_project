@@ -479,13 +479,13 @@
                     <!-- 이전(◀) -->
                     <li>
                         <a class="page-link-arrow"
-                        th:if="${!newsList.first}"
-                        th:href="@{/news/main(page=${page-1}, keyword=${keyword})}"
-                        aria-label="Previous page">
-                        <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Prev page arrow">
+                            th:if="${!newsList.first}"
+                            th:href="@{/news/main(page=${page-1}, keyword=${keyword})}"
+                            aria-label="Previous page">
+                            &laquo;
                         </a>
                         <span class="page-link-arrow disabled" th:unless="${!newsList.first}">
-                        <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Prev page arrow">
+                            &laquo;
                         </span>
                     </li>
 
