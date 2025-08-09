@@ -235,6 +235,8 @@ main {
     color: white;
     padding: 8px 18px;
     border: none;
+    text-decoration: none;
+    /* 밑줄 제거 */
     border-radius: 4px;
     cursor: pointer;
 }

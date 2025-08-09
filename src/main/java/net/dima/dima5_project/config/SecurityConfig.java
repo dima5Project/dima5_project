@@ -32,10 +32,11 @@ public class SecurityConfig {
                                                 "/api/**",
                                                 "/lang",
                                                 "/main",
-                                                "/intro/**",
+                                                "/intro/**", // 소개
+                                                "/ask/**",   // 문의 - 나중에 삭제
                                                 "/predict/**", // 차항지 예측 - 나중에 삭제
                                                 "/user/**",
-                                                "/news/**",
+                                                "/news/**",  // 뉴스
                                                 "/api/port/**",
                                                 "/mypage/**", // 마이페이지 - 나중에 삭제
                                                 "/images/**",
@@ -43,15 +44,14 @@ public class SecurityConfig {
                                                 "/js/**",
                                                 "/api/info/**", // 부가정보 - 나중에 삭제
                                                 "/port/info/**",
-                                                "/ask/**" // 문의 - 나중에 삭제
+                                                "/info/**", // 부가정보 - 나중에 삭제
+                                                "/ask/**"   // 문의 - 나중에 삭제
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
-                                // .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER")
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 
-                // security가 제공하는 기본 폼을 사용하지 않고, 개발자가 만든 폼 사용
-                // 시큐리티가 받아서 처리하는 파라미터는 userid, userpwd 인데,
+                // 로그인에 대한 처리
                 http
                                 .formLogin((auth) -> auth
                                                 .loginPage("/user/login") // 로그인 없이 특정페이지에 접속을 시도하면 무조건 로그인 페이지로 이동 =
@@ -77,8 +77,6 @@ public class SecurityConfig {
                                 );
 
                 // Post는 무조건 토큰을 전달해야 함. disabled 시키면 토큰 전달할 필요없음.
-                // 시큐리티는 사이트 위변조를 방어하도록 설정되어 있음
-                // 개발할 때는 위변조 방어(CSRF 공격)를 disable하고 배포할 때 enabled 시킴
                 http
                                 .csrf((auth) -> auth.disable());
 

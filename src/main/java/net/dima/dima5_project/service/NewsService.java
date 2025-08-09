@@ -24,43 +24,37 @@ public class NewsService {
     // 레포지토리에서 데이터를 가져와서 검색을 하고 컨트롤러에 넘겨주는 역할
     private final NewsRepository newsRepository;
 
-    int pageLimit = 9; // 페이지당 뉴스 수
-
     /**
-     * 뉴스 메인보드 + 페이징 기능
-     * @param pageable
-     * @param keyword
-     * @return
+     * 뉴스 메인보드 + 페이징(+정렬) + 제목 검색
      */
-    public Page<NewsBoardDTO> getPagedNews(Pageable pageable, String keyword){
+    public Page<NewsBoardDTO> selectAll(Pageable pageable, String searchWord) {
 
-        int page = pageable.getPageNumber() - 1; // 사용자가 1 페이지 요청 : page = 0
+        // 정렬: newsSeq DESC로 보장 (컨트롤러에서 넘어온 size/page 그대로 사용)
+        PageRequest pageReq = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "newsSeq")
+        );
 
-        // 검색어 + 페이징 이용한 조회
-        Page<NewsBoardEntity> entityPage = null; //  뉴스 엔티티들을 여러 개 담을 공간 생성, 한 페이지 분량만 담을 수 있는 Page 타입으로 선언
-        Page<NewsBoardDTO> dtoPage = null;
+        Page<NewsBoardEntity> entityPage;
+        String kw = (searchWord == null) ? "" : searchWord.trim();
 
-        // 검색어가 없으면 전체 뉴스를 불러옴
-        if(keyword == null || keyword.isEmpty()){
-            entityPage = newsRepository.findAll(
-                // 페이지 요청 : 몇 번째 페이지, 몇 개씩, 어떤 순서로 정렬할지를 지정
-                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "newsSeq")));
+        if (kw.isBlank()) {
+            entityPage = newsRepository.findAll(pageReq);
         } else {
-            entityPage = newsRepository.findByNewsTitleContaining(
-                keyword, 
-                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "newsSeq")));
+            entityPage = newsRepository.findByNewsTitleContaining(kw, pageReq);
         }
 
-        dtoPage = entityPage.map(NewsBoardDTO::toDTO);
-
-        return dtoPage; // DTO 를 페이지 단위로 담아서 반환
+        return entityPage.map(NewsBoardDTO::toDTO);
+        
     }
 
     public List<NewsBoardDTO> getAllnews() {
         List<NewsBoardEntity> temp = newsRepository.findAll(Sort.by(Sort.Direction.DESC, "newsSeq"));
         List<NewsBoardDTO> list = new ArrayList<>();
-        temp.forEach((news) -> list.add(NewsBoardDTO.toDTO(news)));
+        temp.forEach(news -> list.add(NewsBoardDTO.toDTO(news)));
         return list;
     }
+
 
 }

@@ -445,10 +445,11 @@
         <div class="hero-content">
             <p class="hero-subtitle">For Those Who Move the World</p>
             <h1 class="hero-title">해상과 무역의 흐름,<br>지금 여기서 확인하세요</h1>
-            <form class="search-form" action="#" method="get">
-                <input type="search" class="search-input" placeholder="검색어를 입력하세요">
+            <form class="search-form" th:action="@{/news/main}" method="get">
+                <input type="search" class="search-input" name="keyword" 
+                        placeholder="검색어를 입력하세요" th:value="${keyword}">
                 <button type="submit" class="search-button" aria-label="Search">
-                    <img th:src="@{/images/newsImages/316_422.svg}" alt="Search Icon">
+                    <img th:src="@{/images/newsImages/316_422.svg}" src="images/newsImages/316_422.svg" alt="Search Icon">
                 </button>
             </form>
         </div>
@@ -474,21 +475,45 @@
             </div>
             
             <nav class="pagination" aria-label="Page navigation">
-                <ul class="pagination-list">
-                    <li><a href="#" class="page-link active">1</a></li>
-                    <li><a href="#" class="page-link">2</a></li>
-                    <li><a href="#" class="page-link">3</a></li>
-                    <li><a href="#" class="page-link">4</a></li>
-                    <li><a href="#" class="page-link">5</a></li>
+                <ul class="pagination-list" th:if="${newsList.totalPages > 1}">
+                    <!-- 이전(◀) -->
                     <li>
-                        <a href="#" class="page-link-arrow" aria-label="Next page">
-                            <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Next page arrow">
+                        <a class="page-link-arrow"
+                            th:if="${!newsList.first}"
+                            th:href="@{/news/main(page=${page-1}, keyword=${keyword})}"
+                            aria-label="Previous page">
+                            &laquo;
                         </a>
+                        <span class="page-link-arrow disabled" th:unless="${!newsList.first}">
+                            &laquo;
+                        </span>
+                    </li>
+
+                    <!-- 번호들 -->
+                    <li th:each="i : ${#numbers.sequence(1, newsList.totalPages)}">
+                        <a class="page-link"
+                        th:href="@{/news/main(page=${i}, keyword=${keyword})}"
+                        th:text="${i}"
+                        th:classappend="${i == page} ? ' active' : ''"></a>
+                    </li>
+
+                    <!-- 다음(▶) -->
+                    <li>
+                        <a class="page-link-arrow"
+                        th:if="${!newsList.last}"
+                        th:href="@{/news/main(page=${page+1}, keyword=${keyword})}"
+                        aria-label="Next page">
+                        <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Next page arrow">
+                        </a>
+                        <span class="page-link-arrow disabled" th:unless="${!newsList.last}">
+                        <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Next page arrow">
+                        </span>
                     </li>
                 </ul>
             </nav>
         </div>
     </section>
+
     <footer id="section-footer" class="site-footer">
         <div class="container footer-container">
             <div class="footer-info">

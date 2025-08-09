@@ -1,95 +1,242 @@
+/* 문의글 남기기 css */
+@charset "UTF-8";
+
 body {
-    font-family: 'Pretendard', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
-    padding: 0;
-    background: #f4f4f4;
+    background-color: #fff;
+    color: #000;
 }
 
-header {
-    background: white;
-    border-bottom: 1px solid #ccc;
-    padding: 15px 40px;
+main {
+    max-width: 1040px;
+    margin: 60px auto;
+    /* 위아래 60px 여백, 좌우는 auto → 가로 가운데 정렬 */
+    padding: 0 20px;
+    /* 콘텐츠 내부 좌우 여백 20px */
+}
+
+.qna-header-bg {
+    background-color: #0f1035;
+    /* 진한 파랑 */
+    height: 350px;
+    /* 고정 높이 */
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 25px;
-    margin: 0;
-    padding: 0;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: black;
-    font-weight: 500;
-}
-
-.hero {
-    background: #007aff;
-    color: white;
-    text-align: center;
-    padding: 40px 20px;
-}
-
-.filter-buttons button {
-    background: white;
-    color: #007aff;
-    border: none;
-    margin: 0 5px;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.search-bar {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    gap: 10px;
-}
-
-table {
-    width: 90%;
+.qna-header {
+    padding-top: 20vh;
+    max-width: 1200px;
     margin: 0 auto;
-    border-collapse: collapse;
-    background: white;
+    text-align: center;
+    color: white;
 }
 
-th,
-td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #ccc;
+.qna-header h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.qna-header p {
+    font-size: 16px;
+    color: #ddd;
+}
+
+/* ===== 글쓰기 폼 레이아웃 ===== */
+.qna-form {
+    max-width: 1040px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.form-row label,
+.form-label {
+    font-size: 14px;
+    color: #222;
+}
+
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #4a6cf7;
+}
+
+/* textarea 높이 */
+textarea {
+    min-height: 260px;
+    resize: vertical;
+    font-family: 'Noto Sans KR', sans-serif;
+    /* 글씨체 */
+    font-size: 14px;
+    /* 글자 크기 */
+    line-height: 1.5;
+    /* 줄 간격 */
+    color: #333;
+    /* 글자 색상 */
+}
+
+/* ===== 공개여부 세그먼트 ===== */
+.segmented {
+    display: inline-grid;
+    grid-auto-flow: column;
+    gap: 8px;
+}
+
+.segmented input[type="radio"] {
+    display: none;
+}
+
+.segmented label {
+    min-width: 64px;
+    padding: 8px 14px;
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #f7f7f7;
+    cursor: pointer;
+    user-select: none;
     text-align: center;
 }
 
-th {
-    background: #f0f0f0;
+.segmented input[type="radio"]:checked+label {
+    background: #e7eeff;
+    border-color: #4a6cf7;
+    color: #132a7a;
+    font-weight: 600;
 }
 
-.reply-link {
-    color: #007aff;
-    text-decoration: underline;
-}
-
-.post-btn {
-    float: right;
-    margin: 10px 5% 0 0;
-    padding: 8px 16px;
-    background: #007aff;
-    color: white;
-    border: none;
+/* ===== 파일 입력: 기본 file 스타일 활용 (입력창 + 버튼) ===== */
+input[type="file"] {
+    font-size: 14px;
+    border: 1px solid #bdbdbd;
     border-radius: 4px;
+    padding: 8px;
+    background: #fff;
+}
+
+/* 버튼 부분 스타일 (크롬/엣지/사파리) */
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    background: #e9f0ff;
     cursor: pointer;
 }
 
-.footer {
-    background: #1d1d1d;
-    color: white;
-    padding: 30px;
+input[type="file"]::file-selector-button:hover {
+    background: #dbe7ff;
+}
+
+/* ===== 비밀번호 영역 ===== */
+.form-row .pw-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* 입력창과 안내문 간격 */
+    white-space: nowrap;
+    /* 안내문 줄바꿈 방지 */
+    min-width: 0;
+    /* grid 안에서 넘침 방지 */
+}
+
+#pw {
+    width: 100px;
+    /* 4자리 입력창 */
+    text-align: first;
+    /* 숫자 가운데 정렬 */
+}
+
+.pw-hint {
+    color: #d32f2f;
+    font-size: 12px;
+    line-height: 1;
+}
+
+#pw:focus {
+    border-color: #4a6cf7;
+    outline: none;
+}
+
+.form-row label[for="pw"] {
+    align-self: center;
+}
+
+/* ===== 하단 버튼 ===== */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.btn {
+    /* 공통 */
+    display: inline-flex;
+    /* 텍스트 수직/수평 중앙정렬을 위해 */
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    /* 버튼 높이 통일 */
+    padding: 0 18px;
+    /* 세로 패딩은 0, 높이로 컨트롤 */
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-family: 'Noto Sans KR', sans-serif;
     font-size: 14px;
-    text-align: center;
+    font-weight: 700;
+    /* 두 버튼 글꼴 두께 통일 */
+    line-height: 1;
+    /* 라인하이트 통일 */
+    cursor: pointer;
+    vertical-align: middle;
+    -webkit-appearance: none;
+    /* 기본 버튼 스타일 제거 */
+    appearance: none;
+}
+
+.btn.primary {
+    background: #4a6cf7;
+    /* 파란 버튼 톤 */
+    color: #fff;
+}
+
+.btn.primary:hover {
+    background: #3e5de0;
+}
+
+.btn.secondary {
+    background: #e9f0ff;
+    color: #1e3a8a;
+    border-color: #b7c7ff;
+}
+
+.btn.secondary:hover {
+    background: #dbe7ff;
 }
