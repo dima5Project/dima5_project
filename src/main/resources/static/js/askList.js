@@ -205,4 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🔹 첫 페이지 기본 표시
     showPage(1);
+
+
 });
