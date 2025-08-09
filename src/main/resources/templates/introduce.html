@@ -4,15 +4,177 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/header/header.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script defer th:src="@{/js/header.js}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <script src="global.js" defer></script>
     <title>소개 페이지</title>
 </head>
 
 <body>
     <div th:replace="~{/header :: bu3_navigation}"></div>
 
+    <section id="hero" class="hero-section">
+        <div class="hero-background">
+            <img src="images/e59d1902c3c4b7db5d55888ca39742143589383e.png" alt="Port background" class="hero-bg-image">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">부3갈매기</h1>
+            <p class="hero-subtitle">해상 물류 운송의 가시화 서비스, 부3갈매기로 물류를 혁신합니다</p>
+        </div>
+    </section>
+    <section id="about" class="about-section">
+        <div class="container about-layout">
+            <aside class="sidebar">
+                <h2 class="sidebar-title">소개페이지</h2>
+                <nav class="sidebar-nav">
+                    <a href="#" class="sidebar-link active">
+                        <span>서비스 소개</span>
+                        <img src="images/I724_3748_501_830.svg" alt="arrow icon">
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <span>팀 소개</span>
+                        <img src="images/I724_3749_501_830.svg" alt="arrow icon">
+                    </a>
+                </nav>
+            </aside>
+            <main class="content-area">
+                <article class="content-block">
+                    <header class="content-header">
+                        <h3 class="content-title-en">Portcast</h3>
+                        <p class="content-subtitle">차기 정박항 예측으로 물류의 불확실성을 줄입니다</p>
+                    </header>
+                    <div class="content-body-flex">
+                        <img src="images/4830828d1150c189d7e83cbdab610b0678c395e8.png" alt="Portcast service interface"
+                            class="content-image">
+                        <div class="content-text">
+                            <p>AIS 데이터를 기반으로 해상 물류의 보이지 않던 정보를 <span class="bold">시각화</span>하고 누구나 <span class="bold">예측
+                                    가능한 공급망</span>을 설계할 수 있도록 돕습니다</p>
+                            <p>물류 계획을 사전에 수립하고 하역, 통관 일정 혼선을 줄이며 <span class="bold">공급망 위험을 선제적으로 관리</span>할 수 있습니다</p>
+                            <p>좋은 제품을 빠르고 정확하게 전달할 수 있는 물류 최적화를 통해 <span class="bold">물류 경쟁력을 강화</span>하세요.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="content-block">
+                    <header class="content-header">
+                        <h3 class="content-title-en">Portcast Predict</h3>
+                        <p class="content-subtitle">차기 정박항 예측이 필요한 이유</p>
+                    </header>
+                    <div class="content-body-flex">
+                        <div class="content-text">
+                            <p>전 세계 물류의 <span class="bold">90%</span>는 바다를 통해 이동합니다</p>
+                            <p>선사의 상업 전략, 보안 이슈, 내부 정책 등으로 인해 항만, 무역회사, 화주 등 다양한 이해관계자들은 <span class="bold">선박이 언제, 어디에
+                                    도착할지를 사전에 알기 어렵습니다.</span></p>
+                            <p>이는 스케줄 조정 지연, 하역 및 통관 일정 혼선 등으로 인한 전체 물류 흐름의 불확실성을 초래하며 <span class="bold">운영 리스크와 비용
+                                    상승</span>으로 이어집니다.</p>
+                        </div>
+                        <!--merged image-->
+                        <div class="merged-image-container"
+                            style="position: relative; width: 299.05px; height: 269.25px;">
+                            <img src="images/724_3777.svg" alt="Predictive analytics graph element"
+                                style="position: absolute; top: 0px; left: 56.06px;">
+                            <img src="images/724_3779.svg" alt="Predictive analytics graph element"
+                                style="position: absolute; top: 13.18px; left: 56.13px;">
+                            <img src="images/724_3781.svg" alt="Predictive analytics graph element"
+                                style="position: absolute; top: 61.36px; left: 73.33px;">
+                            <img src="images/724_3783.svg" alt="Predictive analytics graph element"
+                                style="position: absolute; top: 10.55px; left: 107.92px;">
+                        </div>
+                    </div>
+                </article>
+            </main>
+        </div>
+    </section>
+    <section class="ais-section">
+        <div class="ais-background">
+            <img src="images/38ec9a16c7382445a5d767efdf0e8d3e6c807b62.png" alt="AIS data visualization"
+                class="ais-bg-image">
+            <div class="ais-overlay"></div>
+        </div>
+        <div class="container ais-content">
+            <header class="content-header">
+                <h3 class="ais-title">AIS 데이터를 통한 문제 해결</h3>
+                <p class="ais-subtitle">AIS(Automatic Identification System)</p>
+            </header>
+            <div class="ais-text">
+                <p>차기 정박항을 예측하기 위해 Portcast는 <span class="bold">AIS(Automatic Identification System) 데이터</span>를 주목했습니다
+                </p>
+                <p>AIS는 선박이 보내는 <span class="bold">실시간 운항 정보</span>로 <span class="bold">위치(LAT/LON), 속력, 항적 방향(COG), 선체
+                        방향(HEADING)</span> 등을 포함하고 있습니다</p>
+                <p>우리는 <span class="bold">과거 선박들의 운항 데이터</span>를 학습하여 선박이 다음에 어디로 향할지 예측하는 <span
+                        class="bold">분류모델</span>을 개발했습니다</p>
+            </div>
+        </div>
+    </section>
+    <section class="methodology-section">
+        <div class="container">
+            <header class="content-header">
+                <h3 class="content-title-en">Portcast Predict 동작원리</h3>
+                <p class="content-subtitle">항구 군집화와 단계적 예측을 통한 정확도 향상</p>
+            </header>
+            <div class="methodology-steps">
+                <div class="step">
+                    <img src="images/792_279.svg" alt="Map showing port clustering" class="step-image">
+                    <div class="step-description">
+                        <h4>항구 군집화 & 1차 예측</h4>
+                        <p>38개 항구를 거리 기반으로<span class="bold"> K-means 군집화</span> 선박 출항 후<span class="bold"> n시간 시점의
+                                위치/방향 데이터</span> 입력 1차 분류 모델이 도착할 가능성이 높은 <span class="bold">항구 그룹(군집) 예측</span></p>
+                    </div>
+                </div>
+                <img src="images/792_308.svg" alt="arrow" class="step-arrow">
+                <div class="step">
+                    <!--merged image-->
+                    <div class="merged-image-container" style="position: relative; width: 460px; height: 486.59px;">
+                        <img src="images/725_161.svg" alt="Map with predictions"
+                            style="position: absolute; top: 0px; left: 0px;">
+                        <img src="images/725_194.svg" alt="Prediction pin"
+                            style="position: absolute; top: 59.88px; left: 64.23px;">
+                        <img src="images/725_195.svg" alt="Prediction pin"
+                            style="position: absolute; top: 52.93px; left: 171.98px;">
+                        <img src="images/725_197.svg" alt="Prediction pin"
+                            style="position: absolute; top: 217.44px; left: 188.56px;">
+                        <img src="images/725_198.svg" alt="Prediction pin"
+                            style="position: absolute; top: 235.98px; left: 252.79px;">
+                        <img src="images/725_199.svg" alt="Prediction pin"
+                            style="position: absolute; top: 270.74px; left: 261.08px;">
+                        <img src="images/725_200.svg" alt="Prediction pin"
+                            style="position: absolute; top: 150.25px; left: 383.33px;">
+                        <img src="images/725_215.svg" alt="Prediction label"
+                            style="position: absolute; top: 179.57px; left: 289.72px;">
+                        <img src="images/725_218.svg" alt="Prediction label"
+                            style="position: absolute; top: 135.28px; left: 193.74px;">
+                        <img src="images/725_219.svg" alt="Prediction label"
+                            style="position: absolute; top: 160.67px; left: 181.31px;">
+                        <img src="images/725_220.svg" alt="Prediction label"
+                            style="position: absolute; top: 204.7px; left: 226.89px;">
+                        <img src="images/725_221.svg" alt="Prediction label"
+                            style="position: absolute; top: 238.29px; left: 270.41px;">
+                        <img src="images/725_222.svg" alt="Prediction label"
+                            style="position: absolute; top: 209.42px; left: 321.28px;">
+                        <img src="images/725_201.svg" alt="Current location pin"
+                            style="position: absolute; top: 185px; left: 333.6px;">
+                    </div>
+                    <div class="step-description">
+                        <h4>군집별 정밀 예측 & TOP3 도출</h4>
+                        <p>각 군집에 최적화된 2차 분류 모델 학습 1차 예측 결과 중 상위 2개 군집에 대해 정밀 예측 수행 Joint 확률을 계산해 <span class="bold">도착
+                                가능성이 높은 항구 3곳의 확률 제공</span></p>
+                        <p class="disclaimer">*일본의 일부 항구의 경우, 목적항이 아닌 군집을 예측합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="accuracy-note">*예측 정확도(테스트 기준)<br>1차 군집 예측 정확도: 77.8%, 실제 도착항을 1순위로 맞춘 확률: 71.15%, 실제 도착항이 TOP3에
+                포함될 확률: 87.98%</p>
+        </div>
+    </section>
+    <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 </body>
 
 </html>

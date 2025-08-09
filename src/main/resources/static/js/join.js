@@ -119,48 +119,20 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             return;
         }
 
-        // 백엔드 API 호출 로직
-        /*
-        // fetch 함수에 요청을 보낼 url과 요청에 대한 설정을 전달
-        fetch('/user/confirmId', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId: userIdInput.value })
-        })
-        
-        // 서버로부터 응답을 받아 응답을 .json() 메서드로 json 형식으로 변환
-        .then(response => response.json())
-
-        // JSON으로 변환된 데이터를 받아서 실제 로직 처리
-        .then(data => {
-            if (data.isDuplicated) {
-                showMessage(userIdInput, 'error', '이미 존재하는 아이디입니다.');
-                isIdConfirmed = false;
-            } else {
-                showMessage(userIdInput, 'success', '사용 가능한 아이디입니다.');
-                isIdConfirmed = true;
+        $.ajax({
+            url: '/user/confirmId'
+            , method: 'POST'
+            , data: { "userId": $("#user_id").val().trim() }
+            , success: function (resp) {
+                if (resp) {
+                    $("#idSuccess").html('사용 가능한 아이디입니다')
+                    isIdConfirmed = true;
+                } else {
+                    $('#idError').html('이미 존재하는 아이디입니다')
+                    isIdConfirmed = false;
+                }
             }
         })
-        
-        // 네트워크 오류와 같이 요청이 실패했을 때 에러를 처리
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage(userIdInput, 'error', '서버 통신 오류가 발생했습니다.');
-            isIdConfirmed = false;
-        });
-        */
-
-        // 가상 중복 확인 (실제 백엔드 연동 전까지 사용) -> 백엔드 연동하면 지울 것. 혹은 주석 처리.
-        const isDuplicated = userIdInput.value.includes('test');
-        if (isDuplicated) {
-            showMessage(userIdInput, 'error', '이미 존재하는 아이디입니다');
-            isIdConfirmed = false;
-        } else {
-            showMessage(userIdInput, 'success', '사용 가능한 아이디입니다');
-            isIdConfirmed = true;
-        }
 
         checkFormValidity();
     });
@@ -288,21 +260,21 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
         }
         // 아이디 유효성
         if (!isIdValid) {
-            showMessage(userIdInput, 'error', '아이디 형식을 올바르게 입력해주세요.');
+            showMessage(userIdInput, 'error', '영문 5~10자로 입력하세요');
             isValid = false;
         }
         if (!isIdConfirmed) {
-            showMessage(userIdInput, 'error', '아이디 중복 확인이 필요합니다.');
+            showMessage(userIdInput, 'error', '아이디 중복 확인이 필요합니다');
             isValid = false;
         }
         // 비밀번호 유효성
         if (!isPasswordValid) {
-            showMessage(passwordInput, 'error', '비밀번호 형식을 올바르게 입력해주세요.');
+            showMessage(passwordInput, 'error', '영문 5~10자로 입력하세요');
             isValid = false;
         }
         // 비밀번호 확인
         if (!isPasswordConfirmed) {
-            showMessage(passwordConfirmInput, 'error', '비밀번호가 일치하지 않습니다.');
+            showMessage(passwordConfirmInput, 'error', '비밀번호가 일치하지 않습니다');
             isValid = false;
         }
         // 이메일 유효성
