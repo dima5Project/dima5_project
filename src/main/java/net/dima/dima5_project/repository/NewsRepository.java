@@ -10,6 +10,6 @@ import net.dima.dima5_project.entity.NewsBoardEntity;
 public interface NewsRepository extends JpaRepository<NewsBoardEntity, Long> {
     
     // 뉴스 제목에 키워드가 포함된 검색 결과 + 페이징
-    Page<NewsBoardEntity> findByNewsTitleContaining(String keyword, PageRequest pageable);
+    Page<NewsBoardEntity> findByNewsTitleContaining(String searchWord, PageRequest pageable);
 
 }
