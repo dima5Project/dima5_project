@@ -22,42 +22,42 @@
 
             <div class="navbar_menu">
                 <div class="nav_item has_submenu" data-submenu-id="submenu_intro_wrapper">
-                    <a href="/intro/service" class="nav_link">소개</a>
+                    <a th:href="@{/intro/service}" class="nav_link">소개</a>
                     <div id="submenu_intro_wrapper" class="submenu_wrapper">
                         <div class="circle" aria-hidden="true"></div>
                         <div id="submenu_intro" class="submenu">
-                            <a href="/intro/service" class="submenu_item">서비스 소개</a>
-                            <a href="/intro/team" class="submenu_item">팀 소개</a>
+                            <a th:href="@{/intro/service}" class="submenu_item">서비스 소개</a>
+                            <a th:href="@{/intro/team}" class="submenu_item">팀 소개</a>
                         </div>
                     </div>
                 </div>
 
                 <div class="nav_item">
-                    <a href="/predict/init" class="nav_link">예측 서비스</a>
+                    <a th:href="@{/predict/init}" class="nav_link">예측 서비스</a>
                 </div>
 
                 <div class="nav_item has_submenu" data-submenu-id="submenu_info_wrapper">
-                    <a href="/info" class="nav_link">부가정보</a>
+                    <a th:href="@{/info}" class="nav_link">부가정보</a>
                     <div id="submenu_info_wrapper" class="submenu_wrapper">
                         <div class="circle" aria-hidden="true"></div>
                         <div id="submenu_info" class="submenu">
-                            <a href="/info" class="submenu_item">날씨</a>
-                            <a href="/info" class="submenu_item">환율</a>
-                            <a href="/info" class="submenu_item">기타 정보</a>
+                            <a th:href="@{/info}" class="submenu_item">날씨</a>
+                            <a th:href="@{/info}" class="submenu_item">환율</a>
+                            <a th:href="@{/info}" class="submenu_item">기타 정보</a>
                         </div>
                     </div>
                 </div>
 
                 <div class="nav_item">
-                    <a href="/news/main" class="nav_link">뉴스룸</a>
+                    <a th:href="@{/news/main}" class="nav_link">뉴스룸</a>
                 </div>
                 <div class="nav_item">
-                    <a href="/ask" class="nav_link">문의</a>
+                    <a th:href="@{/ask}" class="nav_link">문의</a>
                 </div>
             </div>
 
             <div class="navbar_right">
-                <a href="/user/login" class="login_button">로그인</a>
+                <a th:href="@{/user/login}" class="login_button">로그인</a>
                 <div id="langToggle" class="lang_selector">
                     <img th:src="@{/images/headerImages/lang_icon.png}" alt="언어 선택" class="lang_icon">
                     <img th:src="@{/images/headerImages/arrow_down.svg}" alt="화살표" class="arrow_icon">

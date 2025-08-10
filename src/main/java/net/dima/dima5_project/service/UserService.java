@@ -25,7 +25,7 @@ public class UserService {
      * @param userDTO
      */
     public boolean join(PredictUserDTO userDTO) {
-        log.info("회원가입 처리되는지?: {}", userDTO.toString());
+        log.info("회원가입 요청: {}", userDTO.toString());
 
         // 해당 아이디가 있는지 체크
         boolean isExistUser = repository.existsByUserId(userDTO.getUserId());
@@ -40,7 +40,7 @@ public class UserService {
 
         repository.save(userEntity);
 
-        return false;
+        return true;
     }
 
     /**
@@ -56,7 +56,8 @@ public class UserService {
             dto = PredictUserDTO.toDTO(temp.get());
         }
         log.info("아이디 검색: {}", dto);
-        return null;
+        
+        return dto;
     }
 
 }

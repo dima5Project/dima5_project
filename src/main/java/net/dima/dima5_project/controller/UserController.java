@@ -10,15 +10,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.dto.PredictUserDTO;
 import net.dima.dima5_project.service.UserService;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
-    public final UserService userService = null;
+    public final UserService userService;
 
     /**
      * 1) 로그인 화면 요청
@@ -40,11 +42,8 @@ public class UserController {
         model.addAttribute("error", error);
         model.addAttribute("errMessage", errMessage); // 핸들러가 처리해서 보낸 메세지
 
-        // 로그인 X -> 글쓰기 요청 : 로그인 화면으로 리다이렉트
-        // 로그인 시도 -> 성공! -> index로 가면 안됨!, 로그인을 시도한 바로 직전이 어디였나 확인함!
         String refererUrl = request.getHeader("Referer");
 
-        // 1) 로그인을 요청한 이전 페이지를 세션에 잠시 저장하는 작업
         HttpSession session = request.getSession();
         
         if(refererUrl != null)
@@ -83,16 +82,13 @@ public class UserController {
     }
 
     /**
-     * 중복 아이디각 존재하는지 확인
+     * 중복 아이디가 존재하는지 확인
      */
     @ResponseBody
     @PostMapping("/user/confirmId")
     public boolean confirmId(@RequestParam(name = "userId") String userId) {
-        PredictUserDTO dto = userService.selectOne(userId);
 
-        if (dto == null)
-            return true;
-        return false;
+        return userService.selectOne(userId) == null;  // 중복 없으면 true
     }
 
 }

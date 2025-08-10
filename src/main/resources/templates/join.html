@@ -20,7 +20,7 @@
 
     <header class="signup_header"> <!-- 상단 로고 영역. 홈으로 돌아가는 로고 영역 -->
       <a th:href="@{/}" class="logo">
-        <img th:src="@{/images/joinImages/shipLogo.png}" alt="logo">
+        <img th:src="@{/images/joinImages/shipLogo.png}" src="images/joinImages/shipLogo.png" alt="logo">
         <span class="logo_text">Portcast</span>
       </a>
     </header>
@@ -28,12 +28,12 @@
     <main class="signup_main"> <!-- 메인 폼 영역. 회원가입 양식을 담고 있는 메인 콘텐츠. -->
       <div class="form_container"> <!-- 입력 폼을 감싸는 박스 -->
         <a href="#" id="backButton" class="back_link">
-          <img th:src="@{/images/joinImages/backArrow.png}" alt="Back">
+          <img th:src="@{/images/joinImages/backArrow.png}" src="images/joinImages/backArrow.png" alt="Back">
         </a>
 
         <h1 class="form_title">회원가입</h1>
 
-        <form class="signup_form" action="/user/joinProc" method="post"> <!-- 폼 입력 영역 -->
+        <form class="signup_form" th:action="@{/user/joinProc}" method="post"> <!-- 폼 입력 영역 -->
           <div class="form_group"> <!-- form_group: 하나의 입력 필드-->
             <label for="name" class="form_label">이름</label>
             <input type="text" id="name" name="name" class="form_input" placeholder="실명 또는 회사명을 입력하세요">
