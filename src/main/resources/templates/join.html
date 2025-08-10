@@ -11,6 +11,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/join.css}">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" defer></script>
   <script th:src="@{/js/join.js}" defer></script>
 </head>
 
@@ -36,7 +37,7 @@
         <form class="signup_form" th:action="@{/user/joinProc}" method="post"> <!-- 폼 입력 영역 -->
           <div class="form_group"> <!-- form_group: 하나의 입력 필드-->
             <label for="name" class="form_label">이름</label>
-            <input type="text" id="name" name="name" class="form_input" placeholder="실명 또는 회사명을 입력하세요">
+            <input type="text" id="name" name="userName" class="form_input" placeholder="실명 또는 회사명을 입력하세요">
             <p class="error_message" id="nameError">이름을 입력하세요</p>
           </div>
 
@@ -52,7 +53,7 @@
 
           <div class="form_group">
             <label for="password" class="form_label">비밀번호</label>
-            <input type="password" id="password" name="password" class="form_input" placeholder="영문 5~10자를 입력하세요.">
+            <input type="password" id="password" name="userPwd" class="form_input" placeholder="영문 5~10자를 입력하세요.">
             <p class="error_message">영문자 5~10개를 입력하세요</p>
           </div>
 
@@ -80,7 +81,7 @@
               <input type="text" id="email_domain_input" class="form_input" style="display:none;"
                 placeholder="도메인을 입력하세요">
             </div>
-            <input type="hidden" name="email" id="full_email">
+            <input type="hidden" name="userEmail" id="full_email">
             <p class="error_message" id="emailError">올바른 이메일 주소를 입력하세요</p>
           </div>
 
@@ -89,22 +90,22 @@
             <div class="radio_group">
 
               <label class="custom_radio">
-                <input type="radio" name="userType" value="shipper">
+                <input type="radio" name="userType" value="화주">
                 <span class="radio_text">화주</span>
               </label>
 
               <label class="custom_radio">
-                <input type="radio" name="userType" value="carrier">
+                <input type="radio" name="userType" value="선사">
                 <span class="radio_text">선사</span>
               </label>
 
               <label class="custom_radio">
-                <input type="radio" name="userType" value="port">
+                <input type="radio" name="userType" value="항만사">
                 <span class="radio_text">항만사</span>
               </label>
 
               <label class="custom_radio">
-                <input type="radio" name="userType" value="general">
+                <input type="radio" name="userType" value="일반 사용자">
                 <span class="radio_text">일반 사용자</span>
               </label>
 

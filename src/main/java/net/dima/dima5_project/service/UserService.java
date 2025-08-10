@@ -28,9 +28,9 @@ public class UserService {
         log.info("회원가입 요청: {}", userDTO.toString());
 
         // 해당 아이디가 있는지 체크
-        boolean isExistUser = repository.existsByUserId(userDTO.getUserId());
-        if (isExistUser)
-            return false; // 이것은 if의 return문
+        if (repository.existsByUserId(userDTO.getUserId())) return false;
+
+        userDTO.setUserRole("ROLE_USER");
 
         // 비밀번호를 암호화하여 다시 세팅
         userDTO.setUserPwd(bCryptPasswordEncoder.encode(userDTO.getUserPwd()));
