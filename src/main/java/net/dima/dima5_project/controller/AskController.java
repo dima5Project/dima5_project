@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class AskController {
 
     private final AskService askService;
+    private final AskBoardDTO askBoardDTO;
 
     // 한페이지에 보여줄 글 갯수
     @Value("${ask.board.pageLimit}")
@@ -76,7 +77,7 @@ public class AskController {
      */
     @GetMapping("/write")
     public String write() {
-        return "ask/askWrite";
+        return "ask/askwrite";
     }
 
     /**
@@ -97,13 +98,23 @@ public class AskController {
      */
     @GetMapping("/askDetail")
     public String askDetail(@RequestParam("askSeq") Long askSeq,
-            @RequestParam(name = "searchItem", defaultValue = "boardTitle") String searchItem,
-            @RequestParam(name = "searchWord", defaultValue = "") String searchWord, Model model) {
+            @RequestParam(name = "searchItem", defaultValue = "askTitle") String searchItem,
+            @RequestParam(name = "searchWord", defaultValue = "") String searchWord,
+            @RequestParam(name = "pwd", required = false) String pwd, // 추가
+            Model model) {
+
+        // 비밀글 여부 & 열람 가능 여부
+        boolean isSecret = (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank());
+        boolean canView = !isSecret || (pwd != null && pwd.equals(askBoardDTO.getAskPwd()));
+
         AskBoardDTO askBoardDTO = askService.checkOne(askSeq); // 서비스에서 문의 하나 가져오기
+
         model.addAttribute("ask", askBoardDTO);
         model.addAttribute("searchItem", searchItem);
         model.addAttribute("searchWord", searchWord);
-        return "board/boardDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
+        model.addAttribute("canView", canView); // 추가
+
+        return "ask/askDetailAjax :: detailFragment"; // thymeleaf fragment만 반환
     }
 
     /**

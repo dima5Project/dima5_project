@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <div th:if="${canView}"></div>
     <!-- askDetailAjax.html -->
     <div th:fragment="detailFragment">
         <div class="ask-detail-box">
@@ -26,6 +27,10 @@
                 <p>아직 답변이 등록되지 않았습니다.</p>
             </div>
         </div>
+    </div>
+    </div>
+    <div th:if="${!canView}">
+        비밀글입니다. 비밀번호를 입력해 주세요.
     </div>
 
 </body>

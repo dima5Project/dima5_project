@@ -57,7 +57,7 @@ public class AskBoardEntity {
     private String savedFilename;
 
     @Column(name = "ask_pwd")
-    private Integer askPwd;
+    private String askPwd;
 
     @Column(name = "reply_status")
     private Boolean replyStatus;

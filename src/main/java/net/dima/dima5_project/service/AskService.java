@@ -105,6 +105,17 @@ public class AskService {
             askBoardDTO.setOriginalFilename(originalFilename);
             askBoardDTO.setSavedFilename(savedFilename);
         }
+        // 비밀번호(4자리 숫자 문자열) 처리: 비어있으면 공개글(null로 저장)
+        if (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank()) {
+            String pwd = askBoardDTO.getAskPwd().trim();
+            if (!pwd.matches("^\\d{4}$")) {
+                throw new IllegalArgumentException("비밀번호는 숫자 4자리여야 합니다.");
+            }
+            askBoardDTO.setAskPwd(pwd);
+        } else {
+            askBoardDTO.setAskPwd(null);
+        }
+
         AskBoardEntity askBoardEntity = AskBoardEntity.toEntity(askBoardDTO);
 
         askBoardRepository.save(askBoardEntity);

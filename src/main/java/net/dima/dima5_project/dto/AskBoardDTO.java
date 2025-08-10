@@ -25,7 +25,7 @@ public class AskBoardDTO {
     private LocalDateTime createDate;
     private String originalFilename;
     private String savedFilename;
-    private Integer askPwd;
+    private String askPwd;
     private Boolean replyStatus;
     private AskReplyEntity reply;
 
