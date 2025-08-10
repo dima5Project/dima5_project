@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class AskController {
 
     private final AskService askService;
-    private final AskBoardDTO askBoardDTO;
 
     // 한페이지에 보여줄 글 갯수
     @Value("${ask.board.pageLimit}")
@@ -103,11 +102,12 @@ public class AskController {
             @RequestParam(name = "pwd", required = false) String pwd, // 추가
             Model model) {
 
+        // DTO 가져오기
+        AskBoardDTO askBoardDTO = askService.checkOne(askSeq);
+
         // 비밀글 여부 & 열람 가능 여부
         boolean isSecret = (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank());
         boolean canView = !isSecret || (pwd != null && pwd.equals(askBoardDTO.getAskPwd()));
-
-        AskBoardDTO askBoardDTO = askService.checkOne(askSeq); // 서비스에서 문의 하나 가져오기
 
         model.addAttribute("ask", askBoardDTO);
         model.addAttribute("searchItem", searchItem);
