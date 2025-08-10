@@ -1,0 +1,34 @@
+package net.dima.dima5_project.dto;
+
+import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.dima.dima5_project.entity.ResultSaveEntity;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ResultSaveDTO {
+    private Long saveSeq;
+    private String searchVsl;
+    private Double lon;
+    private String top1Port;
+    private Double top1Pred;
+    private LocalDateTime eta;
+
+    public static ResultSaveDTO toDTO(ResultSaveEntity resultSaveEntity) {
+        return ResultSaveDTO.builder()
+                .saveSeq(resultSaveEntity.getSaveSeq())
+                .searchVsl(resultSaveEntity.getSearchVsl())
+                .lat(resultSaveEntity.getLat())
+                .lon(resultSaveEntity.getLon())
+                .top1Port(resultSaveEntity.getTop1Port())
+                .top1Pred(resultSaveEntity.getTop1Pred())
+                .eta(resultSaveEntity.getEta())
+                .build();
+    }
+}
