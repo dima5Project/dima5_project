@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>항구 날씨 보기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .mapboxgl-popup {
+            max-width: 300px;
+            font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 지도 -->
+    <div id="map"></div>
+
+    <!-- Mapbox JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <!-- jQuery (AJAX 사용 위해) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <!-- 내 JS 파일 -->
+    <script src="currentlocation.html"></script>
+</body>
+
+</html>

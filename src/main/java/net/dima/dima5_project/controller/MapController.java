@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 // @RequiredArgsConstructor // final로 선언된 필드를 자동으로 생성자 주입
 @Slf4j
 public class MapController {
-    
+
     @GetMapping("/predict/init")
     public String viewMap() {
         return "portpredict";
