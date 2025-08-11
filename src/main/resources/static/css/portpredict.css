@@ -1,0 +1,1000 @@
+/* portpredict.html */
+
+/* 페이지 전체 마진 제거용 */
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.map-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* 이게 없어서 줄어든 거임 */
+}
+
+/* 지도 크기 */
+#map {
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+
+/* ===== 왼쪽 슬라이드 사이드바 ===== */
+.sidebar {
+    --w: 330px;
+    /* 패널 너비 */
+    --handle: 25px;
+    /* 오른쪽에 항상 보이는 핸들 두께 */
+    --gap: 5px;
+    /* 슬라이드 본체와 버튼 사이 간격 */
+    --shadow: 0 8px 24px rgba(0, 0, 0, .15);
+    --collapsed-visible: calc(var(--handle) + var(--gap));
+    /* 기본은 버튼+간격 */
+    position: absolute;
+    top: 80px;
+    bottom: 0px;
+    left: 0px;
+    width: var(--w);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    /* 지도 위에 얹히게 */
+    overflow: visible;
+    /* 핸들이 바깥으로 나와야 해서 visible */
+    transition: transform .28s ease, box-shadow .28s ease;
+    display: flex;
+    /* 세로 레이아웃 만들기 */
+    flex-direction: column;
+    /* 위→아래 배치 */
+}
+
+/* 접힌 상태: 본체는 왼쪽으로 빠지되, 핸들은 남김 */
+.sidebar.is-collapsed {
+    transform: translateX(calc(-100%));
+}
+
+/* ===== 슬라이드 내용 감싼 부분 ===== */
+.sidebar__content {
+    flex: 1;
+    /* 남는 높이를 전부 차지 */
+    overflow-y: auto;
+    /* 세로 스크롤만 */
+    padding: 5px 16px 10px 16px;
+    box-sizing: border-box;
+}
+
+/* ===== 핸들(토글 버튼) ===== */
+.sidebar__handle {
+    position: absolute;
+    top: 6px;
+    right: calc(-1 * (var(--handle) + var(--gap) + 3px));
+    transform: none;
+    width: var(--handle);
+    height: var(--handle);
+    border: none;
+    background: #B1B1B1;
+    /* 상단 네이비 톤과 비슷하게 */
+    color: #fff;
+    /* 사각 버튼 느낌 */
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: grid;
+    place-items: center;
+}
+
+/* 화살표(▶ / ◀ 모양) */
+.sidebar__handle .chevron {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid #fff;
+    /* 기본은 ▶ */
+    transition: transform .28s ease;
+}
+
+/* 펼쳐졌을 때는 ◀처럼 보이도록 회전 */
+.sidebar:not(.is-collapsed) .sidebar__handle .chevron {
+    transform: rotate(180deg);
+}
+
+/* 사이드바 상단 회색 박스 */
+.sidebar__topbox {
+    width: 100%;
+    height: 35px;
+    /* 피그마 높이 기준 */
+    background-color: #D9D9D9;
+    /* 피그마 색상 */
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    gap: 20px;
+    /* 아이콘 사이 간격 */
+    box-sizing: border-box;
+    flex: 0 0 auto;
+}
+
+/* 아이콘 기본 상태 */
+.sidebar__icon {
+    position: relative;
+    /* 밑줄 배치용 */
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    opacity: .6;
+    cursor: pointer;
+    transition: opacity .2s;
+    display: inline-block;
+}
+
+/* 호버 시 살짝 선명 */
+.sidebar__icon:hover {
+    opacity: .85;
+}
+
+/* 활성화 아이콘 */
+.sidebar__icon.is-active {
+    opacity: 1;
+}
+
+/* 활성화 밑줄 */
+.sidebar__icon.is-active::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -8px;
+    /* topbox 하단과 간격 */
+    width: 22px;
+    /* 밑줄 길이 (아이콘보다 약간 넓게) */
+    height: 3px;
+    /* 밑줄 두께 */
+    background: #ffffff;
+    /* 예시 이미지처럼 밝은 밑줄 */
+    border-radius: 2px;
+}
+
+/* 우상단: 줌 컨트롤과 라인 맞추기 */
+.map-icon-ctrl {
+    position: absolute;
+    top: calc(80px + 30px);
+    /* sidebar__topbox y와 동일 + 20px */
+    right: 18px;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    /* 버튼 간격 */
+    padding: 5px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+}
+
+/* 아이콘 버튼: Mapbox 줌버튼과 비슷한 크기(30x30) */
+.map-icon-ctrl .iconbtn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    transition: background .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.map-icon-ctrl .iconbtn:hover {
+    background: #f3f6fb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+/* 활성(ON) 상태: 파란 배경 + 아이콘 반전 */
+.map-icon-ctrl .iconbtn.is-on {
+    background: #013895;
+    border-color: #013895;
+}
+
+.map-icon-ctrl .iconbtn img {
+    width: 18px;
+    /* 아이콘 크기 */
+    height: 18px;
+    object-fit: contain;
+    pointer-events: none;
+    transition: filter .15s ease, opacity .15s ease;
+}
+
+/* 활성일 때 아이콘을 흰색으로 보이게 */
+.map-icon-ctrl .iconbtn.is-on img {
+    filter: brightness(0) invert(1);
+    /* 검정 아이콘 → 흰색 */
+}
+
+/* 모바일 살짝 줄이기 */
+@media (max-width: 640px) {
+    .map-icon-ctrl {
+        right: 10px;
+        top: 10px;
+        padding: 5px;
+        gap: 5px;
+    }
+
+    .map-icon-ctrl .iconbtn {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+    }
+
+    .map-icon-ctrl .iconbtn img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* 기존 스타일 그대로 두고 아래만 추가 */
+
+/* 툴팁 기본 숨김 */
+.map-icon-ctrl .iconbtn[data-tip] {
+    position: relative;
+}
+
+.map-icon-ctrl .iconbtn[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    /* 버튼 왼쪽 */
+    transform: translateY(-50%) translateX(-6px);
+    background: rgba(255, 255, 255, 0.85);
+    color: rgba(45, 55, 72, 0.9);
+    border: 1px solid rgba(229, 231, 235, 0.6);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 10;
+}
+
+/* hover 시 툴팁 표시 */
+.map-icon-ctrl .iconbtn[data-tip]:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-10px);
+}
+
+/* ───────── 패널(슬라이드 내용) ───────── */
+/* 모든 패널은 같은 크기/레이아웃을 갖고, 활성만 보이기 */
+.panel {
+    display: none;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.panel.is-active {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel--predict .sidebar__content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+.panel--log .sidebar__content {
+    display: block;
+}
+
+/* 로그 패널은 보이게 */
+.panel--map:not(.is-active) .sidebar__content {
+    display: none;
+}
+
+/* 맵 패널만 필요시 숨김 */
+
+.panel--log .sidebar__bottombox,
+.panel--map .sidebar__bottombox {
+    display: none;
+}
+
+/* title 문구(차항지 예측) */
+.sidebar__title {
+    margin: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* select + input */
+.sidebar__section {
+    margin: 10px 16px;
+    --w: 140px;
+    --h: 30px;
+    --px: 12px;
+    /* 좌우 패딩 */
+    --py: 4px;
+    /* 상하 패딩 */
+    --radius: 5px;
+    --font: 14px;
+    --border: #524F4F;
+}
+
+/* ===== Select ===== */
+.cselect {
+    --bg: #fff;
+    --text: #333;
+    --hover: #e6f3f3;
+    --caret-box: 16px;
+    /* 오른쪽 작은 네모(케럿 박스) 한 변 길이 */
+    --caret-gap: 10px;
+    /* 라벨과 케럿 사이 간격 */
+    --tri-w: 8px;
+    /* ▼ 삼각형 너비 */
+    --tri-h: 5px;
+    /* ▼ 삼각형 높이 */
+    --menu-maxh: 220px;
+    /* 드롭다운 최대 높이 */
+    --option-font: 14px;
+    /* 옵션 폰트 크기 */
+    --option-py: 8px;
+    /* 옵션 상하 패딩 */
+    --option-px: 12px;
+    /* 옵션 좌우 패딩 */
+
+    position: relative;
+    width: var(--w);
+    box-sizing: border-box;
+}
+
+/* 닫힌 상태의 컨트롤(라벨 영역) */
+.cselect__control {
+    width: 100%;
+    min-height: var(--h);
+    height: var(--h);
+    line-height: calc(var(--h) - 2px);
+    /* 텍스트 수직 시각 균형(보더 고려) */
+    padding: var(--py) var(--px);
+    /* input과 동일 패딩 */
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 500;
+    font-size: var(--font);
+    /* input과 동일 폰트 */
+    display: inline-flex;
+    align-items: center;
+    /* 내부 수직정렬 */
+    justify-content: space-between;
+    /* 텍스트-케럿 간 배치 */
+    gap: 8px;
+    /* 텍스트와 케럿 사이 안전 여백 */
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 열렸을 때: 아래 모서리 펼치기 위해 하단 라운드 제거 */
+.cselect.is-open .cselect__control {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* 오른쪽 작은 네모(케럿 박스) */
+.cselect__caret {
+    position: relative;
+    width: var(--caret-box);
+    height: var(--caret-box);
+    margin-left: var(--caret-gap);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+}
+
+/* 케럿의 ▼ 모양 */
+.cselect__caret::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--tri-w);
+    height: var(--tri-h);
+    background: #2b2f3a;
+    transform: translate(-50%, -50%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-radius: 2px;
+    /* 꼭짓점 살짝 둥글게 */
+}
+
+/* 드롭다운 메뉴 */
+.cselect__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    /* 컨트롤과 연결 */
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    max-height: var(--menu-maxh);
+    overflow: auto;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+    /* 기본 숨김 */
+    z-index: 20;
+}
+
+/* 열렸을 때 메뉴 보이기 */
+.cselect.is-open .cselect__menu {
+    display: block;
+}
+
+/* 옵션 항목 */
+.cselect__option {
+    padding: 8px 12px;
+    /* 옵션 패딩은 고정(원하면 var(--option-py/px)로 바꿔도 됨) */
+    cursor: pointer;
+    font-weight: 400;
+    color: var(--text);
+    white-space: nowrap;
+    font-size: var(--font);
+    /* 공통 폰트로 통일 */
+}
+
+/* 옵션 호버 */
+.cselect__option:hover {
+    background: var(--hover);
+}
+
+/* 마지막 옵션과 메뉴 하단 라운드 일치 */
+.cselect__option:last-child {
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+}
+
+/* ───────────────── Input ───────────────── */
+.sidebar__input {
+    box-sizing: border-box;
+    width: var(--w);
+    /* select와 동일 폭 */
+    height: var(--h);
+    /* select와 동일 높이 */
+    padding: var(--py) var(--px);
+    /* select와 동일 패딩 */
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    font-size: var(--font);
+    /* 공통 폰트 */
+
+    /* 비어있을 때 placeholder 중앙 정렬 */
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+/* placeholder 스타일 */
+.sidebar__input::placeholder {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: var(--font);
+    /* 16px 고정 → 공통 폰트로 통일 */
+}
+
+/* 포커스되면 placeholder 숨기고 왼쪽 정렬 + 들여쓰기 */
+.sidebar__input:focus {
+    text-align: left;
+    text-indent: 1ch;
+}
+
+.sidebar__input:focus::placeholder {
+    opacity: 0;
+}
+
+/* 값이 입력된 상태에서도 왼쪽 + 들여쓰기 유지 */
+.sidebar__input:not(:placeholder-shown) {
+    text-align: left;
+    text-indent: 0;
+}
+
+/* 조회 버튼 전, 고정영역만 보이는 경우 */
+.is-hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* 초기화 btn */
+.sidebar__btn {
+    height: var(--h);
+    flex: 0 0 60px;
+    background: #B0B0B0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
+    font-size: 14px;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+/* 조회 btn */
+.sidebar__btn.primary {
+    background: #013895;
+    border: none;
+    color: #fff;
+}
+
+/* 버튼 간격 */
+.sidebar__row {
+    display: flex;
+    gap: 11px;
+}
+
+/* 슬라이드 바_선박 정보, 예측 결과 */
+.sidebar__sub {
+    font-size: 15px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 선박 사진 */
+.vessel_image {
+    display: block;
+    /* inline → block으로 */
+    margin: 10px auto 0;
+    max-width: 260px;
+    width: 100%;
+    aspect-ratio: 98 / 55;
+    /* 원본 비율 유지 */
+    height: auto;
+    /* 세로 자동 계산 */
+    border-radius: 10px;
+    /* 피그마 설정 */
+    object-fit: cover;
+    /* 사진 잘림 없이 비율 유지 */
+}
+
+/* 선박 정보 content */
+.kv {
+    display: flex;
+    /* span, strong 좌우 배치*/
+    justify-content: space-between;
+    padding: 10px 16px 6px 16px;
+    border-bottom: 1px dashed #eee;
+    /* 아래 점선 표시*/
+}
+
+/* 작은 글씨 */
+.kv span {
+    color: #666;
+    font-size: 12px;
+}
+
+/* 굵은 글씨 */
+.kv strong {
+    font-size: 13px;
+}
+
+.sidebar__predict h3.sidebar__sub {
+    margin: 15px 0 10px 0;
+}
+
+
+/* 카드 패딩값 변수로 잡아두기 */
+.box {
+    --pad: 10px;
+    border: 1px solid #524F4F;
+    border-radius: 10px;
+    position: relative;
+    padding: var(--pad);
+    margin: 10px auto 0;
+    width: 260px;
+    box-sizing: border-box;
+    /* 패딩 포함해서 238px 유지 */
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* 헤더: 가운데 정렬, 간격 축소 */
+.box__head {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.box__head .head__label {
+    color: #0f3c9a;
+    font-weight: 600;
+    font-size: 19px;
+}
+
+.box__head strong {
+    color: #000;
+    font-weight: 600;
+    font-size: 19px;
+}
+
+/* 본문 중앙 정렬 */
+.box__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* ── 가운데 연두색 밴드 ── */
+.route__bg {
+    position: relative;
+    left: calc(-1 * var(--pad));
+    /* 좌측 패딩 만큼 당김 */
+    width: calc(100% + (var(--pad) * 2));
+    /* 패딩 당긴 만큼 폭 확장 */
+    padding: 8px 12px;
+    background: rgba(230, 243, 243, 0.5);
+    box-sizing: border-box;
+    align-self: stretch;
+    /* flex 줄임 방지 */
+    margin-bottom: 12px;
+}
+
+/* 출발 >> 도착 줄 */
+.route {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 17px;
+    /* 간격 살짝 축소 */
+    margin: 0;
+    color: #524F4F;
+    min-width: 0;
+    /* flex 환경에서 자식이 줄어들 수 있도록 */
+}
+
+.route>div {
+    text-align: center;
+    min-width: 0;
+}
+
+/* 항구 코드 타이포 */
+.route b {
+    font-size: clamp(18px, 6vw, 22px);
+    /* 화면/박스 크기에 맞춰 줄어듦 */
+    font-weight: 600;
+    line-height: 1.1;
+    color: inherit;
+    white-space: nowrap;
+    /* 코드 자체는 줄바꿈 방지 */
+}
+
+.route b:first-child {
+    color: #000;
+}
+
+.route b.last {
+    color: #0f3c9a;
+}
+
+/* 화살표 스타일 */
+.arrow {
+    font-size: clamp(18px, 6vw, 34px);
+    color: #6e767e;
+    line-height: 1;
+    display: inline-block;
+    transform: translateY(2px);
+}
+
+/* 서브 라벨 */
+.route .sub {
+    margin-top: 6px;
+    font-size: clamp(12px, 4vw, 14px);
+    font-weight: 500;
+    color: #6c757d;
+    white-space: normal;
+    /* 부 라벨은 줄바꿈 가능 */
+}
+
+/* ETA 라인 */
+.box .eta__time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111;
+    width: 100%;
+}
+
+/* ETA pill */
+.box .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid #d0d6dc;
+    background: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* 하단 회색 box */
+.sidebar__bottombox {
+    width: 100%;
+    height: 35px;
+    background-color: #D9D9D9;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+}
+
+/* 결과 저장 btn */
+.sidebar__btn.save {
+    flex: 0 0 auto;
+    width: auto;
+    display: inline-block;
+    /* 버튼이 내용만큼 차지하도록 */
+    background: #013895;
+    color: #fff;
+    margin-right: 20px;
+}
+
+/* ===== 2) 슬라이드_시점별 타임라인 (왼쪽 고정 컬럼 + 점선 + 원형) ===== */
+.logpanel {
+    --node: 45px;
+    --ring: 7px;
+    --gutter: 120px;
+    /* ← 왼쪽 컬럼(점선/원형 자리) */
+    --line-x: 48px;
+    /* 점선의 x 위치 (gutter 안쪽 기준) */
+    --pill-h: 24px;
+    --chip-h: 30px;
+    --font: 12px;
+    padding: 8px 12px 16px;
+}
+
+/* 왼쪽에 전용 컬럼 확보 */
+.voy-timeline {
+    list-style: none;
+    padding-left: var(--gutter);
+    position: relative;
+}
+
+/* 세로 점선(왼쪽 컬럼 중앙쯤) */
+.voy-timeline::before {
+    content: "";
+    position: absolute;
+    left: var(--line-x);
+    top: 0;
+    bottom: 0;
+    border-right: 2px dotted #45c0e9;
+    opacity: .9;
+    transform: translateX(-1px);
+    z-index: 0;
+}
+
+/* 각 섹션 */
+.voy-item {
+    position: relative;
+}
+
+/* 원형 노드: 점선 위에 겹치도록 배치 */
+.voy-node {
+    border: none;
+    position: absolute;
+    left: calc(var(--line-x) - var(--gutter));
+    /* 점선 위치로 이동 */
+    transform: translateX(-50%);
+    /* 원형 중심을 점선에 정렬 */
+    top: 0;
+    width: var(--node);
+    height: var(--node);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #e6ebf0;
+    box-shadow: inset 0 0 0 var(--ring) rgba(0, 0, 0, .06);
+    z-index: 1;
+    /* 점선 위로 */
+}
+
+.voy-node span {
+    display: inline-grid;
+    place-items: center;
+    width: calc(var(--node) - 14px);
+    height: calc(var(--node) - 14px);
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: calc(var(--font) + 2px);
+    background: #D9D9D9;
+    /* 기본 회색 */
+}
+
+/* 클릭 시 파랑 */
+.voy-node.is-active {
+    background: #cfeeff;
+    box-shadow: inset 0 0 0 var(--ring) rgba(79, 195, 247, .25);
+}
+
+.voy-node.is-active span {
+    background: #1fb6ff;
+}
+
+/* 한 줄(버튼 + 값칩) : 콘텐츠는 왼쪽 패딩 이후부터 배치 */
+.voy-row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    /* 버튼 폭 + 값칩 */
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* 소제목 */
+.voy-label {
+    margin: 6px 0 12px;
+    color: #2b2f3a;
+    font-weight: 700;
+    font-size: calc(var(--font) + 1px);
+}
+
+/* 값칩(텍스트) */
+.voy-chip {
+    height: var(--chip-h);
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #eef3f7;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--font);
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Top-1/2/3 버튼 */
+.pillbtn {
+    height: var(--pill-h);
+    min-width: 68px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1.5px solid #cfd8e3;
+    background: #fff;
+    color: #3a4a5b;
+    font-weight: 800;
+    font-size: var(--font);
+    letter-spacing: .3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.pillbtn:hover {
+    border-color: #9fb3c8;
+}
+
+/* (Top 버튼은 색 토글 안 씀 — 그대로 유지) */
+/* ===== 저장 확인 모달 ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 9999;
+}
+
+.modal.is-open {
+    display: block;
+
+}
+
+.modal__bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .28);
+    backdrop-filter: blur(2px);
+}
+
+.modal__dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 150px;
+    max-width: 90vw;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+    padding: 14px 16px 14px;
+    text-align: center;
+}
+
+.modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+}
+
+.modal__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 10px 40px 5px 40px;
+}
+
+.modal__btn {
+    min-width: 72px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+
+
+.modal__btn.primary {
+    background: #013895;
+    color: #fff;
+    border-color: #013895;
+    cursor: pointer;
+}
+
+
+/* map +/- btn 적용, 맨 아래 권장 */
+.mapboxgl-ctrl-bottom-right {
+    margin: 0 10px 5px 0;
+}
+
+.mapboxgl-ctrl {
+    z-index: 20;
+}
+
+/* map box 저작권 모양 */
+.mapboxgl-ctrl-attrib button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ===== 반응형: 좁은 화면에선 패널을 조금 더 넓게 ===== */
+@media (max-width: 1024px) {
+    .sidebar {
+        --w: 360px;
+    }
+}
+
+@media (max-width: 640px) {
+    .sidebar {
+        --w: min(86vw, 420px);
+        top: 8px;
+        left: 8px;
+        bottom: 8px;
+    }
+}
