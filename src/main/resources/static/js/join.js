@@ -1,28 +1,28 @@
 document.addEventListener('DOMContentLoaded', function () {// defer를 사용해도 이거 해주는 것이 안정성이 더 높음
 
     // DOM 요소 가져오기
-    const backButton = document.getElementById('backButton');
-    const form = document.querySelector('.signup_form');
-    const signupButton = document.querySelector('.btn_full_width');
-    const nameInput = document.getElementById('name');
-    const userIdInput = document.getElementById('user_id');
-    const duplicateCheckButton = document.querySelector('.input_group .btn_dark');
-    const passwordInput = document.getElementById('password');
-    const passwordConfirmInput = document.getElementById('password_confirm');
-    const emailLocalInput = document.getElementById('email_local');
-    const emailDomainSelect = document.getElementById('email_domain');
-    const emailDomainInput = document.getElementById('email_domain_input');
-    const fullEmailInput = document.getElementById('full_email');
-    const userTypeInputs = document.querySelectorAll('input[name="userType"]');
+    let backButton = document.getElementById('backButton');
+    let form = document.querySelector('.signup_form');
+    let signupButton = document.querySelector('.btn_full_width');
+    let nameInput = document.getElementById('name');
+    let userIdInput = document.getElementById('user_id');
+    let duplicateCheckButton = document.querySelector('.input_group .btn_dark');
+    let passwordInput = document.getElementById('password');
+    let passwordConfirmInput = document.getElementById('password_confirm');
+    let emailLocalInput = document.getElementById('email_local');
+    let emailDomainSelect = document.getElementById('email_domain');
+    let emailDomainInput = document.getElementById('email_domain_input');
+    let fullEmailInput = document.getElementById('full_email');
+    let userTypeInputs = document.querySelectorAll('input[name="userType"]');
 
     // 에러 메시지 요소 가져오기
-    const nameError = document.getElementById('nameError');
-    const userIdError = document.getElementById('idError');
-    const userIdSuccess = document.getElementById('idSuccess');
-    const passwordError = passwordInput.closest('.form_group').querySelector('.error_message');
-    const passwordMatchError = passwordConfirmInput.closest('.form_group').querySelector('.error_message');
-    const emailError = document.getElementById('emailError');
-    const userTypeError = document.getElementById('userTypeError');
+    let nameError = document.getElementById('nameError');
+    let userIdError = document.querySelector('.idError');
+    let userIdSuccess = document.querySelector('.idSuccess');
+    let passwordError = passwordInput.closest('.form_group').querySelector('.error_message');
+    let passwordMatchError = passwordConfirmInput.closest('.form_group').querySelector('.passsword_confirm');
+    let emailError = document.getElementById('emailError');
+    let userTypeError = document.getElementById('userTypeError');
 
     // 전역 변수
     let isNameValid = false;
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
 
     // 특정 메시지 표시 함수
     function showMessage(element, type, message) {
-        const msgElement = element.closest('.form_group').querySelector(`.${type}_message`);
+        let msgElement = element.closest('.form_group').querySelector(`.${type}_message`);
         if (msgElement) {
             msgElement.textContent = message;
             msgElement.style.display = 'block';
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     function checkFormValidity() {
         isUserTypeChecked = Array.from(userTypeInputs).some(r => r.checked);
 
-        const isFormValid = isNameValid &&
+        let isFormValid = isNameValid &&
             isIdValid &&
             isIdConfirmed &&
             isPasswordValid &&
@@ -78,9 +78,11 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
 
     // 1. 이름 입력 유무 확인
     nameInput.addEventListener('input', function () {
-        const nameVal = this.value.trim();
+        let nameVal = this.value.trim();
+
         if (nameVal === '') {
-            nameError.style.display = 'none';
+            nameError.textContent = '이름을 입력하세요';
+            nameError.style.display = 'block';
             isNameValid = false;
         } else {
             nameError.style.display = 'none';
@@ -93,9 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     userIdInput.addEventListener('input', function () {
         hideMessages();
         const regex = /^[a-zA-Z]{5,10}$/;
-        const val = this.value.trim();
+        let val = this.value.trim();
 
         if (val === '') { //입력값 없으면 메시지 안 뜸
+            showMessage(this, 'error', '아이디를 입력하세요');
             isIdValid = false;
             isIdConfirmed = false;
         } else if (!regex.test(val)) {
@@ -104,8 +107,8 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             isIdConfirmed = false;
         } else {
             // 형식이 올바르면 에러 메시지 숨김
-            document.getElementById('idError').style.display = 'none';
-            document.getElementById('idSuccess').style.display = 'none';
+            document.querySelector('.idError').style.display = 'none';
+            document.querySelector('.idSuccess').style.display = 'none';
             isIdValid = true;
             isIdConfirmed = false; // 재입력했으니 중복확인 상태 초기화
         }
@@ -125,10 +128,12 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             , data: { "userId": $("#user_id").val().trim() }
             , success: function (resp) {
                 if (resp) {
-                    $("#idSuccess").html('사용 가능한 아이디입니다')
+                    $(".idSuccess").html('사용 가능한 아이디입니다').show();
+                    $('.idError').hide();
                     isIdConfirmed = true;
                 } else {
-                    $('#idError').html('이미 존재하는 아이디입니다')
+                    $('.idError').html('이미 존재하는 아이디입니다').show();
+                    $('.idSuccess').hide();
                     isIdConfirmed = false;
                 }
             }
@@ -140,11 +145,13 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     // 3. 비밀번호 유효성 검사
     passwordInput.addEventListener('input', function () {
         const regex = /^[a-zA-Z]{5,10}$/;
-        const val = this.value.trim();
+        let val = this.value.trim();
 
         if (val === '') { // 입력값 없으면 메시지 숨김
-            showMessage(this, 'error', '');
+            showMessage(this, 'error', '비밀번호를 입력하세요');
             isPasswordValid = false;
+            passwordConfirmInput.value = ''; // 비밀번호 확인란 값 초기화
+            isPasswordConfirmed = false;
         } else if (!regex.test(val)) {
             showMessage(this, 'error', '영문 5~10자로 입력하세요');
             isPasswordValid = false;
@@ -152,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             showMessage(this, 'error', '');
             isPasswordValid = true;
         }
-        checkPasswordMatch();
+
         checkFormValidity();
     });
 
@@ -160,9 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     passwordConfirmInput.addEventListener('input', checkPasswordMatch);
 
     function checkPasswordMatch() {
-        const val = passwordConfirmInput.value.trim();
+        let val = passwordConfirmInput.value.trim();
         if (val === '') { // 입력값 없으면 메시지 숨김
-            showMessage(passwordConfirmInput, 'error', '');
+            showMessage(passwordConfirmInput, 'error', '비밀번호 확인을 입력하세요');
             isPasswordConfirmed = false;
         } else if (passwordInput.value !== val) {
             showMessage(passwordConfirmInput, 'error', '비밀번호가 일치하지 않습니다');
@@ -191,35 +198,36 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     });
 
     function checkEmailValidity() {
-        const local = emailLocalInput.value.trim();
+        let local = emailLocalInput.value.trim();
         let domain = emailDomainSelect.value;
-        if (domain === 'custom') {
-            domain = emailDomainInput.value.trim();
-        }
 
         if (local === '') { // 입력값 없으면 메시지 숨김
-            emailError.style.display = 'none';
+            emailError.style.display = 'block';
             isEmailValid = false;
             checkFormValidity();
-            return; // 함수 실행을 여기서 중단
         }
 
         // select의 값이 변경될 때 동작
         // 직접입력 옵션을 선택하면 select 숨김, input 보여줌 /  다른 옵션을 선택하면 반대로
+        // '직접입력' 옵션을 선택했을 때의 동작
         if (domain === 'custom') {
             emailDomainSelect.style.display = 'none';
             emailDomainInput.style.display = 'inline-block';
+
+            // 포커스 이동: 사용자가 직접 입력 상자에 바로 입력할 수 있도록
             if (document.activeElement !== emailDomainInput) {
                 emailDomainInput.focus();
             }
+
+            domain = emailDomainInput.value.trim(); // 직접 입력한 값으로 도메인 변수 업데이트
         } else {
+            // '직접입력'이 아닌 다른 옵션을 선택했을 때의 동작
             emailDomainInput.style.display = 'none';
-            emailDomainInput.value = '';
+            emailDomainInput.value = ''; // 직접 입력 상자 값 초기화
             emailDomainSelect.style.display = 'inline-block';
         }
 
-        // 사용자 입력 누락 방지, 도메인 형식 검증
-        if (!local || !domain || !domain.includes('.')) {
+        if (local === '' || domain === '' || !domain.includes('.')) {
             emailError.textContent = '올바른 이메일 주소를 입력하세요';
             emailError.style.display = 'block';
             isEmailValid = false;
@@ -227,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             emailError.style.display = 'none';
             isEmailValid = true;
         }
+
         checkFormValidity();
     }
 
@@ -238,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
             if (this === lastCheckedUserType) {
                 this.checked = false;
                 lastCheckedUserType = null;
+                userTypeError.textContent = '사용자 유형을 선택하세요';
                 userTypeError.style.display = 'block';
             } else {
                 lastCheckedUserType = this;
@@ -287,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
         }
         // 사용자 유형
         if (!isUserTypeChecked) {
+            userTypeError.textContent = '사용자 유형을 선택하세요';
             userTypeError.style.display = 'block';
             isValid = false;
         }
@@ -298,15 +309,6 @@ document.addEventListener('DOMContentLoaded', function () {// defer를 사용해
     });
 
     // 페이지 로드 시 초기 상태 설정
-    checkEmailValidity();
+    hideMessages();
     checkFormValidity();
 });
-
-
-
-
-
-
-
-
-

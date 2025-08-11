@@ -28,7 +28,8 @@ public class UserService {
         log.info("회원가입 요청: {}", userDTO.toString());
 
         // 해당 아이디가 있는지 체크
-        if (repository.existsByUserId(userDTO.getUserId())) return false;
+        if (repository.existsByUserId(userDTO.getUserId()))
+            return false;
 
         userDTO.setUserRole("ROLE_USER");
 
@@ -56,7 +57,7 @@ public class UserService {
             dto = PredictUserDTO.toDTO(temp.get());
         }
         log.info("아이디 검색: {}", dto);
-        
+
         return dto;
     }
 
