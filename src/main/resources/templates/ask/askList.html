@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
@@ -20,7 +20,12 @@
 </head>
 
 <body>
-    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+    <div sec:authorize="isAnonymous()">
+        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
 
     <div class="qna-header-bg">
         <section class="qna-header">
