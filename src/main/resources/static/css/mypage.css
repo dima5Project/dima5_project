@@ -1,0 +1,295 @@
+@charset "UTF-8";
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+main {
+    max-width: 1040px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.qna-header-bg {
+    background-color: #0f1035;
+    height: 350px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qna-header {
+    padding-top: 20vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+}
+
+.qna-header h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.qna-header p {
+    font-size: 16px;
+    color: #ddd;
+}
+
+/* ===== 공통 레이아웃 ===== */
+.mypage {
+    max-width: 1040px;
+    margin: 40px auto 80px;
+    /* 위쪽 40px, 아래쪽 80px */
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.mp-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+}
+
+/* ===== 좌측 사이드 ===== */
+.mp-side {
+    background: #fff;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.mp-side__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.mp-side__nav {
+    display: grid;
+    gap: 8px;
+}
+
+.mp-side__nav a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #222;
+    font-size: 14px;
+}
+
+.mp-side__nav a.is-active,
+.mp-side__nav a:hover {
+    background: #f2f5f9;
+}
+
+/* ===== 우측: 요약 카드 ===== */
+.mp-content {
+    min-width: 0;
+}
+
+.mp-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    background: #fff;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+/* 왼쪽: 인사 + 메타정보 (2줄) */
+.mp-summary__hello {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.mp-summary__hello .hello {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+}
+
+.mp-summary__hello .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.mp-summary__hello .email {
+    color: #666;
+}
+
+.mp-summary__hello .sep {
+    color: #c9cdd2;
+}
+
+/* 오른쪽: 통계 */
+.mp-summary__stats {
+    display: flex;
+    gap: 40px;
+}
+
+.mp-summary__stats li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: #333;
+    text-align: center;
+    min-width: 96px;
+}
+
+.mp-summary__stats .num {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #013895;
+    text-decoration: none;
+}
+
+/* ===== 섹션 공통 ===== */
+.mp-section {
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 18px;
+}
+
+.mp-section__head {
+    display: flex;
+    justify-content: flex-start;
+    column-gap: 15px;
+    /* 제목과 버튼 사이 거리 */
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef1f4;
+}
+
+.mp-section__head h4 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.btn-more {
+    font-size: 12px;
+    border: 1px solid #d9dde2;
+    background: #fff;
+    border-radius: 999px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.btn-more:hover {
+    background-color: #f2f5f9;
+    /* 연한 배경 */
+    border-color: #ccc;
+}
+
+.table-wrap {
+    padding: 10px 16px 16px;
+}
+
+/* ===== 테이블 ===== */
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13px;
+}
+
+.tbl thead th {
+    background: #f8fafc;
+    border-top: 1px solid #e5e8eb;
+    border-bottom: 1px solid #e5e8eb;
+    color: #222;
+    font-weight: 600;
+    padding: 10px 8px;
+    text-align: left;
+    text-align: center;
+    vertical-align: middle;
+    /* 세로 가운데 */
+}
+
+.tbl tbody td {
+    border-bottom: 1px solid #f0f2f4;
+    color: #333;
+    padding: 11px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    /* 세로 가운데 */
+}
+
+.tbl tbody tr:hover td {
+    background: #fbfdff;
+}
+
+/* 강조 텍스트 (확률) */
+.tbl b {
+    color: #013895;
+    font-weight: 700;
+}
+
+/* 재검색 버튼 */
+.btn-search-again {
+    padding: 6px 14px;
+    font-size: 11px;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #bbb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-search-again:hover {
+    background-color: #f5f5f5;
+}
+
+/* 재검색 열 가운데 정렬 */
+.tbl thead th:last-child,
+.tbl tbody td:last-child {
+    text-align: center;
+}
+
+/* 태그 */
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tag-done {
+    background: #eef5ff;
+    color: #013895;
+}
+
+/* ===== 히어로(상단 남색)와의 연결감 보정 ===== */
+.qna-header-bg {
+    position: relative;
+}
+
+.qna-header {
+    padding-top: 120px;
+}
