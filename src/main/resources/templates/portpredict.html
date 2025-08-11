@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지도 페이지</title>
+
+    <!-- 배너 fragment -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
 
     <!-- Mapbox CSS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
@@ -24,6 +29,13 @@
 </head>
 
 <body>
+    <div sec:authorize="isAnonymous()">
+        <div th:insert="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:insert="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
+
     <!-- 전체 래퍼(지도는 뒤, 사이드바는 위에 겹침) -->
     <div class="map-wrap">
         <!-- 지도 -->
@@ -52,11 +64,18 @@
 
             <!-- 항상 상단 고정되는 회색 박스 -->
             <div class="sidebar__topbox">
-                <img src="/images/portpredictImages/port.png" th:src="@{/images/portpredictImages/port.png}"
-                    alt="Port Icon" class="sidebar__icon is-active" data-panel="predict" />
-                <img src="/images/portpredictImages/log.png" th:src="@{/images/portpredictImages/log.png}"
-                    alt="Log Icon" class="sidebar__icon" data-panel="log" />
+                <button class="iconwrap is-active" data-panel="predict" data-tip="차항지 예측" aria-label="차항지 예측"
+                    type="button">
+                    <img src="/images/portpredictImages/port.png" th:src="@{/images/portpredictImages/port.png}"
+                        alt="Port Icon" class="sidebar__icon">
+                </button>
+
+                <button class="iconwrap" data-panel="log" data-tip="시점별 예측 타임라인" aria-label="시점별 예측 타임라인" type="button">
+                    <img src="/images/portpredictImages/log.png" th:src="@{/images/portpredictImages/log.png}"
+                        alt="Log Icon" class="sidebar__icon">
+                </button>
             </div>
+
 
             <!-- 1) 예측 슬라이드 바-->
             <div class="panel panel--predict is-active">
@@ -192,26 +211,28 @@
             <!-- 2) 로그 슬라이드 바 -->
             <div class="panel panel--log">
                 <div class="sidebar__header">
-                    <h2 class="sidebar__title">시점별 예측 타임라인</h2>
+                    <h2 class="sidebar__secondtitle">시점별 예측 타임라인</h2>
                 </div>
 
                 <!-- 가운데만 스크롤 되는 영역 -->
                 <div class="sidebar__content logpanel">
                     <ol class="voy-timeline">
-                        <!-- 05시 -->
+                        <!-- 출발항 -->
                         <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false"><span>05시</span></button>
+                            <button class="voy-node" type="button" aria-pressed="false">
+                                <img th:src="@{/images/vessel_Icon.png}" alt="출발항 아이콘">
+                            </button>
 
                             <div class="voy-rows">
-                                <div class="voy-label">AIS 스냅샷</div>
+                                <div class="voy-label">KRBUS 부산항</div>
 
                                 <div class="voy-row">
                                     <button class="pillbtn" type="button">Top‑1</button>
-                                    <div class="voy-chip">부산 · 71.8%</div>
+                                    <div class="voy-chip">상하이 · 71.8%</div>
                                 </div>
                                 <div class="voy-row">
                                     <button class="pillbtn" type="button">Top‑2</button>
-                                    <div class="voy-chip">상하이 · 17.8%</div>
+                                    <div class="voy-chip">홍콩 · 17.8%</div>
                                 </div>
                                 <div class="voy-row">
                                     <button class="pillbtn" type="button">Top‑3</button>
@@ -220,9 +241,57 @@
                             </div>
                         </li>
 
-                        <!-- 08시 -->
+                        <!-- 05시 -->
                         <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false"><span>08시</span></button>
+                            <button class="voy-node" type="button" aria-pressed="false">
+                                <img th:src="@{/images/marker.png}" alt="시점 마커 아이콘">
+                            </button>
+                            <div class="voy-rows">
+                                <div class="voy-label"></div>
+                                <div class="voy-label">출항 후 5시간</div>
+
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑1</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑2</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑3</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- 8시 -->
+                        <li class="voy-item">
+                            <button class="voy-node" type="button" aria-pressed="false">
+                                <img th:src="@{/images/marker.png}" alt="시점 마커 아이콘">
+                            </button>
+                            <div class="voy-rows">
+                                <div class="voy-label"></div>
+                                <div class="voy-label">출항 후 8시간</div>
+
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑1</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑2</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑3</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- 11시(현 시점)-->
+                        <li class="voy-item">
+                            <button class="voy-node" type="button" aria-pressed="false"><span>14시</span></button>
                             <div class="voy-rows">
                                 <div class="voy-label"></div>
                                 <div class="voy-label">AIS 스냅샷</div>
@@ -242,9 +311,8 @@
                             </div>
                         </li>
 
-                        <!-- 11시(현재) -->
                         <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false"><span>11시(현재)</span></button>
+                            <button class="voy-node" type="button" aria-pressed="false"><span>17시(현재)</span></button>
                             <div class="voy-rows">
                                 <div class="voy-label"></div>
                                 <div class="voy-label">AIS 스냅샷</div>
@@ -263,6 +331,7 @@
                                 </div>
                             </div>
                         </li>
+
                     </ol>
                 </div>
             </div>

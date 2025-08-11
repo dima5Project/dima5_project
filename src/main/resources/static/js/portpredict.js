@@ -120,23 +120,27 @@ $(document).on('click', function (e) {
 // 아이콘 
 // 초기: predict가 기본 활성
 $(function () {
-    $('.sidebar__icon[data-panel="predict"]').addClass('is-active');
+    // predict 탭/패널 기본 활성
+    $('.sidebar__topbox .iconwrap[data-panel="predict"]').addClass('is-active');
     $('.panel--predict').addClass('is-active');
 });
 
-// 아이콘 클릭 → 패널 전환 + 밑줄 이동
-$(document).on('click', '.sidebar__icon[data-panel]', function () {
-    const target = $(this).data('panel'); // 'predict' | 'log' | 'map'
+// 상단 아이콘(버튼) 클릭 → 패널 전환 + 활성 표시
+$(document).on('click', '.sidebar__topbox .iconwrap', function () {
+    const target = $(this).data('panel'); // 'predict' | 'log'
 
-    $('.sidebar__icon').removeClass('is-active');
+    // 탭 활성 토글
+    $('.sidebar__topbox .iconwrap').removeClass('is-active');
     $(this).addClass('is-active');
 
+    // 패널 전환
     $('.panel').removeClass('is-active');
     $(`.panel--${target}`).addClass('is-active');
 
-    // 지도 레이아웃 보정
+    // mapbox 리사이즈
     window.dispatchEvent(new Event('resize'));
 });
+
 
 // 아이콘 버튼 클릭 → ON/OFF 토글 + 커스텀 이벤트 알림
 document.addEventListener('click', (e) => {
