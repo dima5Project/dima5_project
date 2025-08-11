@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS predict_user
 	user_type 	varchar(100) CHECK (user_type IN ('화주','선사','항만사','일반 사용자')),
 	user_role 	varchar(50)  DEFAULT 'ROLE_USER' CHECK (user_role IN ('ROLE_USER', 'ROLE_ADMIN')) 
 );
+ALTER TABLE predict_user
+    MODIFY user_pwd varchar(100) NOT NULL;  -- 최소 60 필요(보통 100 권장)
 
 -- (ROLE_ADMIN) 관리자는 INSERT 구문으로 수동 입력해야 할 듯!
 
