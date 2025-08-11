@@ -133,13 +133,14 @@ $(document).on('click', '.sidebar__topbox .iconwrap', function () {
     $('.sidebar__topbox .iconwrap').removeClass('is-active');
     $(this).addClass('is-active');
 
-    // 패널 전환
-    $('.panel').removeClass('is-active');
-    $(`.panel--${target}`).addClass('is-active');
+    // 패널 전환 (is-active + hidden 속성 토글)
+    $('.panel').removeClass('is-active').attr('hidden', true);
+    $(`.panel--${target}`).addClass('is-active').removeAttr('hidden');
 
     // mapbox 리사이즈
     window.dispatchEvent(new Event('resize'));
 });
+
 
 
 // 아이콘 버튼 클릭 → ON/OFF 토글 + 커스텀 이벤트 알림
