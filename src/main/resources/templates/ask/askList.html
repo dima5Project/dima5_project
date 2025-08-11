@@ -42,18 +42,18 @@
             <span>전체 <strong>00건</strong></span>
 
             <!-- 오른쪽 요소들 묶기 -->
-            <div class="qna-search-right">
+            <form th:action="@{/ask}" method="get" class="qna-search-right">
                 <select name="searchItem">
                     <option value="" th:selected="${searchItem == null or searchItem == ''}">선택</option>
                     <option value="all" th:selected="${searchItem == 'all'}">전체(글쓴이+제목)</option>
-                    <option value="qnaWriter" th:selected="${searchItem=='qnaWriter'}">글쓴이</option>
-                    <option value="qnaTitle" th:selected="${searchItem == 'qnaTitle'}">제목</option>
+                    <option value="writer" th:selected="${searchItem == 'writer'}">글쓴이</option>
+                    <option value="askTitle" th:selected="${searchItem == 'askTitle'}">제목</option>
                 </select>
 
-                <input type="text" name="searchWord" placeholder="검색어를 입력하세요" />
+                <input type="text" name="searchWord" th:value="${searchWord}" placeholder="검색어를 입력하세요" />
 
                 <button class="search-btn">검색</button>
-            </div>
+            </form>
         </section>
 
         <section class="qna-table">
@@ -250,7 +250,7 @@
         </section>
 
         <div class="write-btn-wrap">
-            <button class="write-btn" th:href="@{/ask/askwrite}">글쓰기</button>
+            <a class="write-btn" th:href="@{/ask/write}">글쓰기</a>
         </div>
     </main>
 

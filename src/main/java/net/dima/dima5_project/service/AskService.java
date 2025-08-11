@@ -41,48 +41,72 @@ public class AskService {
      * @param searchWord
      * @return
      */
-    public Page<AskBoardDTO> selectAll(Pageable pageable, String searchItem, String searchWord) {
-        // 페이징을 위한 사전 작업
-        int page = pageable.getPageNumber() - 1;
+    // public Page<AskBoardDTO> selectAll(Pageable pageable, String searchItem,
+    // String searchWord) {
+    // // 페이징을 위한 사전 작업
+    // int page = pageable.getPageNumber();
 
-        // 검색어 + 페이징 이용한 조회
-        Page<AskBoardEntity> temp = null;
-        Page<AskBoardDTO> list = null;
+    // // 검색어 + 페이징 이용한 조회
+    // Page<AskBoardEntity> temp = null;
+    // Page<AskBoardDTO> list = null;
 
-        switch (searchItem) {
-            case "askTitle":
-                temp = askBoardRepository.findByAskTitleContains(
-                        searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
-                break;
+    // switch (searchItem) {
+    // case "askTitle":
+    // temp = askBoardRepository.findByAskTitleContains(
+    // searchWord,
+    // PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
+    // break;
 
-            case "writer":
-                temp = askBoardRepository.findByWriterContains(
-                        searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
-                break;
+    // case "writer":
+    // temp = askBoardRepository.findByWriterContains(
+    // searchWord,
+    // PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
+    // break;
 
-            case "askContent":
-                temp = askBoardRepository.findByAskContentContains(
-                        searchWord,
-                        PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
-                break;
+    // case "askContent":
+    // temp = askBoardRepository.findByAskContentContains(
+    // searchWord,
+    // PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "askSeq")));
+    // break;
+    // }
+
+    // list = temp.map((askboard) -> AskBoardDTO.builder()
+    // .askSeq(askboard.getAskSeq())
+    // .askType(askboard.getAskType())
+    // .askTitle(askboard.getAskTitle())
+    // .askContent(askboard.getAskContent())
+    // .writer(askboard.getWriter())
+    // .createDate(askboard.getCreateDate())
+    // .originalFilename(askboard.getOriginalFilename())
+    // .savedFilename(askboard.getSavedFilename())
+    // .askPwd(askboard.getAskPwd())
+    // .replyStatus(askboard.getReplyStatus())
+    // .reply(askboard.getReply())
+    // .build());
+    // return list;
+    // }
+
+    // 실험
+    public Page<AskBoardDTO> selectAll(Pageable pageable, String item, String word) {
+        String keyword = (word == null) ? "" : word.trim();
+        Page<AskBoardEntity> page;
+
+        if (keyword.isEmpty()) {
+            // 검색어 없으면 전체 조회
+            page = askBoardRepository.findAll(pageable);
+        } else {
+            switch (item) {
+                case "askTitle" -> // 제목
+                    page = askBoardRepository.findByAskTitleContains(keyword, pageable);
+                case "writer" -> // 작성자 ID
+                    page = askBoardRepository.findByWriter_UserIdContains(keyword, pageable);
+                case "all" -> // 제목 + 작성자 ID
+                    page = askBoardRepository.findByAskTitleContainsOrWriter_UserIdContains(keyword, keyword, pageable);
+                default -> // 잘못된 값이면 전체
+                    page = askBoardRepository.findAll(pageable);
+            }
         }
-
-        list = temp.map((askboard) -> AskBoardDTO.builder()
-                .askSeq(askboard.getAskSeq())
-                .askType(askboard.getAskType())
-                .askTitle(askboard.getAskTitle())
-                .askContent(askboard.getAskContent())
-                .writer(askboard.getWriter())
-                .createDate(askboard.getCreateDate())
-                .originalFilename(askboard.getOriginalFilename())
-                .savedFilename(askboard.getSavedFilename())
-                .askPwd(askboard.getAskPwd())
-                .replyStatus(askboard.getReplyStatus())
-                .reply(askboard.getReply())
-                .build());
-        return list;
+        return page.map(AskBoardDTO::toDTO);
     }
 
     /**
@@ -105,7 +129,8 @@ public class AskService {
             askBoardDTO.setOriginalFilename(originalFilename);
             askBoardDTO.setSavedFilename(savedFilename);
         }
-        // 비밀번호(4자리 숫자 문자열) 처리: 비어있으면 공개글(null로 저장)
+
+        // 비밀번호(4자리 숫자 문자열) 처리: 비어있으면 공개글(null로 저장) -> 확인해야 함
         if (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank()) {
             String pwd = askBoardDTO.getAskPwd().trim();
             if (!pwd.matches("^\\d{4}$")) {
@@ -159,6 +184,25 @@ public class AskService {
             FileService.deleteFile(fullPath);
         }
         askBoardRepository.deleteById(askSeq);
+    }
+
+    /**
+     * 비밀번호 검증 메소드
+     * 
+     * @param askSeq
+     * @param pwd
+     * @return
+     */
+    public boolean verifyPassword(Long askSeq, String pwd) {
+        AskBoardDTO ask = checkOne(askSeq);
+        if (ask == null)
+            return false;
+
+        if (ask.getAskPwd() == null || ask.getAskPwd().isBlank()) {
+            return true;
+        }
+
+        return ask.getAskPwd().equals(pwd.trim());
     }
 
 }
