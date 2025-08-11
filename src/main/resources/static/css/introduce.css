@@ -127,42 +127,40 @@ img {
     gap: 85px;
 }
 
+/* 린규린규에게 뺏어온 css */
 .sidebar {
-    flex-shrink: 0;
-    /* 사이드바 고정 폭, 줄어들지 않음 */
-    width: 155px;
+    background: #fff;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
 }
 
 .sidebar_title {
-    font-size: 24px;
-    font-weight: 500;
-    text-align: center;
-    padding: 20px 5px;
-    /* 내부 여백 */
-    border: 1px solid var(--color-text-dark);
-    /* 테두리로 박스화 */
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
 }
 
 .sidebar_nav {
-    display: flex;
-    /* 메뉴 세로 나열 */
-    flex-direction: column;
+    display: grid;
+    gap: 8px;
 }
 
 .sidebar_link {
-    display: flex;
-    /* 텍스트-아이콘 좌/우 정렬 */
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 5px;
-    /* 클릭 영역 확대 */
-    border: 1px solid var(--color-border);
-    /* 리스트처럼 위아래 연결 */
-    border-top: none;
-    font-size: 20px;
-    /* 사이드 메뉴 가독성 */
-    font-weight: 500;
+    display: block;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #222;
+    font-size: 14px;
 }
+
+.sidebar_link.is-active,
+.sidebar_link:hover {
+    background: #f2f5f9;
+}
+
 
 .content_area {
     flex-grow: 1;
@@ -225,6 +223,32 @@ img {
 
 .merged_image_container {
     flex-shrink: 0;
+}
+
+/* 애니메이션 효과 */
+
+/* CSS 애니메이션 정의 */
+@keyframes moveShip {
+    0% {
+        transform: translateX(0);
+        /* 시작 위치 */
+    }
+
+    50% {
+        transform: translateX(20px);
+        /* 오른쪽으로 20px 이동 */
+    }
+
+    100% {
+        transform: translateX(0);
+        /* 다시 원래 위치로 돌아옴 */
+    }
+}
+
+/* 이미지에 애니메이션 적용 */
+.shipping-ship {
+    animation: moveShip 4s ease-in-out infinite;
+    /* 4초 동안 반복, 부드러운 움직임 */
 }
 
 /* CSS for section section:ais */
