@@ -6,11 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import net.dima.dima5_project.dto.VesselMasterDTO;
+
 
 @Entity
 @Table(name="vessel_master")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class VesselMasterEntity {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +48,19 @@ public class VesselMasterEntity {
     @Column(name="vsl_width")
     private Integer vslWidth;
 
+    public static VesselMasterEntity toEntity(VesselMasterDTO vesselMasterDTO) {
+        return VesselMasterEntity.builder()
+                .vslSeq(vesselMasterDTO.getVslSeq())
+                .vslId(vesselMasterDTO.getVslId())
+                .vslName(vesselMasterDTO.getVslName())
+                .vslMmsi(vesselMasterDTO.getVslMmsi())
+                .vslImo(vesselMasterDTO.getVslImo())
+                .shipType(vesselMasterDTO.getShipType())
+                .callSign(vesselMasterDTO.getCallSign())
+                .vslLength(vesselMasterDTO.getVslLength())
+                .vslWidth(vesselMasterDTO.getVslWidth())
+                .build();
+    }
 
 }
 

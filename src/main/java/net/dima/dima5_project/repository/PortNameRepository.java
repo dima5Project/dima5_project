@@ -18,4 +18,6 @@ public interface PortNameRepository extends JpaRepository<PortNameEntity, String
     @Query("SELECT DISTINCT p.countryNameKr FROM PortNameEntity p")
     List<String> findDistinctCountryNames();
 
+    List<PortNameEntity> findByPortIdIn(List<String> portIds);
+
 }

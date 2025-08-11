@@ -37,14 +37,15 @@ public class SecurityConfig {
                                                 "/predict/**", // 차항지 예측 - 나중에 삭제
                                                 "/user/**",
                                                 "/news/**", // 뉴스
-                                                "/api/port/**",
                                                 "/mypage/**", // 마이페이지 - 나중에 삭제
                                                 "/images/**",
                                                 "/css/**",
                                                 "/js/**",
                                                 "/api/info/**", // 부가정보 - 나중에 삭제
                                                 "/port/info/**",
-                                                "/info/**" // 부가정보 - 나중에 삭제
+                                                "/info/**", // 부가정보 - 나중에 삭제
+                                                "/proxy/met/**" // API 끌어오는 ajax 처리
+                                                
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능

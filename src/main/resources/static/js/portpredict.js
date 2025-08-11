@@ -24,13 +24,13 @@ $(document).on('click', '.sidebar__btn.primary', function () {
 
 
     // ===== 나중에 백엔드 붙일 때는 아래 원래 AJAX 복원 =====
-    /*
+    
     $.ajax({
-        url: '/api/vessel-info', // API 엔드포인트
+        url: '/api/vessel-info', // API 엔드포인트 - 컨트롤러 매핑 주소
         method: 'GET',
         data: {
-            type: selectValue,
-            query: inputValue
+            type: selectValue, // IMO 또는 MMSI
+            query: inputValue  // 사용자가 입력한 값
         },
         success: function (response) {
             $('.sidebar__content').html(response);
@@ -39,7 +39,7 @@ $(document).on('click', '.sidebar__btn.primary', function () {
             alert('데이터를 불러오는 중 오류가 발생했습니다.');
         }
     });
-    */
+    
 });
 
 
