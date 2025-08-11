@@ -32,19 +32,19 @@ public class SecurityConfig {
                                                 "/api/**",
                                                 "/lang",
                                                 "/main",
-                                                "/intro/**",        // 소개
-                                                "/ask/**",          // 문의 - 나중에 삭제
-                                                "/predict/**",      // 차항지 예측 - 나중에 삭제
+                                                "/intro/**", // 소개
+                                                "/ask/**", // 문의 - 나중에 삭제
+                                                "/predict/**", // 차항지 예측 - 나중에 삭제
                                                 "/user/**",
-                                                "/news/**",         // 뉴스
+                                                "/news/**", // 뉴스
                                                 "/api/port/**",
-                                                "/mypage/**",       // 마이페이지 - 나중에 삭제
+                                                "/mypage/**", // 마이페이지 - 나중에 삭제
                                                 "/images/**",
                                                 "/css/**",
                                                 "/js/**",
-                                                "/api/info/**",     // 부가정보 - 나중에 삭제
+                                                "/api/info/**", // 부가정보 - 나중에 삭제
                                                 "/port/info/**",
-                                                "/info/**"          // 부가정보 - 나중에 삭제
+                                                "/info/**" // 부가정보 - 나중에 삭제
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
