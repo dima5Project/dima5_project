@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const nav = document.querySelector(".navbar");
-    const currentPath = window.location.pathname; // 페이지 로드 시 URL 확인
+    let nav = document.querySelector(".navbar");
+    let currentPath = window.location.pathname; // 페이지 로드 시 URL 확인
 
     // 언어 드롭다운 (click으로 제어)
-    const langToggle = document.getElementById("langToggle");
+    let langToggle = document.getElementById("langToggle");
 
     langToggle.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 외부 클릭 시 언어 드롭다운 닫기
     document.addEventListener("click", (e) => {
-        const langWrapper = document.getElementById("submenu_lang_wrapper");
+        let langWrapper = document.getElementById("submenu_lang_wrapper");
 
         if (!langToggle.contains(e.target) && !langWrapper.contains(e.target)) {
             langToggle.classList.remove("active");

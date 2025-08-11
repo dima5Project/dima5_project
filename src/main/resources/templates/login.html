@@ -25,7 +25,7 @@
         <h1 class="logo_text">Portcast</h1>
       </header>
 
-      <form action="/user/loginProc" method="post" class="login_form"> <!-- 로그인 폼 전체 영역 -->
+      <form th:action="@{/user/loginProc}" method="post" class="login_form"> <!-- 로그인 폼 전체 영역 -->
         <div class="form_group"> <!-- 아이디 입력 폼 영역 -->
           <label for="username" class="form_label">아이디</label> <!-- label은 접근성 개선(화면 리더기 대응) -->
           <div class="input_wrapper">

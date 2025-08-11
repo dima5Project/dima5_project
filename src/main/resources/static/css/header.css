@@ -12,10 +12,14 @@ body {
     height: 100%;
 }
 
+body {
+    padding-top: 80px;
+}
+
 /* 네비게이션 바 전체 외곽. 초기 상태 */
 .navbar {
     background-color: #fcfcfd;
-    height: 68px;
+    height: 80px;
     width: 100%;
     position: fixed;
     top: 0;
@@ -60,7 +64,7 @@ body {
 /* 각 메뉴 항목 (드롭다운의 위치 기준) */
 .nav_item {
     position: relative;
-    height: 68px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
