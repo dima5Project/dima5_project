@@ -113,6 +113,8 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+    z-index: 1002;
 }
 
 /* 서브메뉴 항목 */
@@ -149,7 +151,7 @@ body {
     top: -6px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1001;
+    z-index: 1003;
 }
 
 /* 오른쪽 영역 (로그인 + 언어 선택) */
@@ -181,7 +183,7 @@ body {
     justify-content: center;
     /* 가로 중앙 정렬 */
     /* 좌우 패딩을 넉넉하게 줍니다. */
-    max-width: 110px;
+    max-width: 150px;
     min-width: 85px;
 }
 
@@ -212,7 +214,7 @@ a.login_button:hover {
 .login_area .submenu {
     background-color: #013895;
     min-width: 85px;
-    max-width: 110px;
+    max-width: 150px;
     width: auto;
     padding: 6px;
 }
