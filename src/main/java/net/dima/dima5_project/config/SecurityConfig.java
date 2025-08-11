@@ -58,7 +58,7 @@ public class SecurityConfig {
                                                                                        // 받아서 처리
                                                 .usernameParameter("userId") // security가 사용하는 파라미터 대신 개발자가 설정한 파라미터 사용
                                                 .passwordParameter("userPwd")
-                                                .defaultSuccessUrl("/") // 로그인 성공 시 루트로 이동
+                                                .defaultSuccessUrl("/", true) // 로그인 성공 시 루트로 이동
                                                 .successHandler(loginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
                                                 .failureHandler(loginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
                                                 .failureUrl("/user/login?error=true") // 로그인 에러가 나면 다시 로그인 페이지로 이동, 에러를
