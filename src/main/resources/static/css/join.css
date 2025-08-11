@@ -191,13 +191,6 @@ input {
   /* 요소가 줄어드는 걸 방지하는 속성. 부모가 공간이 부족할 때, 이 요소는 줄이지 말라고 하는 것.*/
 }
 
-/* 입력창과 메세지 사이 간격 조정 */
-.form_group .error_message,
-.form_group .success_message {
-  min-height: 18px;
-  /* 메시지가 없어도 공간을 차지하여 레이아웃 흔들림 방지 */
-}
-
 /* 메세지 */
 .error_message,
 .success_message {
@@ -205,7 +198,6 @@ input {
   font-weight: 400;
   line-height: 1;
   margin: 0;
-  /* 항상 공간 확보되도록 함 */
   display: none;
 }
 

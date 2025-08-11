@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
   <meta charset="UTF-8" />
@@ -20,7 +20,12 @@
 </head>
 
 <body>
-  <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+  <div sec:authorize="isAnonymous()">
+    <div th:insert="~{fragment/header :: bu3_navigation}"></div>
+  </div>
+  <div sec:authorize="isAuthenticated()">
+    <div th:insert="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+  </div>
   <div class="container">
 
     <!-- Hero Section -->
@@ -56,7 +61,7 @@
             </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-          
+
           <h4>팀 소개</h4>
           <p>팀 부3갈매기에 대해 자세히 알아보세요.</p>
         </div>
@@ -67,7 +72,7 @@
             </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-          
+
           <h4>서비스 소개</h4>
           <p>우리 팀의 핵심 서비스를 안내합니다.</p>
         </div>
@@ -78,7 +83,7 @@
             </a>
             <div class="overlay-text">DISCOVER MORE &gt;</div>
           </div>
-          
+
           <h4>뉴스룸</h4>
           <p>물류 관련 최신 이슈들을 확인하세요.</p>
         </div>
