@@ -1,762 +1,286 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-    <script defer th:src="@{/js/header.js}"></script>
-    <title>부3갈매기 - 차항지 예측</title>
+    <title>지도 페이지</title>
 
-    <!-- 구글 폰트 연결용 preconnect
-    폰트 데이터를 빨리 받아오기 위해 미리 연결 준비해두는 역할 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Noto Sans KR 한글 폰트 불러오기
-    350, 400, 500, 700 굵기 사용가능 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap"
-        rel="stylesheet">
-
-    <!-- 직접 만든 전역 CSS
-    전체 레이아웃, 폰트, 마진 등 공통 스타일 넣는 곳 -->
-    <link rel="stylesheet" th:href="@{/css/map.css}">
-
-    <!-- Mapbox CSS 지도 UI 스타일 적용
-    줌 버튼, 로딩 스피너, 지도 로고 등에 필요-->
+    <!-- Mapbox CSS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <!-- portpredict CSS -->
+    <link rel="stylesheet" th:href="@{/css/portpredict.css}">
 
-    <!-- Mapvox JS 라이브러리
-    지도 기능용 JavaScript. 지도를 생성하고 조작하는 기능 제공하는 Mapbox JavaScript 라이브러리 -->
+    <!-- Mapbox JS -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
+    <!-- jQuery -->
     <script th:src="@{/js/jquery-3.7.1.js}"></script>
-    <!-- 사용자 정의 지도 생성 스크립트 -->
+
+    <!-- 지도 map.js -->
     <script defer th:src="@{/js/map.js}"></script>
-
-    <!-- 비동기로 지도에 올릴 데이터 요청  -->
-    <script>
-        $(function () {
-            $("#search").on('click', searchFunc)
-            init();   // 지도위에 올릴 데이터 요청하는 함수 실행
-        });
-
-        // 지도위에 올릴 데이터 요청하는 함수 실행
-        function searchFunc() {
-            let lat_input = $('#lat_input').val();
-            let lon_input = $('#lon_input').val();
-            let cog_input = $('#cog_input').val();
-            let heading_input = $('#heading_input').val();
-
-            // 검증작업을 한다.
-
-
-            let sendData = { "lat": lat_input, "lon": lon_input, "cog": cog_input, "heading": heading_input };
-            $.ajax({
-                url: '/api/port/pso',
-                method: 'get',
-                data: sendData,
-                success: marker
-            })
-        }
-
-        function marker(resp) {
-            alert(JSON.stringify(resp));
-        }
-    </script>
-    <style>
-        #map {
-            width: 100%;
-            height: 100%;
-            min-height: 600px;
-            flex: 1;
-        }
-    </style>
-
-    <style id="sections-styles">
-        /* CSS for section section:header */
-        .site-header {
-            max-width: 1440px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        .header-top-bar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 25px;
-            padding: 12px 40px 12px 0;
-        }
-
-        .user-auth {
-            display: flex;
-            gap: 20px;
-            font-size: 16px;
-            color: #0f1035;
-        }
-
-        .lang-switcher img {
-            width: 28px;
-            height: 28px;
-        }
-
-        .main-navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--secondary-color);
-            padding: 0 60px;
-            height: 90px;
-        }
-
-        .logo {
-            color: #dcf2f1;
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 700;
-            font-size: 36px;
-        }
-
-        .nav-menu ul {
-            display: flex;
-            align-items: center;
-            gap: 120px;
-        }
-
-        .nav-menu a {
-            color: var(--text-light);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 700;
-            font-size: 22px;
-            line-height: 85px;
-            position: relative;
-            padding-bottom: 5px;
-        }
-
-        .nav-menu a:hover::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 3px;
-            background-color: var(--text-light);
-        }
-
-        @media (max-width: 1200px) {
-            .nav-menu ul {
-                gap: 60px;
-            }
-
-            .main-navigation {
-                padding: 0 30px;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .nav-menu {
-                display: none;
-                /* Simple hide for mobile, would need a hamburger menu */
-            }
-
-            .main-navigation {
-                justify-content: center;
-            }
-        }
-
-        /* CSS for section section:main */
-        .main-content {
-            display: flex;
-            height: calc(1024px - 90px - 44px);
-            /* Full height minus header */
-            position: relative;
-        }
-
-        .sidebar {
-            width: 434px;
-            background-color: var(--bg-light);
-            border-right: 1px solid var(--border-color);
-            position: relative;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-container {
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .sidebar-toggle {
-            position: absolute;
-            left: 100%;
-            top: 0;
-            width: 48px;
-            height: 106px;
-            background-color: #d9d9d9;
-            border-radius: 0 20px 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 2px 2px 2px 0px rgba(0, 0, 0, 0.25);
-        }
-
-        .sidebar-form {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            font-size: 20px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-icon {
-            width: 22px;
-            height: 22px;
-        }
-
-        .custom-select,
-        .form-group input {
-            border: 1px solid var(--text-muted);
-            border-radius: 5px;
-            padding: 5px 14px;
-            height: 42px;
-            font-size: 18px;
-        }
-
-        .custom-select {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--text-light);
-            color: var(--text-muted);
-        }
-
-        .custom-select span {
-            letter-spacing: 20px;
-            padding-left: 10px;
-        }
-
-        .form-group input::placeholder {
-            color: rgba(0, 0, 0, 0.3);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 20px;
-            padding-top: 10px;
-        }
-
-        .btn {
-            padding: 5px 20px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: 700;
-            box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
-            height: 34px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--text-light);
-            flex-grow: 1;
-        }
-
-        .btn-secondary {
-            background-color: #b0b0b0;
-            color: var(--text-dark);
-            flex-grow: 1;
-        }
-
-        .divider {
-            border: none;
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 25px 0;
-        }
-
-        .results-panel {
-            flex-grow: 1;
-            background-color: rgba(190, 190, 190, 0.2);
-            margin: 0 -25px;
-            padding: 10px 25px;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .results-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* Hide default scrollbar */
-        .results-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        .results-list {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-
-        .result-card {
-            background-color: rgba(220, 242, 241, 0.5);
-            padding: 15px;
-        }
-
-        .result-card-alt {
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .result-title {
-            margin: 0 0 20px 0;
-            font-size: 24px;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-
-        .result-title .percentage {
-            color: var(--text-dark);
-        }
-
-        .route-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .location {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .location .code {
-            font-size: 29px;
-            font-weight: 500;
-        }
-
-        .location .code-primary {
-            font-size: 29px;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-
-        .location .name {
-            font-size: 17px;
-            color: var(--text-muted);
-        }
-
-        .route-arrow {
-            width: 20px;
-            height: 23px;
-        }
-
-        .eta-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-        .eta-info .eta-label {
-            border: 1px solid rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            padding: 5px 14px;
-            background-color: var(--text-light);
-        }
-
-        .eta-info-simple {
-            font-size: 20px;
-            font-weight: 500;
-            margin: 0;
-        }
-
-        .custom-scrollbar {
-            width: 11px;
-            background-color: #eaeaea;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            flex-shrink: 0;
-        }
-
-        .scrollbar-thumb {
-            width: 11px;
-            height: 50px;
-            background-color: #b0b0b0;
-            border-radius: 4px;
-        }
-
-        .alias-section {
-            position: relative;
-            height: 57px;
-            margin: 25px -25px -25px -25px;
-            flex-shrink: 0;
-        }
-
-        .alias-bg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .alias-form {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 25px;
-        }
-
-        .alias-form label {
-            font-size: 20px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .alias-form input {
-            border: 1px solid var(--text-muted);
-            border-radius: 5px;
-            padding: 5px 14px;
-            height: 32px;
-            flex-grow: 1;
-        }
-
-        .alias-form input::placeholder {
-            color: rgba(0, 0, 0, 0.3);
-        }
-
-        .alias-form .btn-primary {
-            flex-shrink: 0;
-            width: 82px;
-        }
-
-        .map-area {
-            flex-grow: 1;
-            position: relative;
-            background-color: #e9eef1;
-            /* Placeholder for map */
-            height: 100%;
-            min-height: 500px;
-        }
-
-        .map-background {
-            position: absolute;
-            inset: 0;
-            height: 100%;
-            /* 실제 map에서 사용하는 부분과ㅠ 높이 동일하게 설정해야 함 */
-        }
-
-        .map-marker,
-        .map-ship-marker,
-        .map-popup,
-        .map-controls {
-            position: absolute;
-        }
-
-        .map-marker {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .map-marker .marker-label {
-            text-align: center;
-            line-height: 1.3;
-        }
-
-        .map-ship-marker {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: var(--accent-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .map-popup {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 5px;
-            box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
-            width: 138px;
-            padding: 5px 10px;
-        }
-
-        .popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 17px;
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .popup-body {
-            font-size: 11px;
-            line-height: 1.4;
-            color: #1e1e1e;
-        }
-
-        .map-controls {
-            top: 234px;
-            right: 23px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .map-control-btn {
-            width: 50px;
-            height: 50px;
-            background-color: #d9d9d9;
-            border-radius: 2px;
-            box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .faq-btn {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.25);
-        }
-
-        @media (max-width: 992px) {
-            .main-content {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .sidebar-toggle {
-                display: none;
-            }
-
-            .map-area {
-                height: 60vh;
-                min-height: 400px;
-            }
-        }
-
-        /* CSS for section section:footer */
-        #section-footer {
-            /* This section is empty as per the design. */
-        }
-    </style>
-    <script th:src="@{/js/map.js}" defer></script>
+    <!-- 지도 위 본문 내용 js -->
+    <script defer th:src="@{/js/portpredict.js}"></script>
 </head>
 
 <body>
-    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+    <!-- 전체 래퍼(지도는 뒤, 사이드바는 위에 겹침) -->
+    <div class="map-wrap">
+        <!-- 지도 -->
+        <div id="map"></div>
 
-    <main class="main-content" id="section-prediction">
-        <aside class="sidebar">
-            <div class="sidebar-container">
-                <form class="sidebar-form">
-                    <div class="form-group">
-                        <img for="timepoint-select">시점 선택 <img src="/images/PortPredictImages/I420_957_190_584.svg"
-                            th:src="@{/images/PortPredictImages/I420_957_190_584.svg}" alt="info"
-                            class="info-icon"></label>
-                        <div class="custom-select">
-                            <span>선 택</span>
-                            <img src="/images/PortPredictImages/I420_961_139_246.svg"
-                                th:src="@{/images/PortPredictImages/I420_961_139_246.svg}" alt="dropdown arrow">
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="lat_input">위도 (LAT)</label>
-                            <input type="text" id="lat_input" placeholder="소수점 6자리까지 입력">
-                        </div>
-                        <div class="form-group">
-                            <label for="lon_input">경도 (LON)</label>
-                            <input type="text" id="lon_input" placeholder="소수점 6자리까지 입력">
-                        </div>
-                        <div class="form-group">
-                            <label for="cog_input">COG</label>
-                            <input type="text" id="cog_input">
-                        </div>
-                        <div class="form-group">
-                            <label for="heading_input">HEADING</label>
-                            <input type="text" id="heading_input">
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" id="search">검색</button>
-                        <button type="reset" class="btn btn-secondary">초기화</button>
-                    </div>
-                </form>
-
-                <hr class="divider">
-
-                <div class="results-panel">
-                    <div class="results-list">
-                        <article class="result-card">
-                            <h3 class="result-title">Top - 1 <span class="percentage">71.8%</span></h3>
-                            <div class="route-info">
-                                <div class="location">
-                                    <span class="code">KRBUS</span>
-                                    <span class="name">한국 / 부산</span>
-                                </div>
-                                <img src="/images/PortPredictImages/420_935.svg"
-                                    th:src="@{/images/PortPredictImages/420_935.svg}" alt="arrow" class="route-arrow">
-                                <div class="location">
-                                    <span class="code-primary">CNSHA</span>
-                                    <span class="name">중국 / 상하이</span>
-                                </div>
-                            </div>
-                            <div class="eta-info">
-                                <span class="eta-label">ETA</span>
-                                <span>2025-10-19 4:42:31</span>
-                            </div>
-                        </article>
-                        <article class="result-card result-card-alt">
-                            <h3 class="result-title">Top - 2 <span class="percentage">34.7%</span></h3>
-                            <div class="route-info">
-                                <div class="location">
-                                    <span class="code">KRBUS</span>
-                                    <span class="name">한국 / 부산</span>
-                                </div>
-                                <img src="/images/PortPredictImages/420_950.svg"
-                                    th:src="@{/images/PortPredictImages/420_950.svg}" alt="arrow" class="route-arrow">
-                                <div class="location">
-                                    <span class="code-primary">HKHKG</span>
-                                    <span class="name">홍콩 / 홍콩</span>
-                                </div>
-                            </div>
-                            <p class="eta-info-simple">ETA : 2024-10-19 4:42:31</p>
-                        </article>
-                    </div>
-                    <div class="custom-scrollbar">
-                        <img src="/images/PortPredictImages/420_963.svg"
-                            th:src="@{/images/PortPredictImages/420_963.svg}" alt="scroll up">
-                        <div class="scrollbar-thumb"></div>
-                        <img src="/images/PortPredictImages/420_965.svg"
-                            th:src="@{/images/PortPredictImages/420_965.svg}" alt="scroll down"
-                            style="transform: rotate(-180deg);">
-                    </div>
-                </div>
-
-                <div class="alias-section">
-                    <img src="/images/PortPredictImages/420_967.svg" th:src="@{/images/PortPredictImages/420_967.svg}"
-                        class="alias-bg" alt="">
-                    <form class="alias-form">
-                        <label for="alias-input">별칭 <img src="/images/PortPredictImages/I420_968_328_417.svg"
-                                th:src="@{/images/PortPredictImages/I420_968_328_417.svg}" alt="info"
-                                class="info-icon"></label>
-                        <input type="text" id="alias-input" placeholder="별칭 또는 선박명">
-                        <button type="submit" class="btn btn-primary">저장</button>
-                    </form>
-                </div>
-            </div>
-            <button class="sidebar-toggle">
-                <img src="/images/PortPredictImages/420_917.svg" th:src="@{/images/PortPredictImages/420_917.svg}"
-                    alt="toggle sidebar">
+        <!-- 우상단 아이콘 컨트롤 -->
+        <div class="map-icon-ctrl" aria-label="지도 보조 컨트롤">
+            <button class="iconbtn" data-type="map" data-tip="지도 스타일">
+                <img src="/images/portpredictImages/map.png" alt="" />
             </button>
-        </aside>
+            <button class="iconbtn" data-type="congestion" data-tip="혼잡도">
+                <img src="/images/portpredictImages/ship_congestion.png" alt="" />
+            </button>
+            <button class="iconbtn" data-type="weather" data-tip="날씨">
+                <img src="/images/portpredictImages/weather.png" alt="" />
+            </button>
+        </div>
 
-        <div class="map-area">
-            <div class="map-background">
-                <div id="map"></div>
+        <!-- 왼쪽 슬라이드 사이드바 -->
+        <div class="sidebar" aria-label="차항지 예측 패널">
+            <!-- 핸들 -->
+            <button class="sidebar__handle" type="button" aria-controls="sidebar-content" aria-expanded="true"
+                title="패널 열기/닫기">
+                <span class="chevron" aria-hidden="true"></span>
+            </button>
+
+            <!-- 항상 상단 고정되는 회색 박스 -->
+            <div class="sidebar__topbox">
+                <img src="/images/portpredictImages/port.png" th:src="@{/images/portpredictImages/port.png}"
+                    alt="Port Icon" class="sidebar__icon is-active" data-panel="predict" />
+                <img src="/images/portpredictImages/log.png" th:src="@{/images/portpredictImages/log.png}"
+                    alt="Log Icon" class="sidebar__icon" data-panel="log" />
             </div>
-            <div class="map-marker" style="left: 903px; top: 253px;">
-                <img src="/images/PortPredictImages/420_907.svg" th:src="@{/images/PortPredictImages/420_907.svg}"
-                    alt="map marker">
-                <span>KRBUS</span>
-            </div>
-            <div class="map-marker" style="left: 580px; top: 820px;">
-                <img src="/images/PortPredictImages/420_904.svg" th:src="@{/images/PortPredictImages/420_904.svg}"
-                    alt="map marker">
-                <div class="marker-label">
-                    Top - 1 71.8%<br>CNSHA
+
+            <!-- 1) 예측 슬라이드 바-->
+            <div class="panel panel--predict is-active">
+                <!-- 상단 고정: 제목 + 폼 + hr -->
+                <div class="sidebar__header">
+                    <h2 class="sidebar__title">차항지 예측</h2>
+
+                    <!-- 선박 고유 번호 select box -->
+                    <div class="sidebar__section">
+                        <div class="cselect" data-name="idType">
+                            <button type="button" class="cselect__control" aria-haspopup="listbox"
+                                aria-expanded="false">
+                                <span class="cselect__value" data-value="MMSI">MMSI</span>
+                                <span class="cselect__caret" aria-hidden="true"></span>
+                            </button>
+
+                            <ul class="cselect__menu" role="listbox" tabindex="-1">
+                                <li class="cselect__option" role="option" data-value="MMSI" aria-selected="true">
+                                    MMSI
+                                </li>
+                                <li class="cselect__option" role="option" data-value="IMO">IMO</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 입력 + 버튼 -->
+                    <div class="sidebar__section">
+                        <div class="sidebar__row">
+                            <input id="imo" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력" />
+                            <button class="sidebar__btn primary">조회</button>
+                            <button class="sidebar__btn">초기화</button>
+                        </div>
+                    </div>
+
+                    <!-- 상단 고정 구역의 구분선 -->
+                    <hr class="sidebar__divider" />
+                </div>
+
+                <!-- 가운데만 스크롤 되는 영역 -->
+                <div id="sidebar-content" class="sidebar__content is-hidden">
+                    <!-- 선박 정보 -->
+                    <div class="sidebar__vesselinfo">
+                        <h3 class="sidebar__sub">선박 정보</h3>
+                        <img src="/images/portpredictImages/vessel.jpg" th:src="@{/images/portpredictImages/vessel.jpg}"
+                            alt="vessel image" class="vessel_image" />
+                        <div class="kv"><span>CALL SIGN</span><strong>S6AS6</strong></div>
+                        <div class="kv"><span>SHIP TYPE</span><strong>CONTAINER</strong></div>
+                        <div class="kv"><span>VSL_LENGTH</span><strong>213 m</strong></div>
+                        <div class="kv"><span>VSL_WIDTH</span><strong>32 m</strong></div>
+                    </div>
+
+                    <!-- 예측 결과 -->
+                    <div class="sidebar__predict">
+                        <h3 class="sidebar__sub">예측 결과</h3>
+                        <!-- Top 1~3 박스 -->
+                        <div class="box one">
+                            <div class="box__head">
+                                <span class="head__label">Top - 1</span>
+                                <strong>71.8%</strong>
+                            </div>
+                            <div class="box__body">
+                                <div class="route__bg">
+                                    <div class="route">
+                                        <div>
+                                            <b>KRBUS</b>
+                                            <div class="sub">한국 / 부산</div>
+                                        </div>
+                                        <div class="arrow">»</div>
+                                        <div>
+                                            <b class="last">CNSHA</b>
+                                            <div class="sub">중국 / 상하이</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="eta__time"><span class="pill">ETA</span> 2025-10-19 4:42:31</div>
+                            </div>
+                        </div>
+
+                        <div class="box two">
+                            <div class="box__head">
+                                <span class="head__label">Top - 2</span>
+                                <strong>17.8%</strong>
+                            </div>
+                            <div class="box__body">
+                                <div class="route__bg">
+                                    <div class="route">
+                                        <div>
+                                            <b>KRBUS</b>
+                                            <div class="sub">한국 / 부산</div>
+                                        </div>
+                                        <div class="arrow">»</div>
+                                        <div>
+                                            <b class="last">HKHKG</b>
+                                            <div class="sub">홍콩 / 홍콩</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="eta__time"><span class="pill">ETA</span> 2025-10-19 4:42:31</div>
+                            </div>
+                        </div>
+
+                        <div class="box three">
+                            <div class="box__head">
+                                <span class="head__label">Top - 3</span>
+                                <strong>10.4%</strong>
+                            </div>
+                            <div class="box__body">
+                                <div class="route__bg">
+                                    <div class="route">
+                                        <div>
+                                            <b>KRBUS</b>
+                                            <div class="sub">한국 / 부산</div>
+                                        </div>
+                                        <div class="arrow">»</div>
+                                        <div>
+                                            <b class="last">TWKHH</b>
+                                            <div class="sub">대만 / 가오슝</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="eta__time"><span class="pill">ETA</span> 2025-10-19 4:42:31</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 항상 하단 고정 -->
+                <div class="sidebar__bottombox">
+                    <button class="sidebar__btn save">결과 저장</button>
                 </div>
             </div>
-            <div class="map-ship-marker" style="left: 756px; top: 485px;">
-                <img src="/images/PortPredictImages/420_910.svg" th:src="@{/images/PortPredictImages/420_910.svg}"
-                    alt="ship position">
-            </div>
-            <div class="map-popup" style="left: 623px; top: 899px;">
-                <div class="popup-header">
-                    <span>CNSHA</span>
-                    <img src="/images/PortPredictImages/420_978.svg" th:src="@{/images/PortPredictImages/420_978.svg}"
-                        alt="weather icon">
+
+            <!-- 2) 로그 슬라이드 바 -->
+            <div class="panel panel--log">
+                <div class="sidebar__header">
+                    <h2 class="sidebar__title">시점별 예측 타임라인</h2>
                 </div>
-                <div class="popup-body">
-                    환율<br>목적항 부가정보 내용<br>날씨 정보
+
+                <!-- 가운데만 스크롤 되는 영역 -->
+                <div class="sidebar__content logpanel">
+                    <ol class="voy-timeline">
+                        <!-- 05시 -->
+                        <li class="voy-item">
+                            <button class="voy-node" type="button" aria-pressed="false"><span>05시</span></button>
+
+                            <div class="voy-rows">
+                                <div class="voy-label">AIS 스냅샷</div>
+
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑1</button>
+                                    <div class="voy-chip">부산 · 71.8%</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑2</button>
+                                    <div class="voy-chip">상하이 · 17.8%</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑3</button>
+                                    <div class="voy-chip">가오슝 · 10.4%</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- 08시 -->
+                        <li class="voy-item">
+                            <button class="voy-node" type="button" aria-pressed="false"><span>08시</span></button>
+                            <div class="voy-rows">
+                                <div class="voy-label"></div>
+                                <div class="voy-label">AIS 스냅샷</div>
+
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑1</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑2</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑3</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- 11시(현재) -->
+                        <li class="voy-item">
+                            <button class="voy-node" type="button" aria-pressed="false"><span>11시(현재)</span></button>
+                            <div class="voy-rows">
+                                <div class="voy-label"></div>
+                                <div class="voy-label">AIS 스냅샷</div>
+
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑1</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑2</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                                <div class="voy-row">
+                                    <button class="pillbtn" type="button">Top‑3</button>
+                                    <div class="voy-chip">…</div>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
                 </div>
             </div>
-            <div class="map-controls">
-                <button class="map-control-btn">
-                    <img src="/images/PortPredictImages/420_981.svg" th:src="@{/images/PortPredictImages/420_981.svg}"
-                        alt="map outline">
-                </button>
-                <button class="faq-btn">
-                    <img src="/images/PortPredictImages/420_983.svg" th:src="@{/images/PortPredictImages/420_983.svg}"
-                        alt="FAQ">
-                </button>
+            <!-- 로그 슬라이드 바 끝-->
+
+        </div>
+    </div>
+    <!-- 저장 확인 모달 -->
+    <div id="saveModal" class="modal" aria-hidden="true">
+        <div class="modal__bg" data-action="close"></div>
+        <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="saveModalTitle">
+            <h3 id="saveModalTitle" class="modal__title">결과를 저장할까요?</h3>
+            <div class="modal__actions">
+                <button class="modal__btn primary" data-action="yes">예</button>
+                <button class="modal__btn secondary" data-action="no">아니오</button>
             </div>
         </div>
-    </main>
-    <section id="section-footer">
-        <!-- No footer content in design -->
-    </section>
-
-
+    </div>
 </body>
 
 </html>
