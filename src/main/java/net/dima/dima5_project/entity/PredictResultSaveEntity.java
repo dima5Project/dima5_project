@@ -15,9 +15,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dima.dima5_project.dto.AskBoardDTO;
+import net.dima.dima5_project.dto.PredictResultSaveDTO;
 
 @Entity
-@Table(name = "predict_result_save")
+@Table(name = "result_save")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,27 +29,15 @@ public class PredictResultSaveEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "result_seq")
-    private Integer resultSeq;
+    @Column(name = "save_seq")
+    private Integer saveSeq;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private PredictUserEntity user;
+    @Column(name="user_id")
+    private PredictUserEntity userId;
 
-    @Column(name = "vessel_alias")
-    private String vesselAlias;
-
-    @Column(name = "lat")
     private Double lat;
-
-    @Column(name = "lon")
     private Double lon;
-
-    @Column(name = "cog")
-    private Double cog;
-
-    @Column(name = "heading")
-    private Double heading;
 
     @Column(name = "top1_port")
     private String top1Port;
@@ -57,4 +47,19 @@ public class PredictResultSaveEntity {
 
     @Column(name = "eta")
     private LocalDateTime eta;
+
+    public static PredictResultSaveEntity toEntity(PredictResultSaveDTO predictResultSaveDTO) {
+        return PredictResultSaveEntity.builder()
+                .saveSeq(predictResultSaveDTO.getSaveSeq())
+                //.userId(predictResultSaveDTO.getUserId())
+                .lat(predictResultSaveDTO.getLat())
+                .lon(predictResultSaveDTO.getLon())
+                .top1Port(predictResultSaveDTO.getTop1Port())
+                .top1Prob(predictResultSaveDTO.getTop1Prob())
+                .eta(predictResultSaveDTO.getEta())
+                .build();
+    }
+
+
+
 }

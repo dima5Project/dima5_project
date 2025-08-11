@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8" />
@@ -11,44 +11,48 @@
 </head>
 
 <body>
-    <!-- 검색 선택 -->
-    <div style="margin-bottom: 100px;">
-        <select id="countrySelect"></select>
-        <select id="portSelect"></select>
-        <button id="searchBtn">검색</button>
-    </div>
-
-    <!-- 부가정보 레이아웃 -->
-    <div class="extra-info-container">
-        <!-- 1행 -->
-        <div class="row">
-            <div class="map-box">
-                <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
-            </div>
-            <div class="info-card" id="dockingCard"></div>
+    <!--  header.html 프래그먼트 포함 -->
+    <header th:replace="~{fragment/header :: bu3_navigation}"></header>
+    <main>
+        <!-- 검색 선택 -->
+        <div style="margin-bottom: 100px;">
+            <select id="countrySelect"></select>
+            <select id="portSelect"></select>
+            <button id="searchBtn">검색</button>
         </div>
 
-        <!-- 2+3행 전체 -->
-        <div class="row content-row">
-            <!-- 날씨 카드 (2행+3행 통합 높이) -->
-            <div class="info-card tall-weather" id="weatherCard"></div>
-
-            <!-- 오른쪽 : 그래프 + 하단 2칸 -->
-            <div class="col-2">
-                <div class="info-card" id="chartCard">
-                    <canvas id="graphCanvas" height="180"></canvas>
+        <!-- 부가정보 레이아웃 -->
+        <div class="extra-info-container">
+            <!-- 1행 -->
+            <div class="row">
+                <div class="map-box">
+                    <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
                 </div>
+                <div class="info-card" id="dockingCard"></div>
+            </div>
 
-                <div class="row inner-row">
-                    <div class="info-card" id="timezoneCard"></div>
-                    <div class="info-card" id="holidayCard">
-                        <div id="todayText"></div>
-                        <div id="holidayCalendarContainer"></div>
+            <!-- 2+3행 전체 -->
+            <div class="row content-row">
+                <!-- 날씨 카드 (2행+3행 통합 높이) -->
+                <div class="info-card tall-weather" id="weatherCard"></div>
+
+                <!-- 오른쪽 : 그래프 + 하단 2칸 -->
+                <div class="col-2">
+                    <div class="info-card" id="chartCard">
+                        <canvas id="graphCanvas" height="180"></canvas>
+                    </div>
+
+                    <div class="row inner-row">
+                        <div class="info-card" id="timezoneCard"></div>
+                        <div class="info-card" id="holidayCard">
+                            <div id="todayText"></div>
+                            <div id="holidayCalendarContainer"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 
 </html>
