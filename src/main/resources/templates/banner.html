@@ -21,10 +21,10 @@
 
 <body>
   <div sec:authorize="isAnonymous()">
-    <div th:insert="~{fragment/header :: bu3_navigation}"></div>
+    <div th:replace="~{fragment/header :: bu3_navigation}"></div>
   </div>
   <div sec:authorize="isAuthenticated()">
-    <div th:insert="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
   </div>
   <div class="container">
 
