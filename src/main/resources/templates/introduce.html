@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,11 +18,17 @@
 </head>
 
 <body>
-    <div th:replace="~{/header :: bu3_navigation}"></div>
+    <div sec:authorize="isAnonymous()">
+        <div th:insert="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:insert="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
 
     <section id="hero" class="hero-section">
         <div class="hero-background">
-            <img src="images/e59d1902c3c4b7db5d55888ca39742143589383e.png" alt="Port background" class="hero-bg-image">
+            <img th:src="@{/images/e59d1902c3c4b7db5d55888ca39742143589383e.png}" alt="Port background"
+                class="hero-bg-image">
             <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
