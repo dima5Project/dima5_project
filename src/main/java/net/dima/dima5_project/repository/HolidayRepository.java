@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import net.dima.dima5_project.entity.HolidayEntity;
 
-public interface HolidayRepository extends JpaRepository<HolidayEntity, String> {
+public interface HolidayRepository extends JpaRepository<HolidayEntity, Long> {
 
     // 특정 국가 + 날짜의 공휴일 조회
     Optional<HolidayEntity> findByCountryNameKrAndHolidayDate(String countryNameKr, String holidayDate);
