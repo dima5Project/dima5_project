@@ -1,4 +1,3 @@
-/* CSS for section section:header */
 :root {
     --color-primary: #013895;
     --color-dark-blue: #0f1035;
@@ -20,147 +19,44 @@ body {
     background-color: var(--color-background);
     color: var(--color-text-dark);
     line-height: 1.6;
-}
-
-.page-wrapper {
-    max-width: 1440px;
-    margin: 0 auto;
-    overflow-x: hidden;
-    position: relative;
+    /* 가독성 좋은 줄간격 */
 }
 
 .container {
     width: 100%;
     max-width: 1280px;
+    /* 섹션 내부 컨테이너 폭 */
     margin: 0 auto;
     padding: 0 40px;
+    /* 좌우 내부 여백 */
 }
 
 a {
     text-decoration: none;
+    /* 링크 밑줄 제거 */
     color: inherit;
+    /* 부모 텍스트 색상 상속 */
 }
 
 img {
     max-width: 100%;
     height: auto;
+    /* 반응형 이미지 */
     display: block;
+    /* 인라인 간격 제거 */
 }
 
 .bold {
     font-weight: 700;
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-}
-
-.site-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10;
-}
-
-.header-container {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 80px;
-}
-
-.header-top {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 13px;
-    padding-top: 23px;
-    padding-bottom: 22px;
-}
-
-.login-links {
-    display: flex;
-    gap: 20px;
-    color: var(--color-text-light);
-    font-size: 18px;
-}
-
-.lang-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-
-.main-nav-wrapper {
-    background-color: #fcfcfd;
-}
-
-.main-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 70px;
-}
-
-.logo {
-    color: var(--color-primary);
-    font-size: 30px;
-    font-weight: 700;
-}
-
-.nav-links {
-    display: flex;
-    gap: 100px;
-}
-
-.nav-links a {
-    color: var(--color-text-dark);
-    font-size: 20px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-@media (max-width: 1024px) {
-    .header-container {
-        padding: 0 40px;
-    }
-
-    .nav-links {
-        gap: 40px;
-    }
-}
-
-@media (max-width: 768px) {
-    .header-container {
-        padding: 0 20px;
-    }
-
-    .main-nav {
-        flex-direction: column;
-        height: auto;
-        padding: 10px 0;
-    }
-
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-        padding-top: 10px;
-    }
-
-    .nav-links a {
-        font-size: 16px;
-    }
-}
-
 /* CSS for section section:hero */
-.hero-section {
+.hero_section {
     position: relative;
+    /* 배경/오버레이 절대배치 기준 */
     height: 435px;
     display: flex;
+    /* 중앙 정렬(수평/수직) */
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -168,7 +64,180 @@ img {
     color: var(--color-text-light);
 }
 
-.hero-background {
+.hero_background {
+    position: absolute;
+    /* 히어로 전면을 깔아주는 레이어(이미지/오버레이가 위치) */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero_bg_image {
+    /* 화면 비율이 변해도 꽉 채움 */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    /* 이미지 위에 반투명 검정막 */
+    opacity: 0.5;
+}
+
+.hero_content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    /* 제목/부제 간 간격 */
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 85px;
+    /* 헤더가 겹치지 않게 보정 */
+}
+
+/* 강한 타이틀 */
+.hero_title {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* 보조 카피 */
+.hero_subtitle {
+    font-size: 22px;
+    font-weight: 500;
+}
+
+/* CSS for section section:about */
+.about_section {
+    padding-top: 115px;
+    padding-bottom: 120px;
+}
+
+.about_layout {
+    display: flex;
+    /* 사이드바와 본문을 좌우 배치 */
+    gap: 85px;
+}
+
+.sidebar {
+    flex-shrink: 0;
+    /* 사이드바 고정 폭, 줄어들지 않음 */
+    width: 155px;
+}
+
+.sidebar_title {
+    font-size: 24px;
+    font-weight: 500;
+    text-align: center;
+    padding: 20px 5px;
+    /* 내부 여백 */
+    border: 1px solid var(--color-text-dark);
+    /* 테두리로 박스화 */
+}
+
+.sidebar_nav {
+    display: flex;
+    /* 메뉴 세로 나열 */
+    flex-direction: column;
+}
+
+.sidebar_link {
+    display: flex;
+    /* 텍스트-아이콘 좌/우 정렬 */
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 5px;
+    /* 클릭 영역 확대 */
+    border: 1px solid var(--color-border);
+    /* 리스트처럼 위아래 연결 */
+    border-top: none;
+    font-size: 20px;
+    /* 사이드 메뉴 가독성 */
+    font-weight: 500;
+}
+
+.content_area {
+    flex-grow: 1;
+    /* 남은 공간 모두 차지 */
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+}
+
+/* 카드 내부 간격 */
+.content_block {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* 제목 부제목 중앙 정렬 */
+.content_header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.content_title_en {
+    color: var(--color-primary);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* 설명 글 */
+.content_subtitle {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* 이미지, 텍스트 가로 배치 */
+.content_body_flex {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.content_image {
+    width: 286px;
+    height: 203px;
+    object-fit: cover;
+    /* 일정 크기 유지하며 잘림 허용 */
+    flex-shrink: 0;
+    /* 텍스트가 좁아져도 이미지 너비 유지 */
+}
+
+.content_text {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 19px;
+    line-height: 25px;
+}
+
+.merged_image_container {
+    flex-shrink: 0;
+}
+
+/* CSS for section section:ais */
+.ais_section {
+    position: relative;
+    height: 420px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-text-light);
+}
+
+.ais_background {
     position: absolute;
     top: 0;
     left: 0;
@@ -177,40 +246,128 @@ img {
     z-index: 1;
 }
 
-.hero-bg-image {
+.ais_bg_image {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.hero-overlay {
+.ais_overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: #000000;
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
-.hero-content {
+.ais_content {
     position: relative;
     z-index: 2;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-top: 85px;
-    /* Offset for header */
+    gap: 40px;
 }
 
-.hero-title {
+.ais_title {
     font-size: 30px;
     font-weight: 700;
 }
 
-.hero-subtitle {
-    font-size: 22px;
+.ais_subtitle {
+    font-size: 20px;
     font-weight: 500;
+}
+
+.ais_text {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 19px;
+    line-height: 25px;
+}
+
+/* CSS for section section:methodology */
+.methodology_section {
+    padding-top: 120px;
+    padding-bottom: 120px;
+}
+
+.methodology_section .content_header {
+    margin-bottom: 40px;
+}
+
+.methodology_steps {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+}
+
+.step_image {
+    max-width: 460px;
+}
+
+/* 본문 폭 제한 */
+.step_description {
+    max-width: 510px;
+}
+
+.step_description h4 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.step_description p {
+    font-size: 19px;
+    line-height: 25px;
+}
+
+.step_arrow {
+    transform: rotate(90deg);
+}
+
+/* 주석/주의 문구 */
+.disclaimer {
+    font-size: 15px;
+    margin-top: 3px;
+}
+
+.accuracy_note {
+    text-align: right;
+    font-size: 15px;
+    line-height: 25px;
+    margin-top: 60px;
+}
+
+@media (min-width: 1024px) {
+    .methodology-steps {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .step-arrow {
+        transform: rotate(0deg);
+        margin-top: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -222,106 +379,6 @@ img {
         font-size: 18px;
         padding: 0 10px;
     }
-}
-
-/* CSS for section section:about */
-.about-section {
-    padding-top: 115px;
-    padding-bottom: 120px;
-}
-
-.about-layout {
-    display: flex;
-    gap: 85px;
-}
-
-.sidebar {
-    flex-shrink: 0;
-    width: 155px;
-}
-
-.sidebar-title {
-    font-size: 24px;
-    font-weight: 500;
-    text-align: center;
-    padding: 20px 5px;
-    border: 1px solid var(--color-text-dark);
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 5px;
-    border: 1px solid var(--color-border);
-    border-top: none;
-    font-size: 20px;
-    font-weight: 500;
-}
-
-.sidebar-link.active {
-    /* Active styles can be added here */
-}
-
-.content-area {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 120px;
-}
-
-.content-block {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.content-header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.content-title-en {
-    color: var(--color-primary);
-    font-size: 30px;
-    font-weight: 700;
-}
-
-.content-subtitle {
-    font-size: 20px;
-    font-weight: 500;
-}
-
-.content-body-flex {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.content-image {
-    width: 286px;
-    height: 203px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.content-text {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
-}
-
-.merged-image-container {
-    flex-shrink: 0;
 }
 
 @media (max-width: 1024px) {
@@ -342,189 +399,5 @@ img {
     .content-body-flex {
         flex-direction: column;
         text-align: center;
-    }
-}
-
-/* CSS for section section:ais */
-.ais-section {
-    position: relative;
-    height: 420px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--color-text-light);
-}
-
-.ais-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.ais-bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.ais-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000000;
-    opacity: 0.6;
-}
-
-.ais-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.ais-title {
-    font-size: 30px;
-    font-weight: 700;
-}
-
-.ais-subtitle {
-    font-size: 20px;
-    font-weight: 500;
-}
-
-.ais-text {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
-}
-
-/* CSS for section section:methodology */
-.methodology-section {
-    padding-top: 120px;
-    padding-bottom: 120px;
-}
-
-.methodology-section .content-header {
-    margin-bottom: 40px;
-}
-
-.methodology-steps {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 40px;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    text-align: center;
-}
-
-.step-image {
-    max-width: 460px;
-}
-
-.step-description {
-    max-width: 510px;
-}
-
-.step-description h4 {
-    font-size: 19px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.step-description p {
-    font-size: 19px;
-    line-height: 25px;
-}
-
-.step-arrow {
-    transform: rotate(90deg);
-}
-
-.disclaimer {
-    font-size: 15px;
-    margin-top: 3px;
-}
-
-.accuracy-note {
-    text-align: right;
-    font-size: 15px;
-    line-height: 25px;
-    margin-top: 60px;
-}
-
-@media (min-width: 1024px) {
-    .methodology-steps {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    .step-arrow {
-        transform: rotate(0deg);
-        margin-top: 200px;
-    }
-}
-
-/* CSS for section section:footer */
-.site-footer {
-    background-color: var(--color-dark-blue);
-    color: var(--color-text-light);
-    padding: 57px 0;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.footer-info {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.footer-logo {
-    font-size: 24px;
-    font-weight: 400;
-}
-
-.footer-info p {
-    font-size: 16px;
-    line-height: 25px;
-}
-
-.footer-socials {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.footer-socials img {
-    width: 25px;
-    height: 25px;
-}
-
-@media (max-width: 768px) {
-    .footer-content {
-        flex-direction: column;
-        align-items: flex-start;
     }
 }
