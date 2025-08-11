@@ -27,8 +27,8 @@
 
     <section id="hero" class="hero-section">
         <div class="hero-background">
-            <img th:src="@{/images/e59d1902c3c4b7db5d55888ca39742143589383e.png}" alt="Port background"
-                class="hero-bg-image">
+            <img th:src="@{/images/e59d1902c3c4b7db5d55888ca39742143589383e.png}"
+                src="images/e59d1902c3c4b7db5d55888ca39742143589383e.png" alt="Port background" class="hero-bg-image">
             <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
@@ -36,21 +36,26 @@
             <p class="hero-subtitle">해상 물류 운송의 가시화 서비스, 부3갈매기로 물류를 혁신합니다</p>
         </div>
     </section>
+
     <section id="about" class="about-section">
         <div class="container about-layout">
             <aside class="sidebar">
                 <h2 class="sidebar-title">소개페이지</h2>
                 <nav class="sidebar-nav">
-                    <a href="#" class="sidebar-link active">
+                    <!-- a 태그: href 유지 + th:href 추가 -->
+                    <a href="/introduce/service" th:href="@{/introduce/service}" class="sidebar-link active">
                         <span>서비스 소개</span>
-                        <img src="images/I724_3748_501_830.svg" alt="arrow icon">
+                        <img src="images/I724_3748_501_830.svg" th:src="@{/images/I724_3748_501_830.svg}"
+                            alt="arrow icon">
                     </a>
-                    <a href="#" class="sidebar-link">
+                    <a href="/introduce/team" th:href="@{/introduce/team}" class="sidebar-link">
                         <span>팀 소개</span>
-                        <img src="images/I724_3749_501_830.svg" alt="arrow icon">
+                        <img src="images/I724_3749_501_830.svg" th:src="@{/images/I724_3749_501_830.svg}"
+                            alt="arrow icon">
                     </a>
                 </nav>
             </aside>
+
             <main class="content-area">
                 <article class="content-block">
                     <header class="content-header">
@@ -58,8 +63,9 @@
                         <p class="content-subtitle">차기 정박항 예측으로 물류의 불확실성을 줄입니다</p>
                     </header>
                     <div class="content-body-flex">
-                        <img src="images/4830828d1150c189d7e83cbdab610b0678c395e8.png" alt="Portcast service interface"
-                            class="content-image">
+                        <img src="images/4830828d1150c189d7e83cbdab610b0678c395e8.png"
+                            th:src="@{/images/4830828d1150c189d7e83cbdab610b0678c395e8.png}"
+                            alt="Portcast service interface" class="content-image">
                         <div class="content-text">
                             <p>AIS 데이터를 기반으로 해상 물류의 보이지 않던 정보를 <span class="bold">시각화</span>하고 누구나 <span class="bold">예측
                                     가능한 공급망</span>을 설계할 수 있도록 돕습니다</p>
@@ -82,16 +88,20 @@
                             <p>이는 스케줄 조정 지연, 하역 및 통관 일정 혼선 등으로 인한 전체 물류 흐름의 불확실성을 초래하며 <span class="bold">운영 리스크와 비용
                                     상승</span>으로 이어집니다.</p>
                         </div>
-                        <!--merged image-->
+                        <!-- merged image -->
                         <div class="merged-image-container"
                             style="position: relative; width: 299.05px; height: 269.25px;">
-                            <img src="images/724_3777.svg" alt="Predictive analytics graph element"
+                            <img src="images/724_3777.svg" th:src="@{/images/724_3777.svg}"
+                                alt="Predictive analytics graph element"
                                 style="position: absolute; top: 0px; left: 56.06px;">
-                            <img src="images/724_3779.svg" alt="Predictive analytics graph element"
+                            <img src="images/724_3779.svg" th:src="@{/images/724_3779.svg}"
+                                alt="Predictive analytics graph element"
                                 style="position: absolute; top: 13.18px; left: 56.13px;">
-                            <img src="images/724_3781.svg" alt="Predictive analytics graph element"
+                            <img src="images/724_3781.svg" th:src="@{/images/724_3781.svg}"
+                                alt="Predictive analytics graph element"
                                 style="position: absolute; top: 61.36px; left: 73.33px;">
-                            <img src="images/724_3783.svg" alt="Predictive analytics graph element"
+                            <img src="images/724_3783.svg" th:src="@{/images/724_3783.svg}"
+                                alt="Predictive analytics graph element"
                                 style="position: absolute; top: 10.55px; left: 107.92px;">
                         </div>
                     </div>
@@ -99,9 +109,11 @@
             </main>
         </div>
     </section>
+
     <section class="ais-section">
         <div class="ais-background">
-            <img src="images/38ec9a16c7382445a5d767efdf0e8d3e6c807b62.png" alt="AIS data visualization"
+            <img src="images/38ec9a16c7382445a5d767efdf0e8d3e6c807b62.png"
+                th:src="@{/images/38ec9a16c7382445a5d767efdf0e8d3e6c807b62.png}" alt="AIS data visualization"
                 class="ais-bg-image">
             <div class="ais-overlay"></div>
         </div>
@@ -120,6 +132,7 @@
             </div>
         </div>
     </section>
+
     <section class="methodology-section">
         <div class="container">
             <header class="content-header">
@@ -128,44 +141,47 @@
             </header>
             <div class="methodology-steps">
                 <div class="step">
-                    <img src="images/792_279.svg" alt="Map showing port clustering" class="step-image">
+                    <img src="images/792_279.svg" th:src="@{/images/792_279.svg}" alt="Map showing port clustering"
+                        class="step-image">
                     <div class="step-description">
                         <h4>항구 군집화 & 1차 예측</h4>
                         <p>38개 항구를 거리 기반으로<span class="bold"> K-means 군집화</span> 선박 출항 후<span class="bold"> n시간 시점의
                                 위치/방향 데이터</span> 입력 1차 분류 모델이 도착할 가능성이 높은 <span class="bold">항구 그룹(군집) 예측</span></p>
                     </div>
                 </div>
-                <img src="images/792_308.svg" alt="arrow" class="step-arrow">
+
+                <img src="images/792_308.svg" th:src="@{/images/792_308.svg}" alt="arrow" class="step-arrow">
+
                 <div class="step">
-                    <!--merged image-->
+                    <!-- merged image -->
                     <div class="merged-image-container" style="position: relative; width: 460px; height: 486.59px;">
-                        <img src="images/725_161.svg" alt="Map with predictions"
+                        <img src="images/725_161.svg" th:src="@{/images/725_161.svg}" alt="Map with predictions"
                             style="position: absolute; top: 0px; left: 0px;">
-                        <img src="images/725_194.svg" alt="Prediction pin"
+                        <img src="images/725_194.svg" th:src="@{/images/725_194.svg}" alt="Prediction pin"
                             style="position: absolute; top: 59.88px; left: 64.23px;">
-                        <img src="images/725_195.svg" alt="Prediction pin"
+                        <img src="images/725_195.svg" th:src="@{/images/725_195.svg}" alt="Prediction pin"
                             style="position: absolute; top: 52.93px; left: 171.98px;">
-                        <img src="images/725_197.svg" alt="Prediction pin"
+                        <img src="images/725_197.svg" th:src="@{/images/725_197.svg}" alt="Prediction pin"
                             style="position: absolute; top: 217.44px; left: 188.56px;">
-                        <img src="images/725_198.svg" alt="Prediction pin"
+                        <img src="images/725_198.svg" th:src="@{/images/725_198.svg}" alt="Prediction pin"
                             style="position: absolute; top: 235.98px; left: 252.79px;">
-                        <img src="images/725_199.svg" alt="Prediction pin"
+                        <img src="images/725_199.svg" th:src="@{/images/725_199.svg}" alt="Prediction pin"
                             style="position: absolute; top: 270.74px; left: 261.08px;">
-                        <img src="images/725_200.svg" alt="Prediction pin"
+                        <img src="images/725_200.svg" th:src="@{/images/725_200.svg}" alt="Prediction pin"
                             style="position: absolute; top: 150.25px; left: 383.33px;">
-                        <img src="images/725_215.svg" alt="Prediction label"
+                        <img src="images/725_215.svg" th:src="@{/images/725_215.svg}" alt="Prediction label"
                             style="position: absolute; top: 179.57px; left: 289.72px;">
-                        <img src="images/725_218.svg" alt="Prediction label"
+                        <img src="images/725_218.svg" th:src="@{/images/725_218.svg}" alt="Prediction label"
                             style="position: absolute; top: 135.28px; left: 193.74px;">
-                        <img src="images/725_219.svg" alt="Prediction label"
+                        <img src="images/725_219.svg" th:src="@{/images/725_219.svg}" alt="Prediction label"
                             style="position: absolute; top: 160.67px; left: 181.31px;">
-                        <img src="images/725_220.svg" alt="Prediction label"
+                        <img src="images/725_220.svg" th:src="@{/images/725_220.svg}" alt="Prediction label"
                             style="position: absolute; top: 204.7px; left: 226.89px;">
-                        <img src="images/725_221.svg" alt="Prediction label"
+                        <img src="images/725_221.svg" th:src="@{/images/725_221.svg}" alt="Prediction label"
                             style="position: absolute; top: 238.29px; left: 270.41px;">
-                        <img src="images/725_222.svg" alt="Prediction label"
+                        <img src="images/725_222.svg" th:src="@{/images/725_222.svg}" alt="Prediction label"
                             style="position: absolute; top: 209.42px; left: 321.28px;">
-                        <img src="images/725_201.svg" alt="Current location pin"
+                        <img src="images/725_201.svg" th:src="@{/images/725_201.svg}" alt="Current location pin"
                             style="position: absolute; top: 185px; left: 333.6px;">
                     </div>
                     <div class="step-description">
@@ -180,6 +196,7 @@
                 포함될 확률: 87.98%</p>
         </div>
     </section>
+
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 </body>
 

@@ -171,17 +171,22 @@ body {
     text-decoration: none;
     transition: background-color 0.3s;
     display: flex;
-    align-items: center;
     gap: 5px;
     padding: 6px;
     justify-content: center;
-    width: 85px;
     height: 30px;
+    display: inline-flex;
+    align-items: center;
+    /* 세로 중앙 정렬 */
+    justify-content: center;
+    /* 가로 중앙 정렬 */
+    /* 좌우 패딩을 넉넉하게 줍니다. */
+    max-width: 110px;
+    min-width: 85px;
 }
 
 a.login_button:hover {
     background-color: #337ed9;
-    width: 85px;
 }
 
 .login_area:hover .login_button {
@@ -195,8 +200,8 @@ a.login_button:hover {
 }
 
 .user_id {
-    font-size: 15px;
-    font-weight: 500px;
+    font-size: 14px;
+    font-weight: 400px;
 }
 
 .login_area.nav_item.has_submenu {
@@ -206,9 +211,10 @@ a.login_button:hover {
 
 .login_area .submenu {
     background-color: #013895;
-    min-width: auto;
-    width: 85px;
-    padding: 5px 0;
+    min-width: 85px;
+    max-width: 110px;
+    width: auto;
+    padding: 6px;
 }
 
 .login_area .submenu_item {
@@ -217,7 +223,6 @@ a.login_button:hover {
 
 .login_area .submenu_item:hover {
     background-color: #337ed9;
-    width: 85px;
 }
 
 /* 언어 선택 드롭다운 (버튼의 기준) */
