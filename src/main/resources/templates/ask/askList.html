@@ -118,7 +118,14 @@
                         <tr class="detail-row hidden" th:attr="data-id=${q.askSeq}">
                             <td colspan="5">
                                 <div class="detail-box" th:text="${q.askContent}">내용</div>
-
+                                <!-- 첨부파일 표시 -->
+                                <div class="attach" th:if="${q.savedFilename != null}" style="margin-top:8px;">
+                                    <strong>첨부파일: </strong>
+                                    <a th:href="@{/ask/download(askSeq=${q.askSeq})}"
+                                        th:text="${q.originalFilename != null ? q.originalFilename : '다운로드'}">
+                                        다운로드
+                                    </a>
+                                </div>
                                 <div class="detail-actions" style="margin-top:10px; text-align:right;">
                                     <button type="button" class="btn-delete" th:attr="data-id=${q.askSeq}">
                                         삭제
