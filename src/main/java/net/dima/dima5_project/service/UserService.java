@@ -143,4 +143,9 @@ public class UserService {
                 .findByWriter_UserIdOrderByCreateDateDesc(userId, pageable)
                 .map(AskBoardDTO::toDTO);
     }
+
+    public boolean isEmailTakenByOther(String currentUserId, String email) {
+        return repository.existsByUserEmailAndUserIdNot(email, currentUserId);
+    }
+
 }
