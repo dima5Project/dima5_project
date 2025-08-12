@@ -19,7 +19,11 @@ $(document).on('click', '.sidebar__btn.primary', function () {
     }
 
     $('.sidebar__content').removeClass('is-hidden'); // 결과 영역 보이기
-    $('.sidebar__input').prop('disabled', true);
+    $('.sidebar__input')
+        .blur()                       // 커서(포커스) 즉시 제거
+        .prop('disabled', true)       // 폼 입력 비활성
+        .attr('aria-disabled', 'true')
+        .addClass('is-locked');
     $('.cselect__control').prop('disabled', true);      // 🔒 셀렉트 잠금
 
 
@@ -70,7 +74,10 @@ $(document).on('click', '.sidebar__row .sidebar__btn:not(.primary)', function ()
     const $content = $('.sidebar__content');
     $content.scrollTop(0).addClass('is-hidden');
 
-    $('.sidebar__input').prop('disabled', false);
+    $('.sidebar__input')
+        .prop('disabled', false)
+        .removeAttr('aria-disabled')
+        .removeClass('is-locked');
     $('.cselect__control').prop('disabled', false);     // 🔓 셀렉트 해제
 });
 
@@ -172,9 +179,21 @@ document.addEventListener('panel:toggle', (e) => {
 });
 */
 
-// 2) 슬라이드 원형 : 회색 <-> 파랑
+// 2) 슬라이드 원형 : 회색 <-> 파랑 + 팝 애니메이션
 $(document).on('click', '.voy-node', function () {
-    $(this).toggleClass('is-active');
+    const $node = $(this);
+
+    // 색상/상태 토글 (기존 동작)
+    $node.toggleClass('is-active');
+
+    // --- 클릭 팝 애니메이션 ---
+    $node.addClass('is-pop');              // scale up
+    const prev = $node.data('popTimer');   // 이전 타이머 있으면 정리
+    if (prev) clearTimeout(prev);
+    const timer = setTimeout(() => {
+        $node.removeClass('is-pop');       // 원래 크기로 복귀
+    }, 180); // CSS transition 시간과 비슷하게
+    $node.data('popTimer', timer);
 });
 
 
@@ -228,7 +247,7 @@ $(document).on('click', '#saveModal [data-action="yes"]', function () {
     // 실제 저장 API가 붙기 전 임시 처리
     // ※ 여기서 AJAX 붙이면 됨. 성공 콜백에서 아래 alert 실행.
     setTimeout(function () {
-        alert('저장되었습니다. 마이페이지 > 내 선박 정보 에서 확인하세요.');
+        alert('저장되었습니다. "마이페이지 > 내 선박 정보" 에서 확인하세요.');
     }, 50);
 });
 

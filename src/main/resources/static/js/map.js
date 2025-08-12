@@ -1,50 +1,206 @@
+// map.js
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
+
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
-        center: [129.05, 35.13], // 부산항 좌표 (예시)
-        zoom: 4,
-        scrollZoom: true,   // 마우스 휠 줌 유지
+        center: [129.05, 35.13],
+        zoom: 6,
+        scrollZoom: true,
         attributionControl: false
     });
 
-    // 우하단 + / − 줌 버튼 추가 (나침반 숨김)
-    const nav = new mapboxgl.NavigationControl({
-        showZoom: true,
-        showCompass: false
-    });
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
 
-    new mapboxgl.Marker()
-        .setLngLat([129.05, 35.13])
-        .setPopup(new mapboxgl.Popup().setHTML("<h3>부산항</h3>"))
-        .addTo(map);
+    // ─────────────────────────────────────────
+    // 0) Hover 카드 유틸
+    // ─────────────────────────────────────────
+    function degToCompass16(deg) {
+        const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
+            'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+        const i = Math.round(((deg % 360) / 22.5)) % 16;
+        return dirs[i];
+    }
 
-    map.on('load', () => {
-        map.addSource('ports', { type: 'geojson', data: '/data/ports.geojson' });
+    function buildPortHoverCardHTML({ portId, windSpdMS, windDirDeg, tempC, congestion, tzText }) {
+        const dirLabel = degToCompass16(windDirDeg || 0);
+        const congClass = congestion === 'high' ? 'cong--high'
+            : congestion === 'mid' ? 'cong--mid'
+                : 'cong--low';
+        const congText = congestion === 'high' ? '매우 혼잡'
+            : congestion === 'mid' ? '보통'
+                : '원활';
 
-        map.addLayer({
-            id: 'port-points',
-            type: 'symbol',
-            source: 'ports',
-            layout: { 'icon-image': 'harbor-15', 'icon-size': 1.0, 'icon-allow-overlap': true }
+        return `
+    <div class="port-hover-card">
+      <div class="port-hover-card__hd">${portId}</div>
+      <div class="port-hover-card__divider"></div>
+      <div class="port-hover-card__bd">
+        <div class="port-row">
+          <div class="port-row__icon">🧭</div>
+          <div class="port-row__label">바람</div>
+          <div class="port-row__val">
+            ${Number(windSpdMS ?? 0).toFixed(1)} m/s · ${Number(windDirDeg ?? 0)}°
+            <span class="subtle">(${dirLabel})</span>
+          </div>
+        </div>
+        <div class="port-row">
+          <div class="port-row__icon">☁️</div>
+          <div class="port-row__label">날씨</div>
+          <div class="port-row__val">${Number(tempC ?? 0).toFixed(1)} °C</div>
+        </div>
+        <div class="port-row">
+          <div class="port-row__icon">🚢</div>
+          <div class="port-row__label">혼잡도</div>
+          <div class="port-row__val"><span class="cong-dot ${congClass}"></span>${congText}</div>
+        </div>
+        <div class="port-row">
+          <div class="port-row__icon">🕒</div>
+          <div class="port-row__label">시차</div>
+          <div class="port-row__val">UTC ${tzText || '+0'}</div>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    const portMetaCache = new Map();
+    async function ensurePortMeta(portId, lon, lat) {
+        if (portMetaCache.has(portId)) return portMetaCache.get(portId);
+
+        // TODO: 여기서 실제 Open‑Meteo 호출로 교체
+        const mock = { windSpdMS: 3.2, windDirDeg: 180, tempC: 28.2, congestion: 'high', tzText: '+3' };
+        portMetaCache.set(portId, mock);
+        return mock;
+    }
+
+    const hoverPopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        maxWidth: '340px',
+        offset: 35
+    });
+
+    // ─────────────────────────────────────────
+    // 1) SVG 로드/마커 element 생성
+    // ─────────────────────────────────────────
+    async function loadSvgText(url) {
+        const res = await fetch(url, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('SVG 로드 실패: ' + url);
+        return await res.text();
+    }
+
+    function makeSvgMarker(svgText, { color = '#0ea5e9', size = 28 } = {}) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'port-marker';
+        wrapper.style.width = `${size}px`;
+        wrapper.style.height = `${size}px`;
+        wrapper.style.lineHeight = 0;
+        wrapper.style.cursor = 'pointer';
+
+        wrapper.innerHTML = svgText;
+        const svgEl = wrapper.querySelector('svg');
+        if (svgEl) {
+            svgEl.setAttribute('width', `${size}px`);
+            svgEl.setAttribute('height', `${size}px`);
+            svgEl.style.display = 'block';
+        }
+        wrapper.querySelectorAll('path, circle, rect, ellipse, polygon').forEach(node => {
+            const hasFill = node.hasAttribute('fill') && node.getAttribute('fill') !== 'none';
+            const usesCurrentColor = node.getAttribute('fill') === 'currentColor';
+            if (hasFill || usesCurrentColor) node.setAttribute('fill', color);
         });
+        return wrapper;
+    }
 
-        map.on('click', 'port-points', (e) => {
-            const f = e.features[0];
-            const [lon, lat] = f.geometry.coordinates;
-            const { port_id, loc_lat, loc_lon } = f.properties;
+    // ─────────────────────────────────────────
+    // 2) GeoJSON 로드 후 포트 마커 추가 (+ hover 카드)
+    // ─────────────────────────────────────────
+    async function addPortMarkers() {
+        const SVG_URL = '/images/portpredictImages/port_icon.svg';
+        const [svgText, geojson] = await Promise.all([
+            loadSvgText(SVG_URL),
+            fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => {
+                if (!r.ok) throw new Error('ports.geojson 로드 실패'); return r.json();
+            })
+        ]);
+
+        geojson.features.forEach(f => {
+            if (!f.geometry || f.geometry.type !== 'Point') return;
+            const [lng, lat] = f.geometry.coordinates || [];
+            if (typeof lng !== 'number' || typeof lat !== 'number') return;
+
+            const color = f.properties?.color || '#013895';
+            const size = f.properties?.size || 28;
+
+            const el = makeSvgMarker(svgText, { color, size });
+
+            // 클릭 팝업 (기존 동작 유지)
+            el.addEventListener('click', () => {
+                el.classList.add('bump');
+                setTimeout(() => el.classList.remove('bump'), 180);
+
+                const pid = f.properties?.port_id ?? 'Unknown Port';
+                const locLa = f.properties?.loc_lat ?? lat;
+                const locLo = f.properties?.loc_lon ?? lng;
+
+                new mapboxgl.Popup()
+                    .setLngLat([lng, lat])
+                    .setHTML(`<div style="font-weight:700">${pid}</div>
+                    <div style="font-size:12px;color:#666">(${locLa}, ${locLo})</div>`)
+                    .addTo(map);
+            });
+
+            // 마커 추가
+            new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+            // ⬇ Hover 카드: 마커 생성 직후에 연결
+            el.addEventListener('mouseenter', async () => {
+                const pid = f.properties?.port_id || 'Unknown';
+                const meta = await ensurePortMeta(pid, lng, lat);
+                const html = buildPortHoverCardHTML({
+                    portId: pid,
+                    windSpdMS: meta.windSpdMS,
+                    windDirDeg: meta.windDirDeg,
+                    tempC: meta.tempC,
+                    congestion: meta.congestion,
+                    tzText: meta.tzText
+                });
+                hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
+            });
+            el.addEventListener('mouseleave', () => hoverPopup.remove());
+        });
+    }
+
+    // ─────────────────────────────────────────
+    // 3) 맵 로드 후 실행
+    // ─────────────────────────────────────────
+    map.on('load', async () => {
+        // (선택) 베이스맵 라벨 감추기
+        map.getStyle().layers
+            .filter(l => l.type === 'symbol' && (l.id.includes('poi-label') || l.id.includes('harbor-label')))
+            .forEach(l => map.setLayoutProperty(l.id, 'visibility', 'none'));
+
+        // 커스텀 SVG 포트 마커 + hover 카드
+        await addPortMarkers().catch(console.error);
+
+        // 부산항 고정 마커 (기존)
+        const SVG_URL = '/images/portpredictImages/port_icon.svg';
+        const svgText = await loadSvgText(SVG_URL);
+        const busanEl = makeSvgMarker(svgText, { color: '#013895', size: 28 });
+        busanEl.addEventListener('click', () => {
+            busanEl.classList.add('bump');
+            setTimeout(() => busanEl.classList.remove('bump'), 180);
             new mapboxgl.Popup()
-                .setLngLat([lon, lat])
-                .setHTML(`<div style="font-weight:700">${port_id}</div>
-                  <div style="font-size:12px;color:#666">(${loc_lat}, ${loc_lon})</div>`)
+                .setLngLat([129.040, 35.106])
+                .setHTML(`<div style="font-weight:700">Busan Port</div>
+                  <div style="font-size:12px;color:#666">(35.106, 129.040)</div>`)
                 .addTo(map);
         });
-
-        map.on('mouseenter', 'port-points', () => map.getCanvas().style.cursor = 'pointer');
-        map.on('mouseleave', 'port-points', () => map.getCanvas().style.cursor = '');
+        new mapboxgl.Marker({ element: busanEl, anchor: 'bottom' })
+            .setLngLat([129.040, 35.106])
+            .addTo(map);
     });
 });
-
-
