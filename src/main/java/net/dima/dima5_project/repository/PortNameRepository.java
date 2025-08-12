@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import net.dima.dima5_project.entity.PortNameEntity;
 
 @Repository
-public interface PortNameRepository extends JpaRepository<PortNameEntity, String> {
+public interface PortNameRepository extends JpaRepository<PortNameEntity, Long> {
     List<PortNameEntity> findByCountryNameKr(String countryNameKr);
 
     List<PortNameEntity> findByCountryNameEn(String countryNameEn);
