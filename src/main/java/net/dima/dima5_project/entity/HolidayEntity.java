@@ -25,7 +25,7 @@ public class HolidayEntity {
     @Column(name = "holiday_seq")
     private Long holidaySeq;
 
-    @Column(name = "holiday_day")
+    @Column(name = "holiday_date")
     private String holidayDate; // 예: 2025-08-07 (기준이 PK라고 가정)
 
     @Column(name = "country_name_kr")

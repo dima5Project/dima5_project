@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>문의 내역</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+</head>
+
+<body>
+    <h2>문의 내역</h2>
+
+    <div class="table-wrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>문의유형</th>
+                    <th>제목</th>
+                    <th>등록일</th>
+                    <th>답변 여부</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tbody>
+                <tr th:each="a, i : ${askList}">
+                    <td th:text="${i.count}">1</td>
+                    <td th:text="${a.askType}">서비스 이용</td>
+                    <td>
+                        <a th:href="@{'/ask/detail'(askSeq=${a.askSeq})}" th:text="${a.askTitle}">문의 제목</a>
+                    </td>
+                    <td th:text="${a.createDate != null ? #temporals.format(a.createDate, 'yyyy-MM-dd') : '-'}">
+                        2025-05-26</td>
+                    <td>
+                        <span class="tag" th:classappend="${a.replyStatus} ? ' tag-done' : ' tag-wait'"
+                            th:text="${a.replyStatus} ? '답변 완료' : '대기'">대기</span>
+                    </td>
+                </tr>
+
+                <!-- 비었을 때 -->
+                <tr th:if="${#lists.isEmpty(askList)}">
+                    <td colspan="5">문의 내역이 없습니다.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/mypage}">← 마이페이지로 돌아가기</a>
+</body>
+
+</html>

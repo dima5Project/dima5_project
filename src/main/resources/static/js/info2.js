@@ -67,6 +67,7 @@ $(document).ready(function () {
 function initEventBindings() {
     $("#countrySelect").on("change", function () {
         const country = $(this).val();
+        console.log('country changed:', this.value);
         loadPorts(country);
         loadTimezone(country);
         loadHoliday(country);

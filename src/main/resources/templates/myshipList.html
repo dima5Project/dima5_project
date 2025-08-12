@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 선박 저장 목록</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+</head>
+
+<body>
+    <h2>내 선박 저장 목록</h2>
+
+    <div class="table-wrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>선박 번호</th>
+                    <th>위도</th>
+                    <th>경도</th>
+                    <th>TOP1 항구명</th>
+                    <th>확률</th>
+                    <th>ETA</th>
+                    <th>삭제</th>
+                    <th>재검색</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="ship, stat : ${shipList}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${ship.searchVsl.vslId}">112233</td>
+                    <td th:text="${ship.lat}">31.14567</td>
+                    <td th:text="${ship.lon}">127.9872</td>
+                    <td th:text="${ship.top1Port}">VNHPH</td>
+                    <td th:text="${ship.top1Pred + '%'}">88%</td>
+                    <td th:text="${#temporals.format(ship.eta, 'yyyy-MM-dd')}">2025-08-31</td>
+                    <td><button type="button" class="btn-delete">삭제</button></td>
+                    <td><button type="button" class="btn-search-again">재검색</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/mypage}">← 마이페이지로 돌아가기</a>
+</body>
+
+</html>

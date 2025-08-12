@@ -58,8 +58,10 @@ public class InfoController {
 
     // 7. 특정 국가의 항구 목록
     @GetMapping("/ports/{country}")
-    public List<PortNameEntity> getPortsByCountry(@PathVariable String country) {
-        return portInfoService.getPortsByCountry(country);
+    public List<PortSimpleDTO> getPortsByCountry(@PathVariable String country) {
+        return portInfoService.getPortsByCountry(country) // 기존처럼 엔티티 목록 반환
+                .stream()
+                .map(p -> new PortSimpleDTO(p.getPortId(), p.getPortNameKr()))
+                .toList();
     }
-
 }
