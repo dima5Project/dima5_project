@@ -14,17 +14,37 @@ document.addEventListener("DOMContentLoaded", () => {
         showZoom: true,
         showCompass: false
     });
-    map.addControl(nav, 'bottom-right');
+    map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
 
-    // ★ 좌하단에 저작권 아이콘(컴팩트)으로 다시 추가 (추가)
-    map.addControl(new mapboxgl.AttributionControl({
-        compact: true
-    }), 'bottom-left');
-
-    // 마커 테스트
     new mapboxgl.Marker()
         .setLngLat([129.05, 35.13])
         .setPopup(new mapboxgl.Popup().setHTML("<h3>부산항</h3>"))
         .addTo(map);
+
+    map.on('load', () => {
+        map.addSource('ports', { type: 'geojson', data: '/data/ports.geojson' });
+
+        map.addLayer({
+            id: 'port-points',
+            type: 'symbol',
+            source: 'ports',
+            layout: { 'icon-image': 'harbor-15', 'icon-size': 1.0, 'icon-allow-overlap': true }
+        });
+
+        map.on('click', 'port-points', (e) => {
+            const f = e.features[0];
+            const [lon, lat] = f.geometry.coordinates;
+            const { port_id, loc_lat, loc_lon } = f.properties;
+            new mapboxgl.Popup()
+                .setLngLat([lon, lat])
+                .setHTML(`<div style="font-weight:700">${port_id}</div>
+                  <div style="font-size:12px;color:#666">(${loc_lat}, ${loc_lon})</div>`)
+                .addTo(map);
+        });
+
+        map.on('mouseenter', 'port-points', () => map.getCanvas().style.cursor = 'pointer');
+        map.on('mouseleave', 'port-points', () => map.getCanvas().style.cursor = '');
+    });
 });
+
 

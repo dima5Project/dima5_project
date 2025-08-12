@@ -91,4 +91,13 @@ public class UserController {
         return userService.selectOne(userId) == null;  // 중복 없으면 true
     }
 
+    /*
+     * 마이페이지 접속
+     */
+    @GetMapping("/mypage/main")
+    public String myPage() {
+
+        return "mypage";
+    }
+
 }

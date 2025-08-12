@@ -1,19 +1,33 @@
 package net.dima.dima5_project.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Authentication;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.dto.AskBoardDTO;
+import net.dima.dima5_project.dto.LoginUserDetailsDTO;
 import net.dima.dima5_project.entity.AskBoardEntity;
+import net.dima.dima5_project.entity.PredictUserEntity;
 import net.dima.dima5_project.repository.AskBoardRepository;
+import net.dima.dima5_project.repository.UserRepository;
 import net.dima.dima5_project.util.FileService;
 
 @Service
@@ -22,6 +36,7 @@ import net.dima.dima5_project.util.FileService;
 public class AskService {
 
     private final AskBoardRepository askBoardRepository;
+    private final UserRepository UserRepository;
 
     // 글개수
     @Value("${ask.board.pageLimit}")
@@ -114,36 +129,71 @@ public class AskService {
      *
      * @param askBoardDTO
      */
-    public void insertAskBoard(AskBoardDTO askBoardDTO) {
-        // 진짜 코드
-        String originalFilename = null;
-        String savedFilename = null;
+    // public void insertAskBoard(AskBoardDTO askBoardDTO) {
+    // // 진짜 코드
+    // String originalFilename = null;
+    // String savedFilename = null;
 
-        // 첨부파일 있는 경우 파일명 세팅
-        // uploadPath = application.properties 에 파일 저장 위치 설정해야 함 그 다음 위에 @Value로 선언
-        if (!askBoardDTO.getUploadFile().isEmpty()) {
-            originalFilename = askBoardDTO.getUploadFile().getOriginalFilename();
-            savedFilename = FileService.saveFile(askBoardDTO.getUploadFile(),
-                    uploadPath);
+    // // 첨부파일 있는 경우 파일명 세팅
+    // // uploadPath = application.properties 에 파일 저장 위치 설정해야 함 그 다음 위에 @Value로 선언
+    // if (!askBoardDTO.getUploadFile().isEmpty()) {
+    // originalFilename = askBoardDTO.getUploadFile().getOriginalFilename();
+    // savedFilename = FileService.saveFile(askBoardDTO.getUploadFile(),
+    // uploadPath);
 
-            askBoardDTO.setOriginalFilename(originalFilename);
-            askBoardDTO.setSavedFilename(savedFilename);
-        }
+    // askBoardDTO.setOriginalFilename(originalFilename);
+    // askBoardDTO.setSavedFilename(savedFilename);
+    // }
 
-        // 비밀번호(4자리 숫자 문자열) 처리: 비어있으면 공개글(null로 저장) -> 확인해야 함
-        if (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank()) {
-            String pwd = askBoardDTO.getAskPwd().trim();
-            if (!pwd.matches("^\\d{4}$")) {
-                throw new IllegalArgumentException("비밀번호는 숫자 4자리여야 합니다.");
-            }
-            askBoardDTO.setAskPwd(pwd);
+    // // 비밀번호(4자리 숫자 문자열) 처리: 비어있으면 공개글(null로 저장) -> 확인해야 함
+    // if (askBoardDTO.getAskPwd() != null && !askBoardDTO.getAskPwd().isBlank()) {
+    // String pwd = askBoardDTO.getAskPwd().trim();
+    // if (!pwd.matches("^\\d{4}$")) {
+    // throw new IllegalArgumentException("비밀번호는 숫자 4자리여야 합니다.");
+    // }
+    // askBoardDTO.setAskPwd(pwd);
+    // } else {
+    // askBoardDTO.setAskPwd(null);
+    // }
+
+    // AskBoardEntity askBoardEntity = AskBoardEntity.toEntity(askBoardDTO);
+
+    // askBoardRepository.save(askBoardEntity);
+    // }
+
+    @Transactional
+    public void insertAskBoard(AskBoardDTO dto) {
+        // 1) 로그인 사용자
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            // (A) 로그인 필수라면:
+            throw new IllegalStateException("로그인 후 작성해주세요.");
+            // (B) 익명 허용하려면 위 throw 대신 다음처럼:
+            // dto.setWriter(null);
         } else {
-            askBoardDTO.setAskPwd(null);
+            String userId = (auth.getPrincipal() instanceof LoginUserDetailsDTO u) ? u.getUserId() : auth.getName();
+            PredictUserEntity writer = UserRepository.findByUserId(userId)
+                    .orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다: " + userId));
+            dto.setWriter(writer);
         }
 
-        AskBoardEntity askBoardEntity = AskBoardEntity.toEntity(askBoardDTO);
+        // 2) 파일 저장
+        MultipartFile f = dto.getUploadFile();
+        if (f != null && !f.isEmpty()) {
+            dto.setOriginalFilename(f.getOriginalFilename());
+            String saved = FileService.saveFile(f, uploadPath); // ★ 저장
+            dto.setSavedFilename(saved);
+        } else {
+            dto.setOriginalFilename(null);
+            dto.setSavedFilename(null);
+        }
 
-        askBoardRepository.save(askBoardEntity);
+        // 3) 공개글이면 비번 제거
+        if (dto.getAskPwd() != null && dto.getAskPwd().isBlank()) {
+            dto.setAskPwd(null);
+        }
+
+        askBoardRepository.save(AskBoardEntity.toEntity(dto));
     }
 
     /**

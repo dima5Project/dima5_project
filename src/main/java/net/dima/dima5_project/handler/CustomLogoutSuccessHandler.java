@@ -21,16 +21,11 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
-        // 로그아웃 후에 이전 페이지에 그대로 머물러 있기 위해 referer 사용
-        String refererUrl = request.getHeader("Referer");
+        // 로그 출력
+        System.out.println("로그아웃 성공: " + request.getRequestURL());
 
-        log.info("로그아웃 성공: {}", refererUrl);
-
-        if (refererUrl != null) {
-            response.sendRedirect(refererUrl); // 로그아웃 하기 직전의 페이지로 리다이렉트
-        } else {
-            response.sendRedirect("/"); // 정보가 없다면 기본 URL(root)로 리다이랙션
-        }
+        // 메인 페이지로 리다이렉트
+        response.sendRedirect("/");
 
     }
 

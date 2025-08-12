@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 
 <head>
     <meta charset="UTF-8" />
@@ -13,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script defer th:src="@{/js/header.js}"></script>
 
-    <link rel="stylesheet" href="/css/askwrite.css" th:href="@{/css/askWrite.css}">
+    <link rel="stylesheet" href="/css/askWrite.css" th:href="@{/css/askWrite.css}">
 
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
@@ -34,13 +36,15 @@
     </div>
 
     <main>
-        <form class="qna-form" th:action="@{/ask/askwrite}" method="post" enctype="multipart/form-data">
+        <!-- <form class="qna-form" th:action="@{/ask/write}" method="post" enctype="multipart/form-data">-->
+        <form class="qna-form" action="/ask/write" th:action="@{/ask/write}" method="post"
+            enctype="multipart/form-data">
 
             <div class="divider"></div>
 
             <div class="form-row">
                 <label for="category">문의유형</label>
-                <select id="category" name="category" required>
+                <select id="category" name="askType" required>
                     <option value="회원가입">회원가입</option>
                     <option value="서비스 이용">서비스 이용</option>
                     <option value="기타">기타</option>
@@ -58,25 +62,26 @@
             </div>
 
             <div class="form-row">
-                <label for="title">제목</label>
-                <input id="title" name="title" type="text" required>
+                <label for="asktitle">제목</label>
+                <input id="asktitle" name="askTitle" type="text" required>
             </div>
 
             <div class="form-row">
-                <label for="content">내용</label>
-                <textarea id="content" name="content" rows="12" required></textarea>
+                <label for="askcontent">내용</label>
+                <textarea id="askcontent" name="askContent" rows="12" required></textarea>
             </div>
 
             <div class="form-row">
-                <label for="file">첨부파일</label>
+                <label for="uploadFile">첨부파일</label>
                 <!-- 입력창 + 파일 버튼 형태 -->
-                <input id="file" name="file" type="file">
+                <input id="uploadFile" name="uploadFile" type="file">
             </div>
 
             <div class="form-row">
                 <label for="pw">비밀번호</label>
                 <div class="pw-wrap">
-                    <input id="pw" name="pw" type="text" maxlength="4" pattern="\d{4}" required>
+                    <input id="askPwd" name="askPwd" type="text" inputmode="numeric" maxlength="4" pattern="\d{4}"
+                        required>
                     <small class="pw-hint">숫자 4자리를 입력하세요</small>
                 </div>
             </div>
@@ -93,6 +98,27 @@
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 
+    <script>
+        (function () {
+            const pub = document.getElementById('public');
+            const pri = document.getElementById('private');
+            const pw = document.getElementById('askPwd');
+
+            function sync() {
+                if (pri.checked) {
+                    pw.disabled = false;
+                    pw.required = true;
+                } else {
+                    pw.value = '';
+                    pw.disabled = true;
+                    pw.required = false;
+                }
+            }
+            pub.addEventListener('change', sync);
+            pri.addEventListener('change', sync);
+            sync(); // 초기 반영
+        })();
+    </script>
 </body>
 
 </html>

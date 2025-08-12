@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import lombok.RequiredArgsConstructor;
 import net.dima.dima5_project.handler.CustomLoginFailureHandler;
@@ -19,7 +20,7 @@ public class SecurityConfig {
 
         private final CustomLoginSuccessHandler loginSuccessHandler;
         private final CustomLoginFailureHandler loginFailureHandler;
-        private final CustomLogoutSuccessHandler logoutSuccessHandler; // LogoutSuccessHandler은 이미있는 객체이므로 커스텀
+        private final CustomLogoutSuccessHandler CustomLogoutSuccessHandler;
 
         @Bean // 해당 메소드에서 사용, 반환하는 값을 Bean으로 관리
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,19 +33,21 @@ public class SecurityConfig {
                                                 "/api/**",
                                                 "/lang",
                                                 "/main",
-                                                "/intro/**", // 소개
-                                                "/ask/**", // 문의 - 나중에 삭제
-                                                "/predict/**", // 차항지 예측 - 나중에 삭제
+                                                "/intro/**",            // 소개
+                                                //"/ask/**",            // 문의 - 나중에 삭제
+                                                "/predict/**",          // 차항지 예측 - 나중에 삭제
                                                 "/user/**",
-                                                "/news/**", // 뉴스
-                                                "/mypage/**", // 마이페이지 - 나중에 삭제
+                                                "/news/**",
+                                                "/api/info/**",         // 부가정보 - 나중에 삭제
+                                                "/port/info/**",
+                                                "/info/**",             // 부가정보 - 나중에 삭제
+                                                "/proxy/met/**",        // API 끌어오는 ajax 처리
+                                                "/data/**",
+                                                "/logout",
                                                 "/images/**",
                                                 "/css/**",
-                                                "/js/**",
-                                                "/api/info/**", // 부가정보 - 나중에 삭제
-                                                "/port/info/**",
-                                                "/info/**", // 부가정보 - 나중에 삭제
-                                                "/proxy/met/**" // API 끌어오는 ajax 처리
+                                                "/js/**"
+                                                
                                                 
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
@@ -69,9 +72,10 @@ public class SecurityConfig {
                 // 로그아웃에 대한 처리
                 http
                                 .logout((auth) -> auth
-                                                .logoutUrl("/user/logout") // 로그아웃 요청 url
-                                                .logoutSuccessHandler(logoutSuccessHandler) // 로그아웃 성공시 처리할 핸들러 등록
-                                                .logoutSuccessUrl("/") // 로그아웃 성공 시 url
+                                                .logoutUrl("/logout") // 로그아웃 요청 url
+                                                .logoutSuccessHandler(CustomLogoutSuccessHandler) // 로그아웃 성공시 처리할 핸들러 등록
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // GET 허용
+                                                .logoutSuccessUrl("/") // 로그아웃 성공 메인으로 이동
                                                 .invalidateHttpSession(true) // 세션 무효화
                                                 .clearAuthentication(true) // 인증기록 무효화
                                 );
