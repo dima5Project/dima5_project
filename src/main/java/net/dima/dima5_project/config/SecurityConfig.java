@@ -42,6 +42,7 @@ public class SecurityConfig {
                                                 "/port/info/**",
                                                 "/info/**",             // 부가정보 - 나중에 삭제
                                                 "/proxy/met/**",        // API 끌어오는 ajax 처리
+                                                "/data/**",
                                                 "/logout",
                                                 "/images/**",
                                                 "/css/**",
