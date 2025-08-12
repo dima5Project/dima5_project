@@ -10,7 +10,7 @@ import net.dima.dima5_project.entity.AskReplyEntity;
 @Data
 @Builder
 public class AskReplyDTO {
-    private Integer replyNum;
+    private Long replyNum;
     private Long askBoardSeq;
     private String askTitle;
     private String replyContent;

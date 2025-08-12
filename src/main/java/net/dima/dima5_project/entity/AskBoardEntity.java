@@ -2,6 +2,8 @@ package net.dima.dima5_project.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,9 +48,9 @@ public class AskBoardEntity {
     @JoinColumn(name = "ask_writer", referencedColumnName = "user_id")
     private PredictUserEntity writer;
 
-    @Builder.Default
-    @Column(name = "create_date")
-    private LocalDateTime createDate = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name = "create_date", nullable = false, updatable = false)
+    private LocalDateTime createDate;
 
     @Column(name = "original_filename")
     private String originalFilename;
@@ -66,20 +68,23 @@ public class AskBoardEntity {
     @OneToOne(mappedBy = "askBoard", cascade = CascadeType.ALL)
     private AskReplyEntity reply;
 
-    public static AskBoardEntity toEntity(AskBoardDTO askBoardDTO) {
-        return AskBoardEntity.builder()
-                .askSeq(askBoardDTO.getAskSeq())
-                .askType(askBoardDTO.getAskType())
-                .askTitle(askBoardDTO.getAskTitle())
-                .askContent(askBoardDTO.getAskContent())
-                .writer(askBoardDTO.getWriter())
-                .createDate(askBoardDTO.getCreateDate())
-                .originalFilename(askBoardDTO.getOriginalFilename())
-                .savedFilename(askBoardDTO.getSavedFilename())
-                .askPwd(askBoardDTO.getAskPwd())
-                .replyStatus(askBoardDTO.getReplyStatus())
-                .reply(askBoardDTO.getReply())
-                .build();
-    }
+    public static AskBoardEntity toEntity(AskBoardDTO dto) {
+        // ★ createDate가 null이면 아예 세팅하지 않아서 @Builder.Default가 유지되도록
+        AskBoardEntityBuilder b = AskBoardEntity.builder()
+                .askSeq(dto.getAskSeq())
+                .askType(dto.getAskType())
+                .askTitle(dto.getAskTitle())
+                .askContent(dto.getAskContent())
+                .writer(dto.getWriter())
+                .originalFilename(dto.getOriginalFilename())
+                .savedFilename(dto.getSavedFilename())
+                .askPwd(dto.getAskPwd())
+                .replyStatus(dto.getReplyStatus())
+                .reply(dto.getReply());
 
+        if (dto.getCreateDate() != null) {
+            b.createDate(dto.getCreateDate());
+        }
+        return b.build();
+    }
 }
