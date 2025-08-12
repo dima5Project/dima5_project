@@ -33,7 +33,7 @@ public class PredictResultSaveEntity {
     private Integer saveSeq;
 
     @ManyToOne
-    @Column(name="user_id")
+    @JoinColumn(name = "user_id")
     private PredictUserEntity userId;
 
     private Double lat;
@@ -51,7 +51,7 @@ public class PredictResultSaveEntity {
     public static PredictResultSaveEntity toEntity(PredictResultSaveDTO predictResultSaveDTO) {
         return PredictResultSaveEntity.builder()
                 .saveSeq(predictResultSaveDTO.getSaveSeq())
-                //.userId(predictResultSaveDTO.getUserId())
+                // .userId(predictResultSaveDTO.getUserId())
                 .lat(predictResultSaveDTO.getLat())
                 .lon(predictResultSaveDTO.getLon())
                 .top1Port(predictResultSaveDTO.getTop1Port())
@@ -59,7 +59,5 @@ public class PredictResultSaveEntity {
                 .eta(predictResultSaveDTO.getEta())
                 .build();
     }
-
-
 
 }
