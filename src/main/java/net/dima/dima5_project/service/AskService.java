@@ -12,9 +12,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Authentication;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +27,6 @@ import net.dima.dima5_project.dto.LoginUserDetailsDTO;
 import net.dima.dima5_project.entity.AskBoardEntity;
 import net.dima.dima5_project.entity.PredictUserEntity;
 import net.dima.dima5_project.repository.AskBoardRepository;
-import net.dima.dima5_project.repository.PredictUserRepository;
 import net.dima.dima5_project.repository.UserRepository;
 import net.dima.dima5_project.util.FileService;
 
