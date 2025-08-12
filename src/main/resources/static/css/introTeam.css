@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+
+* {
+    -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* 전체 페이지 레이아웃 컨테이너 */
+.main_container {
+    display: flex;
+    min-height: 100vh;
+    padding: 20px;
+    /* 전체 페이지에 균일한 여백 */
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+    background: #fff;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+    width: 150px;
+    flex-shrink: 0;
+    position: absolute;
+    top: 170px;
+    left: 180px;
+    margin-right: 20px;
+    /* 콘텐츠 영역과의 간격 */
+}
+
+.sidebar_title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.sidebar_nav {
+    display: grid;
+    gap: 8px;
+}
+
+.sidebar_link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #222;
+    font-size: 14px;
+}
+
+.sidebar_link.is-active,
+.sidebar_link:hover {
+    background: #f2f5f9;
+}
+
+/* 콘텐츠 영역 */
+.content_area {
+    flex-grow: 1;
+    /* 남은 공간을 모두 차지 */
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    /* 카드 컨테이너를 가로 중앙에 정렬 */
+    align-items: center;
+    /* 카드 컨테이너를 세로 중앙에 정렬 */
+}
+
+/* 팀원 카드들을 담는 컨테이너 */
+.card_container {
+    display: flex;
+    justify-content: center;
+    /* 카드들을 가로 중앙에 정렬 */
+    align-items: stretch;
+    /* 모든 카드의 높이를 통일 */
+    gap: 0;
+    /* 카드 사이의 간격 */
+    width: 100%;
+    border-radius: 50px;
+    height: 350px;
+}
+
+/* 각 팀원 카드 */
+.intro_wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    height: 100%;
+    text-align: center;
+    background-color: #f2f5f9;
+    padding: 20px 10px;
+}
+
+.intro_wrap.first {
+    border-radius: 50px 0 0 50px;
+}
+
+.intro_wrap.end {
+    border-radius: 0 50px 50px 0;
+}
+
+.img_wrapper {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin-top: 40px;
+    border: 2px solid #ccc;
+}
+
+.img_wrapper img.char {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.intro_text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1;
+    min-height: 80px;
+    padding-top: 10px;
+    justify-content: flex-start;
+    padding-top: 10px;
+}
+
+.text_group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.intro_text .name {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.rectangle {
+    width: 30px;
+    height: 2px;
+    background-color: #013895;
+    margin-bottom: 5px;
+}

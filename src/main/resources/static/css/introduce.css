@@ -1,3 +1,7 @@
+@charset "UTF-8";
+
+@charset "UTF-8";
+
 :root {
     --color-primary: #013895;
     --color-dark-blue: #0f1035;
@@ -29,6 +33,11 @@ body {
     margin: 0 auto;
     padding: 0 40px;
     /* 좌우 내부 여백 */
+}
+
+.content_wrapper .container {
+    max-width: 100%;
+    padding: 0;
 }
 
 a {
@@ -99,13 +108,11 @@ img {
     /* 제목/부제 간 간격 */
     flex-direction: column;
     gap: 30px;
-    margin-top: 85px;
-    /* 헤더가 겹치지 않게 보정 */
 }
 
 /* 강한 타이틀 */
 .hero_title {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
 }
 
@@ -115,25 +122,33 @@ img {
     font-weight: 500;
 }
 
+.main_layout {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding-top: 115px;
+    padding-bottom: 120px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
 /* CSS for section section:about */
 .about_section {
-    padding-top: 115px;
     padding-bottom: 120px;
 }
 
-.about_layout {
-    display: flex;
-    /* 사이드바와 본문을 좌우 배치 */
-    gap: 85px;
-}
-
-/* 린규린규에게 뺏어온 css */
 .sidebar {
     background: #fff;
     border: 1px solid #e5e8eb;
     border-radius: 8px;
     padding: 20px;
     height: fit-content;
+    width: 150px;
+    flex-shrink: 0;
+    position: relative;
+    top: 0;
+    z-index: 100;
+    position: relative;
 }
 
 .sidebar_title {
@@ -148,7 +163,9 @@ img {
 }
 
 .sidebar_link {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 10px 12px;
     border-radius: 6px;
     text-decoration: none;
@@ -161,10 +178,16 @@ img {
     background: #f2f5f9;
 }
 
+/* 전체 내용 감싸는 div 태그 스타일 적용 */
+.content_wrapper {
+    max-width: 830px;
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+    margin-left: 20px;
+}
 
 .content_area {
-    flex-grow: 1;
-    /* 남은 공간 모두 차지 */
     display: flex;
     flex-direction: column;
     gap: 120px;
@@ -187,13 +210,13 @@ img {
 
 .content_title_en {
     color: var(--color-primary);
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
 }
 
 /* 설명 글 */
 .content_subtitle {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
 }
 
@@ -205,8 +228,8 @@ img {
 }
 
 .content_image {
-    width: 286px;
-    height: 203px;
+    width: 400px;
+    height: 250px;
     object-fit: cover;
     /* 일정 크기 유지하며 잘림 허용 */
     flex-shrink: 0;
@@ -217,39 +240,29 @@ img {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 .merged_image_container {
     flex-shrink: 0;
+    position: relative;
+    width: 299.05px;
+    height: 269.25px;
 }
 
 /* 애니메이션 효과 */
-
-/* CSS 애니메이션 정의 */
-@keyframes moveShip {
-    0% {
-        transform: translateX(0);
-        /* 시작 위치 */
-    }
-
-    50% {
-        transform: translateX(20px);
-        /* 오른쪽으로 20px 이동 */
-    }
-
-    100% {
-        transform: translateX(0);
-        /* 다시 원래 위치로 돌아옴 */
-    }
+.portcast_visual_container {
+    position: relative;
+    width: 300px;
+    /* 원하는 크기 설정 */
+    height: 300px;
 }
 
-/* 이미지에 애니메이션 적용 */
-.shipping-ship {
-    animation: moveShip 4s ease-in-out infinite;
-    /* 4초 동안 반복, 부드러운 움직임 */
+.portcast_visual_container svg {
+    position: absolute;
 }
+
 
 /* CSS for section section:ais */
 .ais_section {
@@ -259,7 +272,10 @@ img {
     justify-content: center;
     align-items: center;
     color: var(--color-text-light);
+    padding: 0;
 }
+
+/* 배경을 일부만 채우는 것이 더 나은지, 전체를 채우는 것이 더 나은지 */
 
 .ais_background {
     position: absolute;
@@ -269,6 +285,7 @@ img {
     height: 100%;
     z-index: 1;
 }
+
 
 .ais_bg_image {
     width: 100%;
@@ -296,12 +313,12 @@ img {
 }
 
 .ais_title {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
 }
 
 .ais_subtitle {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
 }
 
@@ -309,18 +326,14 @@ img {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
+    font-size: 16px;
+    line-height: 1.5;
 }
 
 /* CSS for section section:methodology */
-.methodology_section {
-    padding-top: 120px;
-    padding-bottom: 120px;
-}
-
 .methodology_section .content_header {
     margin-bottom: 40px;
+    margin-top: 120px;
 }
 
 .methodology_steps {
@@ -348,44 +361,27 @@ img {
 }
 
 .step_description h4 {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     margin-bottom: 10px;
 }
 
 .step_description p {
-    font-size: 19px;
+    font-size: 18px;
     line-height: 25px;
 }
 
+
 .step_arrow {
-    transform: rotate(90deg);
+    width: 50px;
 }
 
-/* 주석/주의 문구 */
-.disclaimer {
-    font-size: 15px;
-    margin-top: 3px;
-}
 
 .accuracy_note {
     text-align: right;
-    font-size: 15px;
-    line-height: 25px;
+    font-size: 14px;
+    line-height: 1.5;
     margin-top: 60px;
-}
-
-@media (min-width: 1024px) {
-    .methodology-steps {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    .step-arrow {
-        transform: rotate(0deg);
-        margin-top: 200px;
-    }
 }
 
 @media (max-width: 768px) {
@@ -395,18 +391,18 @@ img {
 }
 
 @media (max-width: 768px) {
-    .hero-title {
+    .hero_title {
         font-size: 24px;
     }
 
-    .hero-subtitle {
+    .hero_subtitle {
         font-size: 18px;
         padding: 0 10px;
     }
 }
 
 @media (max-width: 1024px) {
-    .about-layout {
+    .about_layout {
         flex-direction: column;
         align-items: center;
     }
@@ -416,11 +412,11 @@ img {
         max-width: 400px;
     }
 
-    .content-area {
+    .content_area {
         width: 100%;
     }
 
-    .content-body-flex {
+    .content_body_flex {
         flex-direction: column;
         text-align: center;
     }

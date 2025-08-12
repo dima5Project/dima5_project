@@ -1,18 +1,33 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
     <title>항구 부가정보</title>
-    <link rel="stylesheet" href="/css/info.css" />
+    <link rel="stylesheet" th:href="@{/css/info.css}" />
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <script defer th:src="@{/js/header.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script defer src="/js/info2.js"></script>
+    <script defer th:src="@{/js/info2.js}"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap"
+        rel="stylesheet">
+
 </head>
 
 <body>
     <!--  header.html 프래그먼트 포함 -->
-    <header th:replace="~{fragment/header :: bu3_navigation}"></header>
+    <div sec:authorize="isAnonymous()">
+        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
+
     <main>
         <!-- 검색 선택 -->
         <div style="margin-bottom: 100px;">
@@ -53,6 +68,10 @@
             </div>
         </div>
     </main>
+
+    <!-- footer fragment -->
+    <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+
 </body>
 
 </html>
