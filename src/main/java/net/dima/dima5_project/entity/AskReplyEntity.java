@@ -26,7 +26,7 @@ public class AskReplyEntity {
 
     @Id
     @Column(name = "reply_num")
-    private Integer replyNum;
+    private Long replyNum;
 
     @OneToOne
     @JoinColumn(name = "reply_num", referencedColumnName = "ask_seq")

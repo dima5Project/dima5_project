@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,33 +94,36 @@ public class AskController {
     // askService.insertAskBoard(askBoardDTO);
     // return "redirect:/ask";
     // }
-
     @GetMapping("")
     public String ask(
             @RequestParam(defaultValue = "0") int page, // 0-base
-            @RequestParam(name = "searchItem", defaultValue = "askTitle") String searchItem,
+            @RequestParam(name = "searchItem", defaultValue = "") String searchItem, // ★ "" 로
             @RequestParam(name = "searchWord", defaultValue = "") String searchWord,
             Model model) {
 
-        // 프런트 옵션에 맞춘 정규화
         String key = switch (searchItem == null ? "" : searchItem) {
-            case "", "askTitle", "qnaTitle" -> "askTitle"; // 빈값/옛값 qnaTitle → 제목
-            case "writer", "qnaWriter" -> "writer"; // 옛값 qnaWriter → 글쓴이
-            case "all" -> "all"; // "전체(글쓴이+제목)"
+            case "", "askTitle", "qnaTitle" -> "askTitle";
+            case "writer", "qnaWriter" -> "writer";
+            case "all" -> "all";
             default -> "askTitle";
         };
 
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "askSeq"));
-
-        log.info("[ASK] key={}, word='{}', page={}, size={}", key, searchWord, page, pageable.getPageSize());
-
+        Pageable pageable = PageRequest.of(Math.max(0, page), 10, Sort.by(Sort.Direction.DESC, "askSeq"));
         Page<AskBoardDTO> list = askService.selectAll(pageable, key, searchWord);
 
+        // ★ 요청 page가 범위 밖이면 마지막 페이지로 보정해서 다시 조회
         int totalPages = list.getTotalPages();
+        if (totalPages > 0 && page >= totalPages) {
+            page = totalPages - 1; // 보정
+            pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "askSeq"));
+            list = askService.selectAll(pageable, key, searchWord);
+            totalPages = list.getTotalPages(); // 재계산
+        }
+
         PageNavigator navi = new PageNavigator(pageLimit, page, totalPages);
 
         model.addAttribute("list", list);
-        model.addAttribute("searchItem", searchItem);
+        model.addAttribute("searchItem", searchItem); // ★ "" 그대로 전달 → 셀렉트 ‘선택’
         model.addAttribute("searchWord", searchWord);
         model.addAttribute("navi", navi);
 
@@ -130,9 +135,21 @@ public class AskController {
         return "ask/askwrite";
     }
 
-    @PostMapping("/write")
-    public String askwrite(@ModelAttribute AskBoardDTO askBoardDTO) {
-        askService.insertAskBoard(askBoardDTO);
+    // @PostMapping("/write")
+    // public String askwrite(@ModelAttribute AskBoardDTO askBoardDTO) {
+    // askService.insertAskBoard(askBoardDTO);
+    // return "redirect:/ask";
+    // }
+
+    @PostMapping({ "/write", "/askwrite" }) // 둘 다 허용해도 됨
+    public String submit(
+            @ModelAttribute AskBoardDTO dto,
+            @RequestParam(value = "uploadFile", required = false) MultipartFile file) {
+
+        if (file != null && !file.isEmpty()) {
+            dto.setUploadFile(file);
+        }
+        askService.insertAskBoard(dto);
         return "redirect:/ask";
     }
 
@@ -212,6 +229,23 @@ public class AskController {
 
         // 비밀번호 일치 여부
         return askBoardDTO.getAskPwd().equals(pwd.trim());
+    }
+
+    @PostMapping("/delete")
+    public String delete(@RequestParam Long askSeq,
+            @RequestParam String pwd,
+            RedirectAttributes ra) {
+
+        // 비번 검증 (공개글이면 askPwd==null이라 verifyPassword가 true 반환)
+        boolean ok = askService.verifyPassword(askSeq, pwd == null ? "" : pwd.trim());
+        if (!ok) {
+            ra.addFlashAttribute("msg", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/ask";
+        }
+
+        askService.deleteOne(askSeq);
+        ra.addFlashAttribute("msg", "삭제되었습니다.");
+        return "redirect:/ask";
     }
 
 }
