@@ -1,5 +1,8 @@
 package net.dima.dima5_project.controller;
 
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,21 +25,34 @@ public class VesselController {
      * @param query- 사용자가 입력한 실제값 (IMO번호나 MMSI 번호)
      * @return
      */
-    @GetMapping("/api/vessel-info")
-    public String getVesselInfo(@RequestParam String type, @RequestParam String query) {
-        return vesselService.findVslId(type, query)
-                            .orElse("선박을 찾을 수 없습니다.");
+    @GetMapping("/vessel-info")
+    public ResponseEntity<String> getVesselInfo(
+            @RequestParam String type, @RequestParam String query 
+        ) {
+        // type 정규화
+        final String t = type == null ? "" : type.trim().toLowerCase();
+
+        // vsl_id 조회 (Service에 findVslId(imo/mmsi 타입, 값) 구현되어 있어야 함)
+        Optional<String> vslIdOpt = vesselService.findVslId(t, query);
+
+        if (vslIdOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body("선박을 찾을 수 없습니다.");
+        }
+        return ResponseEntity.ok(vslIdOpt.get());
     }
 
     /**
-     * DB에서 항구별 선박별 timestamp가 가장 최신인 행의 timepoint 바로 조회
-     * @param vslId
-     * @return
+     * vsl_id 기준으로 최신 timepoint 조회
+     * 예) GET /api/latest-timepoint?vslId=VSL-123
      */
     @GetMapping("/latest-timepoint")
-    public ResponseEntity<Integer> getLatestTimepoint(@RequestParam String vslId) {
-        Integer timepoint = vesselService.getLatestTimepoint(vslId);
-        return ResponseEntity.ok(timepoint);
+    public ResponseEntity<?> getLatestTimepoint(@RequestParam String vslId) {
+        // 서비스가 Optional<Integer>로 반환하도록 구현하면 안전
+        return vesselService.getLatestTimepoint(vslId)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                            .body("해당 vsl_id의 레코드가 없습니다."));
     }
 
 }
