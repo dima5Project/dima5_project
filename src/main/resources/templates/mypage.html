@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
@@ -20,7 +20,12 @@
 </head>
 
 <body>
-    <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+    <div sec:authorize="isAnonymous()">
+        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
 
     <div class="qna-header-bg">
         <section class="qna-header">
@@ -80,14 +85,15 @@
                     <div class="table-wrap">
                         <table class="tbl">
                             <colgroup>
-                                <col style="width:32px" /> <!-- 번호 -->
-                                <col style="width:72px" /> <!-- 선박 번호 -->
-                                <col style="width:74px" /> <!-- 위도 -->
-                                <col style="width:74px" /> <!-- 경도 -->
-                                <col style="width:78px" /> <!-- TOP1 항구명 (한글 헤더 폭 고려) -->
-                                <col style="width:52px" /> <!-- 확률 -->
-                                <col style="width:88px" /> <!-- ETA (날짜 10자) -->
-                                <col style="width:90px" /> <!-- 재검색(버튼) -->
+                                <col style="width:30px" /> <!-- 번호 -->
+                                <col style="width:65px" /> <!-- 선박 번호 -->
+                                <col style="width:65px" /> <!-- 위도 -->
+                                <col style="width:65px" /> <!-- 경도 -->
+                                <col style="width:65px" /> <!-- TOP1 항구명 -->
+                                <col style="width:40px" /> <!-- 확률 -->
+                                <col style="width:60px" /> <!-- ETA -->
+                                <col style="width:50px" /> <!-- 삭제 버튼 -->
+                                <col style="width:60px" /> <!-- 재검색 버튼 -->
                             </colgroup>
 
                             <thead>
@@ -99,6 +105,7 @@
                                     <th>TOP1 항구명</th>
                                     <th>확률</th>
                                     <th>ETA</th>
+                                    <th>삭제</th>
                                     <th>재검색</th>
                                 </tr>
                             </thead>
@@ -113,6 +120,7 @@
                                     <td>VNHPH</td>
                                     <td>88%</td>
                                     <td>2025-08-31</td>
+                                    <td><button type="button" class="btn-delete">삭제</button></td>
                                     <td><button type="button" class="btn-search-again">재검색</button></td>
                                 </tr>
                                 <tr>
@@ -123,6 +131,7 @@
                                     <td>VNHPH</td>
                                     <td>88%</td>
                                     <td>2025-08-31</td>
+                                    <td><button type="button" class="btn-delete">삭제</button></td>
                                     <td><button type="button" class="btn-search-again">재검색</button></td>
                                 </tr>
                                 <tr>
@@ -133,6 +142,7 @@
                                     <td>VNHPH</td>
                                     <td>88%</td>
                                     <td>2025-08-31</td>
+                                    <td><button type="button" class="btn-delete">삭제</button></td>
                                     <td><button type="button" class="btn-search-again">재검색</button></td>
                                 </tr>
                             </tbody>

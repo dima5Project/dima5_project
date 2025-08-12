@@ -142,12 +142,12 @@ function buildEnvPopupHTML(env) {
     const num = (v, f = 1) => (v == null || isNaN(v)) ? "-" : Number(v).toFixed(f);
     return `
     <div style="font:12px/1.4 -apple-system,Segoe UI,Arial">
-      <div><strong>기온</strong> ${num(env.airTempC, 1)}°C ${env.emoji || ""}</div>
-      <div><strong>바람</strong> ${num(env.windMS, 1)} m/s (${degToCompass8(env.windFromDeg)}에서)</div>
-      <div><strong>가시거리</strong> ${env.visibilityHint || "-"}</div>
-      <div><strong>파고</strong> ${num(env.waveHeightM, 1)} m (${degToCompass8(env.waveFromDeg)})</div>
-      <div><strong>해류</strong> ${num(env.currentMS, 2)} m/s (${degToCompass8(env.currentToDeg)})</div>
-      <div><strong>해수온</strong> ${num(env.sstC, 1)} °C</div>
+        <div><strong>기온</strong> ${num(env.airTempC, 1)}°C ${env.emoji || ""}</div>
+        <div><strong>바람</strong> ${num(env.windMS, 1)} m/s (${degToCompass8(env.windFromDeg)}에서)</div>
+        <div><strong>가시거리</strong> ${env.visibilityHint || "-"}</div>
+        <div><strong>파고</strong> ${num(env.waveHeightM, 1)} m (${degToCompass8(env.waveFromDeg)})</div>
+        <div><strong>해류</strong> ${num(env.currentMS, 2)} m/s (${degToCompass8(env.currentToDeg)})</div>
+        <div><strong>해수온</strong> ${num(env.sstC, 1)} °C</div>
     </div>`;
 }
 function debounce(fn, wait = 180) {

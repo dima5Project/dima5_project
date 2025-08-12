@@ -1,6 +1,10 @@
 /* portpredict.html */
 
 /* 페이지 전체 마진 제거용 */
+:root {
+    --header-h: 80px;
+}
+
 body,
 html {
     margin: 0;
@@ -35,13 +39,13 @@ html {
     --collapsed-visible: calc(var(--handle) + var(--gap));
     /* 기본은 버튼+간격 */
     position: absolute;
-    top: 80px;
+    top: var(--header-h);
     bottom: 0px;
     left: 0px;
     width: var(--w);
     background: #ffffff;
     box-shadow: var(--shadow);
-    z-index: 5000;
+    z-index: 10030;
     /* 지도 위에 얹히게 */
     overflow: visible;
     /* 핸들이 바깥으로 나와야 해서 visible */
@@ -172,7 +176,7 @@ html {
     opacity: 0;
     pointer-events: none;
     transition: opacity .15s ease, transform .15s ease;
-    z-index: 8000;
+    z-index: 10050;
 }
 
 /* hover 시 표시 */
@@ -188,8 +192,7 @@ html {
 /* 우상단: 줌 컨트롤과 라인 맞추기 */
 .map-icon-ctrl {
     position: absolute;
-    top: calc(80px + 30px);
-    /* sidebar__topbox y와 동일 + 20px */
+    top: calc(var(--header-h) + 30px);
     right: 18px;
     display: inline-flex;
     flex-direction: column;
@@ -200,6 +203,7 @@ html {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(6px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+    z-index: 10040;
 }
 
 /* 아이콘 버튼: Mapbox 줌버튼과 비슷한 크기(30x30) */
@@ -301,6 +305,10 @@ html {
 
 /* ───────── 패널(슬라이드 내용) ───────── */
 /* 모든 패널은 같은 크기/레이아웃을 갖고, 활성만 보이기 */
+.panel[hidden] {
+    display: none !important;
+}
+
 .panel {
     display: none;
     flex: 1 1 auto;
@@ -315,10 +323,6 @@ html {
 .panel--predict .sidebar__content {
     flex: 1 1 auto;
     overflow-y: auto;
-}
-
-.panel--log .sidebar__content {
-    display: block;
 }
 
 /* 로그 패널은 보이게 */
@@ -789,7 +793,7 @@ html {
 
 /* title 문구(시점별 예측 타임라인) */
 .sidebar__secondtitle {
-    margin: 20px 16px 0 16px;
+    margin: 20px 16px 20px 16px;
     font-size: 15px;
     font-weight: 600;
 }
@@ -798,32 +802,36 @@ html {
     --node: 45px;
     --ring: 7px;
     --gutter: 100px;
+    --pad: 16px;
     /* ← 왼쪽 컬럼(점선/원형 자리) */
     --line-x: 48px;
     /* 점선의 x 위치 (gutter 안쪽 기준) */
     --pill-h: 24px;
-    --chip-h: 30px;
+    --chip-h: var(--pill-h);
+    --col-gap: 12px;
     --font: 12px;
-    padding: 16px 16px;
+    padding: 10px 16px 16px 16px;
+    --label-col: 68px;
 }
 
 /* 왼쪽에 전용 컬럼 확보 */
 .voy-timeline {
     list-style: none;
-    padding-left: var(--gutter);
+    padding-left: calc(var(--pad) + var(--node) + var(--col-gap));
     position: relative;
+    margin: 0;
 }
 
 /* 세로 점선(왼쪽 컬럼 중앙쯤) */
 .voy-timeline::before {
     content: "";
     position: absolute;
-    left: var(--line-x);
+    left: calc(var(--pad) + (var(--node) / 2));
     top: 0;
     bottom: 0;
-    border-right: 2px dotted #45c0e9;
+    border-right: 2px dotted #7FC7D9;
     opacity: .9;
-    transform: translateX(-1px);
+    transform: none;
     z-index: 0;
 }
 
@@ -836,10 +844,9 @@ html {
 .voy-node {
     border: none;
     position: absolute;
-    left: calc(var(--line-x) - var(--gutter));
+    left: 0;
     /* 점선 위치로 이동 */
-    transform: translateX(-50%);
-    /* 원형 중심을 점선에 정렬 */
+    transform: translateX(calc(-1 * (var(--col-gap) + (var(--node)/2)) - 21px));
     top: 0;
     width: var(--node);
     height: var(--node);
@@ -850,13 +857,43 @@ html {
     box-shadow: inset 0 0 0 var(--ring) rgba(0, 0, 0, .06);
     z-index: 1;
     /* 점선 위로 */
+    padding: 0;
+    line-height: 0;
+    box-sizing: content-box;
+    transition: background .18s ease, box-shadow .18s ease;
+    /* 부드럽게 전환 */
+}
+
+/* 활성: 그림자 제거 + 단색(원하면 색 바꿔도 됨) */
+.voy-node.is-active {
+    background: #cfeeff;
+    /* 단색 배경 */
+    box-shadow: none;
+    /* 링 제거 */
+}
+
+/* 아이콘 크기 */
+.voy-node img {
+    width: calc(var(--node));
+    height: calc(var(--node));
+    display: block;
+    /* 인라인 여백 제거 */
+    object-fit: contain;
+    /* 비율 유지 */
+    margin: 0;
+    /* 혹시 모를 여백 제거 */
+}
+
+.voy-node img[alt="출발항 아이콘"] {
+    width: calc(var(--node) * 0.72);
+    height: calc(var(--node) * 0.72);
 }
 
 .voy-node span {
-    display: inline-grid;
+    display: grid;
     place-items: center;
-    width: calc(var(--node) - 14px);
-    height: calc(var(--node) - 14px);
+    width: calc(var(--node) * 0.80);
+    height: calc(var(--node) * 0.80);
     border-radius: 50%;
     color: #fff;
     font-weight: 700;
@@ -865,39 +902,42 @@ html {
     /* 기본 회색 */
 }
 
-/* 클릭 시 파랑 */
-.voy-node.is-active {
-    background: #cfeeff;
-    box-shadow: inset 0 0 0 var(--ring) rgba(79, 195, 247, .25);
+.voy-node.is-active img {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(97%) saturate(5813%) hue-rotate(210deg) brightness(95%) contrast(101%);
 }
 
-.voy-node.is-active span {
-    background: #1fb6ff;
+
+.voy-rows,
+.voy-row {
+    width: 100%;
+}
+
+.voy-rows {
+    margin: 15px 0 25px 11px;
 }
 
 /* 한 줄(버튼 + 값칩) : 콘텐츠는 왼쪽 패딩 이후부터 배치 */
 .voy-row {
     display: grid;
-    grid-template-columns: 72px 1fr;
-    /* 버튼 폭 + 값칩 */
+    grid-template-columns: var(--label-col) minmax(0, 1fr);
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 4px;
+    margin-bottom: 6px;
 }
 
 /* 소제목 */
 .voy-label {
-    margin: 6px 0 12px;
+    margin-bottom: 10px;
     color: #2b2f3a;
     font-weight: 700;
-    font-size: calc(var(--font) + 1px);
+    font-size: calc(var(--font) + 2px);
+
 }
 
 /* 값칩(텍스트) */
 .voy-chip {
-    height: var(--chip-h);
+    height: var(--pill-h);
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
     background: #eef3f7;
     padding: 0 10px;
     display: inline-flex;
@@ -907,14 +947,17 @@ html {
     color: #374151;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    box-sizing: border-box;
+    width: auto;
+    max-width: 120px;
 }
 
 /* Top-1/2/3 버튼 */
 .pillbtn {
     height: var(--pill-h);
-    min-width: 68px;
-    padding: 0 10px;
+    max-width: calc(var(--label-col) - 8px);
+    padding: 0 6px;
+    white-space: nowrap;
     border-radius: 8px;
     border: 1.5px solid #cfd8e3;
     background: #fff;
@@ -926,10 +969,6 @@ html {
     align-items: center;
     justify-content: center;
     line-height: 1;
-}
-
-.pillbtn:hover {
-    border-color: #9fb3c8;
 }
 
 /* (Top 버튼은 색 토글 안 씀 — 그대로 유지) */

@@ -2,7 +2,10 @@ package net.dima.dima5_project.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +23,8 @@ public class PortNameEntity {
 
     @Id
     @Column(name = "port_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "port_id", referencedColumnName = "port_id")
     private String portId;
 
     @Column(name = "country_name_kr")
