@@ -9,23 +9,20 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class CustomLoginFailureHandler implements
-        AuthenticationFailureHandler {
+@Slf4j
+public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
     @Override
-    public void onAuthenticationFailure(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        AuthenticationException exception)
+                                        throws IOException, ServletException {
 
-        // 실패 이유를 request attribute에 저장
-        request.setAttribute("error", true);
-        request.setAttribute("errMessage", "아이디 또는 비밀번호가 일치하지 않습니다.");
+        log.info("로그인 실패: {}", exception.getClass().getSimpleName());
 
-        // 로그인 페이지로 포워딩 (리다이렉트도 가능함)
-        request.getRequestDispatcher("/login").forward(request, response);
+        response.sendRedirect("/user/login?error=true");  // 아이디/비번 구분 없이 공통 에러
     }
-
 }

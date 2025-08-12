@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ import net.dima.dima5_project.dto.ResultSaveDTO;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "result_save")
 @Entity
 public class ResultSaveEntity {
 
@@ -50,16 +52,18 @@ public class ResultSaveEntity {
     @Column(name = "eta")
     private LocalDateTime eta;
 
-
-    public static ResultSaveDTO toDTO(ResultSaveDTO resultSaveDTO) {
-        return ResultSaveDTO.builder()
-            .saveSeq(resultSaveDTO.getSaveSeq())
-            .searchVsl(resultSaveDTO.getSearchVsl())
-            .lat(resultSaveDTO.getLat())
-            .lon(resultSaveDTO.getLon())
-            .top1Port(resultSaveDTO.getTop1Port())
-            .top1Pred(resultSaveDTO.getTop1Pred())
-            .eta(resultSaveDTO.getEta())
-            .build();
-            }
+    public static ResultSaveEntity fromDTO(ResultSaveDTO dto,
+            VesselMasterEntity vsl, // vslId로 조회해 온 엔티티
+            PredictUserEntity user) { // userId로 조회해 온 엔티티
+        return ResultSaveEntity.builder()
+                .saveSeq(dto.getSaveSeq())
+                .searchVsl(vsl)
+                .userId(user)
+                .lat(dto.getLat())
+                .lon(dto.getLon())
+                .top1Port(dto.getTop1Port())
+                .top1Pred(dto.getTop1Pred())
+                .eta(dto.getEta())
+                .build();
+    }
 }

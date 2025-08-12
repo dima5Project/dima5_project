@@ -43,36 +43,37 @@
                 <h3 class="mp-side__title">마이페이지</h3>
                 <nav class="mp-side__nav">
                     <a th:href="@{/checkPassword}" class="is-active">개인정보 수정</a>
-                    <a href="#">내 선박 저장</a>
-                    <a href="#">문의내역</a>
+                    <a href="@{/mypage/ships}">내 선박 저장</a>
+                    <a href="@{/mypage/asks">문의내역</a>
                 </nav>
             </aside>
 
             <!-- 우측: 메인 콘텐츠 -->
             <section class="mp-content">
                 <!-- 요약 카드 -->
+                <!-- 요약 카드 -->
                 <div class="mp-summary">
                     <div class="mp-summary__hello">
                         <p class="hello">
-                            <strong>김규린</strong>님, 반갑습니다.
+                            <strong th:text="${user.userName}">이름</strong>님, 반갑습니다.
                         </p>
                         <div class="meta">
-                            <span class="id">kkrcl122</span>
+                            <span class="id" th:text="${user.userId}">아이디</span>
                             <span class="sep">|</span>
-                            <span class="email">kkrcl122@naver.com</span>
+                            <span class="email" th:text="${user.userEmail}">이메일</span>
                             <span class="sep">|</span>
-                            <span class="role">화주</span>
+                            <span class="role" th:text="${user.userType}">사용자 유형</span>
                         </div>
                     </div>
 
                     <ul class="mp-summary__stats">
                         <li>
                             <span>내 선박 저장</span>
-                            <span class="num">3건</span>
+                            <span class="num" th:text="${saveCount} + '건'">건</span>
                         </li>
                         <li>
                             <span>문의내역</span>
-                            <span class="num">3건</span>
+                            <span class="num" th:text="${askCount} + '건'">건</span>
                         </li>
                     </ul>
                 </div>
