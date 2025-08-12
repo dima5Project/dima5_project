@@ -13,12 +13,18 @@ body {
   color: #000;
 }
 
+body {
+  min-height: 150vh;
+  /* 페이지의 최소 높이를 150vh로 설정하여 강제로 스크롤바 생성 */
+  overflow-y: scroll;
+}
+
 .container {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
 }
 
