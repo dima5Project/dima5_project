@@ -4,15 +4,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -182,58 +185,128 @@ public class UserController {
         if (!isVerified(session))
             return "redirect:/mypage/verify";
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+        var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
         PredictUserDTO user = userService.selectOne(login.getUserId());
         model.addAttribute("user", user);
+
+        // 상단 카드 카운트 채우기
+        Pageable one = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "saveSeq"));
+        long saveCount = userService.getMySaves(login.getUserId(), one).getTotalElements();
+        Pageable one2 = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createDate"));
+        long askCount = userService.getMyAsks(login.getUserId(), one2).getTotalElements();
+        model.addAttribute("saveCount", saveCount);
+        model.addAttribute("askCount", askCount);
+
         return "editInfo";
     }
 
-    /**
-     * 프로필(이메일/이름/유형) 수정
-     */
-    @PostMapping("/mypage/update/profile")
-    @ResponseBody
-    public String updateProfile(@RequestParam(required = false) String userEmail,
-            @RequestParam(required = false) String userName,
+    // /**
+    // * 프로필(이메일/이름/유형) 수정
+    // */
+    // @PostMapping("/mypage/update/profile")
+    // @ResponseBody
+    // public String updateProfile(@RequestParam(required = false) String userEmail,
+    // @RequestParam(required = false) String userName,
+    // @RequestParam(required = false) String userType,
+    // HttpSession session) {
+
+    // if (!isVerified(session))
+    // return "NEED_VERIFY";
+
+    // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    // LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+
+    // userService.updateProfile(login.getUserId(), userEmail, userName, userType);
+
+    // return "redirect:/mypage/main";
+    // }
+
+    // /**
+    // * 비밀번호 변경
+    // *
+    // * @param newPwd
+    // * @param confirmPwd
+    // * @param session
+    // * @return
+    // */
+    // @PostMapping("/mypage/update/password")
+    // public String updatePassword(@RequestParam String newPwd,
+    // @RequestParam String confirmPwd,
+    // HttpSession session) {
+    // if (!isVerified(session))
+    // return "NEED_VERIFY";
+    // if (newPwd == null || newPwd.isBlank())
+    // return "새 비밀번호를 입력하세요.";
+    // if (!newPwd.equals(confirmPwd))
+    // return "비밀번호가 일치하지 않습니다.";
+
+    // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    // LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+
+    // userService.updatePassword(login.getUserId(), newPwd);
+    // return "redirect:/mypage/main";
+    // }
+
+    @PostMapping("/mypage/update/all")
+    public String updateAll(@RequestParam(required = false) String userName,
+            @RequestParam(required = false) String userEmail,
             @RequestParam(required = false) String userType,
-            HttpSession session) {
-
+            @RequestParam(required = false) String newPwd,
+            @RequestParam(required = false) String confirmPwd,
+            HttpSession session,
+            RedirectAttributes ra) {
         if (!isVerified(session))
-            return "NEED_VERIFY";
+            return "redirect:/mypage/verify";
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+        var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        String userId = login.getUserId();
 
-        userService.updateProfile(login.getUserId(), userEmail, userName, userType);
+        // 0) 입력 정리
+        String name = StringUtils.hasText(userName) ? userName.trim() : null;
+        String email = StringUtils.hasText(userEmail) ? userEmail.trim() : null;
+        String type = StringUtils.hasText(userType) ? userType.trim() : null;
 
-        return "redirect:/mypage/main";
-    }
+        // 1) 이메일 중복 체크(자기 자신 제외) - trimmed 값 사용!
+        if (StringUtils.hasText(email) && userService.isEmailTakenByOther(userId, email)) {
+            ra.addFlashAttribute("error", "이미 사용 중인 이메일입니다.");
+            return "redirect:/mypage/update";
+        }
+        // 2) 프로필 업데이트도 trimmed 값 사용!
+        userService.updateProfile(userId, email, name, type);
 
-    /**
-     * 비밀번호 변경
-     * 
-     * @param newPwd
-     * @param confirmPwd
-     * @param session
-     * @return
-     */
-    @PostMapping("/mypage/update/password")
-    public String updatePassword(@RequestParam String newPwd,
-            @RequestParam String confirmPwd,
-            HttpSession session) {
-        if (!isVerified(session))
-            return "NEED_VERIFY";
-        if (newPwd == null || newPwd.isBlank())
-            return "새 비밀번호를 입력하세요.";
-        if (!newPwd.equals(confirmPwd))
-            return "비밀번호가 일치하지 않습니다.";
+        // 3) 비밀번호 변경 (둘 중 하나라도 입력되면 검사)
+        boolean hasPwdInput = (StringUtils.hasText(newPwd) || StringUtils.hasText(confirmPwd));
+        if (hasPwdInput) {
+            if (!StringUtils.hasText(newPwd)) {
+                ra.addFlashAttribute("error", "새 비밀번호를 입력하세요.");
+                return "redirect:/mypage/update";
+            }
+            if (!newPwd.equals(confirmPwd)) {
+                ra.addFlashAttribute("error", "비밀번호가 일치하지 않습니다.");
+                return "redirect:/mypage/update";
+            }
+            userService.updatePassword(userId, newPwd);
+        }
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+        // 4) SecurityContext의 principal 갱신 (상단 카드/헤더에 즉시 반영)
+        PredictUserDTO fresh = userService.selectOne(userId);
+        LoginUserDetailsDTO refreshed = LoginUserDetailsDTO.builder()
+                .userSeq(fresh.getUserSeq())
+                .userId(fresh.getUserId())
+                .userName(fresh.getUserName())
+                .userEmail(fresh.getUserEmail())
+                .userType(fresh.getUserType())
+                .userRole(fresh.getUserRole())
+                // userPwd는 인증에 직접 쓰지 않으니 비워도 됨
+                .build();
+        var newAuth = new UsernamePasswordAuthenticationToken(
+                refreshed, null, refreshed.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        userService.updatePassword(login.getUserId(), newPwd);
+        ra.addFlashAttribute("msg", "개인정보가 저장되었습니다.");
         return "redirect:/mypage/main";
     }
 

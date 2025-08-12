@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" href="/css/editInfo.css" th:href="@{/css/editInfo.css}">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
-    <script defer th:src="@{/js/editInfo.js}"></script>
+    <!-- <script defer th:src="@{/js/editInfo.js}"></script> -->
 
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
@@ -42,15 +42,14 @@
             <aside class="mp-side">
                 <h3 class="mp-side__title">마이페이지</h3>
                 <nav class="mp-side__nav">
-                    <a th:href="@{/checkPassword}" class="is-active">개인정보 수정</a>
-                    <a href="@{/mypage/ships}">내 선박 저장</a>
-                    <a href="@{/mypage/asks">문의내역</a>
+                    <a th:href="@{/mypage/verify}" class="is-active">개인정보 수정</a>
+                    <a th:href="@{/mypage/ships}">내 선박 저장</a>
+                    <a th:href="@{/mypage/asks}">문의내역</a>
                 </nav>
             </aside>
 
             <!-- 우측: 메인 콘텐츠 -->
             <section class="mp-content">
-                <!-- 요약 카드 -->
                 <!-- 요약 카드 -->
                 <div class="mp-summary">
                     <div class="mp-summary__hello">
@@ -90,46 +89,41 @@
                         </p>
 
                         <div class="info-card">
-                            <form class="info-form" action="#" method="get">
-                                <!-- 이름 (읽기전용처럼 보이는 입력) -->
+                            <form class="info-form" th:action="@{/mypage/update/all}" method="post">
+                                <!-- 이름 -->
                                 <div class="field">
                                     <label for="name">이름</label>
-                                    <input id="name" name="name" type="text" value="백 연동처리 필요" class="text-input">
+                                    <input id="name" name="userName" type="text" class="text-input"
+                                        th:value="${user.userName}">
                                 </div>
 
-                                <!-- 아이디 (읽기전용) -->
+                                <!-- 아이디(읽기전용) -->
                                 <div class="field">
                                     <label for="userId">아이디</label>
-                                    <input id="userId" name="userId" type="text" class="text-input" value="kkrcl122"
+                                    <input id="userId" type="text" class="text-input" th:value="${user.userId}"
                                         readonly>
                                 </div>
 
                                 <!-- 비밀번호 -->
                                 <div class="field">
                                     <label for="pw">비밀번호</label>
-                                    <div class="stack">
-                                        <input id="pw" name="pw" type="password" class="text-input"
-                                            placeholder="새 비밀번호 입력">
-                                        <p class="field-error" id="pw-msg" hidden></p> <!-- ← 경고문구 자리 -->
-                                    </div>
+                                    <input id="pw" name="newPwd" type="password" class="text-input"
+                                        placeholder="새 비밀번호 입력">
                                 </div>
 
-                                <!-- 비밀번호 확인 + 에러 텍스트 -->
+                                <!-- 비밀번호 확인 -->
                                 <div class="field">
                                     <label for="pw2">비밀번호 확인</label>
-                                    <div class="stack">
-                                        <input id="pw2" name="pw2" type="password" class="text-input"
-                                            placeholder="새 비밀번호 확인">
-                                        <p class="field-error" id="pw-error" hidden>일치하지 않는 비밀번호입니다.</p>
-                                    </div>
+                                    <input id="pw2" name="confirmPwd" type="password" class="text-input"
+                                        placeholder="새 비밀번호 확인">
                                 </div>
 
-                                <!-- 이메일 + 중복확인 버튼 -->
+                                <!-- 이메일 -->
                                 <div class="field field-email">
                                     <label for="email">이메일</label>
                                     <div class="email-row">
-                                        <input id="email" name="email" type="email" class="text-input"
-                                            value="백 연동처리 필요">
+                                        <input id="email" name="userEmail" type="email" class="text-input"
+                                            th:value="${user.userEmail}">
                                         <button type="button" class="btn-outline" id="btn-email-check">중복확인</button>
                                     </div>
                                 </div>
@@ -138,30 +132,31 @@
                                 <div class="field">
                                     <label>사용자 유형</label>
                                     <div class="radio-row">
-                                        <!-- 사용자 유형에 check되는 값은 로그인한 유저와 일치하도록 백 연동 후 코드 수정 필요 -->
-                                        <label><input type="radio" name="role" value="화주" checked> 화주</label>
-                                        <label><input type="radio" name="role" value="선사"> 선사</label>
-                                        <label><input type="radio" name="role" value="항만사"> 항만사</label>
-                                        <label><input type="radio" name="role" value="일반 사용자"> 일반 사용자</label>
+                                        <label><input type="radio" name="userType" value="화주"
+                                                th:checked="${user.userType}=='화주'">
+                                            화주</label>
+                                        <label><input type="radio" name="userType" value="선사"
+                                                th:checked="${user.userType}=='선사'">
+                                            선사</label>
+                                        <label><input type="radio" name="userType" value="항만사"
+                                                th:checked="${user.userType}=='항만사'">
+                                            항만사</label>
+                                        <label><input type="radio" name="userType" value="일반 사용자"
+                                                th:checked="${user.userType}=='일반 사용자'"> 일반 사용자</label>
                                     </div>
                                 </div>
 
+                                <!-- 하단 확인 버튼 (폼 안) -->
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-confirm">확인</button>
+                                </div>
                             </form>
-                        </div>
-                    </div>
-
-                    <!-- 하단 확인 버튼 -->
-                    <div class="form-actions">
-                        <a href="#" class="btn-confirm" id="btn-save">확인</a> <!--th로 수정 필요-->
-                    </div>
-
-                </section>
-
-            </section> <!-- section 닫힘 태그 추가 -->
-        </div> <!-- mp-container 닫힘 태그 -->
-
+                        </div> <!-- /.info-card -->
+                    </div> <!-- /.info-wrap -->
+                </section> <!-- /.mp-section.info-section -->
+            </section> <!-- /.mp-content -->
+        </div> <!-- /.mp-container -->
     </main>
-
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
 
