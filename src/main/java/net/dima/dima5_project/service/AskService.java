@@ -37,7 +37,7 @@ import net.dima.dima5_project.util.FileService;
 public class AskService {
 
     private final AskBoardRepository askBoardRepository;
-    private final PredictUserRepository predictUserRepository;
+    private final UserRepository UserRepository;
 
     // 글개수
     @Value("${ask.board.pageLimit}")
@@ -173,7 +173,7 @@ public class AskService {
             // dto.setWriter(null);
         } else {
             String userId = (auth.getPrincipal() instanceof LoginUserDetailsDTO u) ? u.getUserId() : auth.getName();
-            PredictUserEntity writer = predictUserRepository.findByUserId(userId)
+            PredictUserEntity writer = UserRepository.findByUserId(userId)
                     .orElseThrow(() -> new IllegalStateException("사용자 정보를 찾을 수 없습니다: " + userId));
             dto.setWriter(writer);
         }
