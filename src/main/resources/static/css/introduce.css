@@ -1,139 +1,45 @@
-:root {
-    --color-primary: #013895;
-    --color-dark-blue: #0f1035;
-    --color-text-dark: #000000;
-    --color-text-light: #ffffff;
-    --color-background: #ffffff;
-    --color-border: #c2bfbf;
-    --font-main: 'Noto Sans KR', sans-serif;
-}
+@charset "UTF-8";
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
 
 * {
+    -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
+html,
 body {
-    font-family: var(--font-main);
-    background-color: var(--color-background);
-    color: var(--color-text-dark);
-    line-height: 1.6;
-    /* 가독성 좋은 줄간격 */
-}
-
-.container {
-    width: 100%;
-    max-width: 1280px;
-    /* 섹션 내부 컨테이너 폭 */
-    margin: 0 auto;
-    padding: 0 40px;
-    /* 좌우 내부 여백 */
+    margin: 0;
+    height: 100%;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
 a {
     text-decoration: none;
-    /* 링크 밑줄 제거 */
-    color: inherit;
-    /* 부모 텍스트 색상 상속 */
 }
 
-img {
-    max-width: 100%;
-    height: auto;
-    /* 반응형 이미지 */
-    display: block;
-    /* 인라인 간격 제거 */
-}
-
-.bold {
-    font-weight: 700;
-}
-
-/* CSS for section section:hero */
-.hero_section {
-    position: relative;
-    /* 배경/오버레이 절대배치 기준 */
-    height: 435px;
+/* 전체 페이지 레이아웃 컨테이너 */
+.main_container {
     display: flex;
-    /* 중앙 정렬(수평/수직) */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: var(--color-text-light);
+    min-height: 100vh;
+    padding: 20px;
+    /* 전체 페이지에 균일한 여백 */
 }
 
-.hero_background {
-    position: absolute;
-    /* 히어로 전면을 깔아주는 레이어(이미지/오버레이가 위치) */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.hero_bg_image {
-    /* 화면 비율이 변해도 꽉 채움 */
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.hero_overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000000;
-    /* 이미지 위에 반투명 검정막 */
-    opacity: 0.5;
-}
-
-.hero_content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    /* 제목/부제 간 간격 */
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 85px;
-    /* 헤더가 겹치지 않게 보정 */
-}
-
-/* 강한 타이틀 */
-.hero_title {
-    font-size: 30px;
-    font-weight: 700;
-}
-
-/* 보조 카피 */
-.hero_subtitle {
-    font-size: 22px;
-    font-weight: 500;
-}
-
-/* CSS for section section:about */
-.about_section {
-    padding-top: 115px;
-    padding-bottom: 120px;
-}
-
-.about_layout {
-    display: flex;
-    /* 사이드바와 본문을 좌우 배치 */
-    gap: 85px;
-}
-
-/* 린규린규에게 뺏어온 css */
+/* 사이드바 스타일 */
 .sidebar {
     background: #fff;
     border: 1px solid #e5e8eb;
     border-radius: 8px;
     padding: 20px;
     height: fit-content;
+    width: 150px;
+    flex-shrink: 0;
+    position: absolute;
+    top: 170px;
+    left: 180px;
+    margin-right: 20px;
+    /* 콘텐츠 영역과의 간격 */
 }
 
 .sidebar_title {
@@ -148,7 +54,9 @@ img {
 }
 
 .sidebar_link {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 10px 12px;
     border-radius: 6px;
     text-decoration: none;
@@ -161,267 +69,96 @@ img {
     background: #f2f5f9;
 }
 
-
+/* 콘텐츠 영역 */
 .content_area {
     flex-grow: 1;
-    /* 남은 공간 모두 차지 */
-    display: flex;
-    flex-direction: column;
-    gap: 120px;
-}
-
-/* 카드 내부 간격 */
-.content_block {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-/* 제목 부제목 중앙 정렬 */
-.content_header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.content_title_en {
-    color: var(--color-primary);
-    font-size: 30px;
-    font-weight: 700;
-}
-
-/* 설명 글 */
-.content_subtitle {
-    font-size: 20px;
-    font-weight: 500;
-}
-
-/* 이미지, 텍스트 가로 배치 */
-.content_body_flex {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.content_image {
-    width: 286px;
-    height: 203px;
-    object-fit: cover;
-    /* 일정 크기 유지하며 잘림 허용 */
-    flex-shrink: 0;
-    /* 텍스트가 좁아져도 이미지 너비 유지 */
-}
-
-.content_text {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
-}
-
-.merged_image_container {
-    flex-shrink: 0;
-}
-
-/* 애니메이션 효과 */
-
-/* CSS 애니메이션 정의 */
-@keyframes moveShip {
-    0% {
-        transform: translateX(0);
-        /* 시작 위치 */
-    }
-
-    50% {
-        transform: translateX(20px);
-        /* 오른쪽으로 20px 이동 */
-    }
-
-    100% {
-        transform: translateX(0);
-        /* 다시 원래 위치로 돌아옴 */
-    }
-}
-
-/* 이미지에 애니메이션 적용 */
-.shipping-ship {
-    animation: moveShip 4s ease-in-out infinite;
-    /* 4초 동안 반복, 부드러운 움직임 */
-}
-
-/* CSS for section section:ais */
-.ais_section {
-    position: relative;
-    height: 420px;
+    /* 남은 공간을 모두 차지 */
+    background-color: #ffffff;
     display: flex;
     justify-content: center;
+    /* 카드 컨테이너를 가로 중앙에 정렬 */
     align-items: center;
-    color: var(--color-text-light);
+    /* 카드 컨테이너를 세로 중앙에 정렬 */
 }
 
-.ais_background {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* 팀원 카드들을 담는 컨테이너 */
+.card_container {
+    display: flex;
+    justify-content: center;
+    /* 카드들을 가로 중앙에 정렬 */
+    align-items: stretch;
+    /* 모든 카드의 높이를 통일 */
+    gap: 0;
+    /* 카드 사이의 간격 */
     width: 100%;
-    height: 100%;
-    z-index: 1;
+    border-radius: 50px;
+    height: 350px;
 }
 
-.ais_bg_image {
+/* 각 팀원 카드 */
+.intro_wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    height: 100%;
+    text-align: center;
+    background-color: #f2f5f9;
+    padding: 20px 10px;
+}
+
+.intro_wrap.first {
+    border-radius: 50px 0 0 50px;
+}
+
+.intro_wrap.end {
+    border-radius: 0 50px 50px 0;
+}
+
+.img_wrapper {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin-top: 40px;
+    border: 2px solid #ccc;
+}
+
+.img_wrapper img.char {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.ais_overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000000;
-    opacity: 0.6;
-}
-
-.ais_content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.ais_title {
-    font-size: 30px;
-    font-weight: 700;
-}
-
-.ais_subtitle {
-    font-size: 20px;
-    font-weight: 500;
-}
-
-.ais_text {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    font-size: 19px;
-    line-height: 25px;
-}
-
-/* CSS for section section:methodology */
-.methodology_section {
-    padding-top: 120px;
-    padding-bottom: 120px;
-}
-
-.methodology_section .content_header {
-    margin-bottom: 40px;
-}
-
-.methodology_steps {
+.intro_text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
+    gap: 5px;
+    flex-grow: 1;
+    min-height: 80px;
+    padding-top: 10px;
+    justify-content: flex-start;
+    padding-top: 10px;
 }
 
-.step {
+.text_group {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    text-align: center;
+    gap: 5px;
 }
 
-.step_image {
-    max-width: 460px;
-}
-
-/* 본문 폭 제한 */
-.step_description {
-    max-width: 510px;
-}
-
-.step_description h4 {
-    font-size: 19px;
+.intro_text .name {
     font-weight: 700;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-bottom: 5px;
 }
 
-.step_description p {
-    font-size: 19px;
-    line-height: 25px;
-}
-
-.step_arrow {
-    transform: rotate(90deg);
-}
-
-/* 주석/주의 문구 */
-.disclaimer {
-    font-size: 15px;
-    margin-top: 3px;
-}
-
-.accuracy_note {
-    text-align: right;
-    font-size: 15px;
-    line-height: 25px;
-    margin-top: 60px;
-}
-
-@media (min-width: 1024px) {
-    .methodology-steps {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    .step-arrow {
-        transform: rotate(0deg);
-        margin-top: 200px;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 24px;
-    }
-
-    .hero-subtitle {
-        font-size: 18px;
-        padding: 0 10px;
-    }
-}
-
-@media (max-width: 1024px) {
-    .about-layout {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .sidebar {
-        width: 100%;
-        max-width: 400px;
-    }
-
-    .content-area {
-        width: 100%;
-    }
-
-    .content-body-flex {
-        flex-direction: column;
-        text-align: center;
-    }
+.rectangle {
+    width: 30px;
+    height: 2px;
+    background-color: #013895;
+    margin-bottom: 5px;
 }
