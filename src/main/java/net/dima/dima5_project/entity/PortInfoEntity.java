@@ -2,9 +2,9 @@ package net.dima.dima5_project.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +29,10 @@ public class PortInfoEntity {
 
     @Column(name = "loc_lon")
     private double locLon;
+
+    // PortNameEntity와 1:1 매핑
+    @OneToOne(mappedBy = "portInfo", fetch = FetchType.LAZY)
+    private PortNameEntity portName;
 
     public static PortInfoEntity toEntity(PortInfoDTO portInfoDTO) {
         return PortInfoEntity.builder()

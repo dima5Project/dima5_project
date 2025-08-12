@@ -26,7 +26,7 @@ public class PortNameDTO {
 
     public static PortNameDTO toDTO(PortNameEntity portNameEntity) {
         return PortNameDTO.builder()
-                .portId(portNameEntity.getPortId())
+                .portId(portNameEntity.getPortInfo().getPortId())
                 .countryNameKr(portNameEntity.getCountryNameKr())
                 .portNameKr(portNameEntity.getPortNameKr())
                 .countryNameEn(portNameEntity.getCountryNameEn())

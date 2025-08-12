@@ -13,18 +13,19 @@ import net.dima.dima5_project.entity.PortInfoEntity;
 @Repository
 public interface PortInfoRepository extends JpaRepository<PortInfoEntity, String> {
 
-    // 재검토 해야 함 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     // PK로 조회 (기본 findById()와 동일하지만 필요 시 유지)
     PortInfoEntity findByPortId(String portId);
 
     boolean existsByPortId(String portId);
 
-    // port_name 같이 가져오기(N+1 방지)
+    // 모든 PortInfoEntity를 PortNameEntity와 함께 조회 (N+1 방지)
     @Query("""
         select p from PortInfoEntity p
         left join fetch p.portName
         """)
     List<PortInfoEntity> findAllWithName();
 
+    // 특정 portId의 PortInfoEntity + PortNameEntity 조회
     @Query("""
         select p from PortInfoEntity p
         left join fetch p.portName
@@ -32,7 +33,7 @@ public interface PortInfoRepository extends JpaRepository<PortInfoEntity, String
         """)
     Optional<PortInfoEntity> findOneWithName(@Param("portId") String portId);
 
-    // 이름으로 검색(한국어)
+    // 한국어 이름 검색
     @Query("""
         select p from PortInfoEntity p
         join fetch p.portName n
@@ -40,5 +41,7 @@ public interface PortInfoRepository extends JpaRepository<PortInfoEntity, String
         """)
     List<PortInfoEntity> searchByKoreanName(@Param("q") String q);
 
+    // 다중 portId 조회
     List<PortInfoEntity> findByPortIdIn(List<String> ids);
+    
 }

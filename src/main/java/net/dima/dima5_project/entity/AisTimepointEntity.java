@@ -23,9 +23,10 @@ import net.dima.dima5_project.dto.AisTimepointDTO;
 @Builder
 public class AisTimepointEntity {
     
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Id 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="ais_seq")
-    private Integer aisSeq;
+    private Long aisSeq;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="port_id", referencedColumnName="port_id", nullable=false)
@@ -41,16 +42,9 @@ public class AisTimepointEntity {
     @Column(name="time_point", nullable=false) 
     private Integer timePoint;
 
-    @Column(name="lat", nullable=false, precision=15, scale=10)     
     private double lat;
-    
-    @Column(name="lon", nullable=false, precision=15, scale=10)     
     private double lon;
-    
-    @Column(name="cog", nullable=false, precision=15, scale=10)     
     private double cog;
-    
-    @Column(name="heading", nullable=false, precision=15, scale=10) 
     private double heading;
 
     public static AisTimepointEntity toDTO(AisTimepointDTO aisTimepointDTO) {

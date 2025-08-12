@@ -2,10 +2,13 @@ package net.dima.dima5_project.service;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import net.dima.dima5_project.entity.VesselMasterEntity;
 import net.dima.dima5_project.repository.AisTimepointRepository;
 import net.dima.dima5_project.repository.VesselMasterRepository;
 
+@Service
 public class VesselService {
     
     private final VesselMasterRepository vesselMasterRepository = null;

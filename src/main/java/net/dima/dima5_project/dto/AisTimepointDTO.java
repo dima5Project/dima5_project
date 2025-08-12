@@ -16,7 +16,7 @@ import net.dima.dima5_project.entity.VesselMasterEntity;
 @Builder
 public class AisTimepointDTO {
     
-    private Integer aisSeq;
+    private Long aisSeq;
     private PortInfoEntity portId;
     private VesselMasterEntity vslId;
     private LocalDateTime timeStamp;
