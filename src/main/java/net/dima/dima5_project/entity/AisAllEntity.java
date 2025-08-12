@@ -2,13 +2,12 @@ package net.dima.dima5_project.entity;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -26,9 +25,10 @@ import net.dima.dima5_project.dto.AisAllDTO;
 @Table(name="ais_all")
 public class AisAllEntity {
     
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="ais_seq")
-    private Integer aisSeq;
+    private Long aisSeq;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="port_id", referencedColumnName="port_id", nullable=false)
@@ -42,16 +42,9 @@ public class AisAllEntity {
     @Column(name="time_stamp", nullable=false)
     private LocalDateTime timeStamp;
 
-    @Column(name="lat", nullable=false, precision=15, scale=10)     
     private double lat;
-    
-    @Column(name="lon", nullable=false, precision=15, scale=10)     
     private double lon;
-    
-    @Column(name="cog", nullable=false, precision=15, scale=10)     
     private double cog;
-    
-    @Column(name="heading", nullable=false, precision=15, scale=10) 
     private double heading;
 
     public static AisAllEntity toDTO(AisAllDTO aisAllDTO) {

@@ -2,14 +2,11 @@ package net.dima.dima5_project.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import net.dima.dima5_project.dto.HolidayDTO;
-import net.dima.dima5_project.dto.PortDockingDTO;
 import net.dima.dima5_project.dto.PortInfoDTO;
 import net.dima.dima5_project.dto.PortInfoResponseDTO;
 import net.dima.dima5_project.dto.PortNameDTO;
@@ -71,14 +68,16 @@ public class PortInfoService {
                 List<PortInfoResponseDTO> responseDTOList = new ArrayList<>();
 
                 for (PortNameEntity portName : portNames) {
-                        PortInfoEntity info = portInfoRepository.findById(portName.getPortId())
+
+                        String portId = portName.getPortInfo().getPortId();
+                        PortInfoEntity info = portInfoRepository.findById(portId)
                                         .orElse(null);
 
                         if (info == null)
                                 continue;
 
                         PortNameDTO portNameDTO = PortNameDTO.builder()
-                                        .portId(portName.getPortId())
+                                        .portId(portId)
                                         .countryNameKr(portName.getCountryNameKr())
                                         .countryNameEn(portName.getCountryNameEn())
                                         .countryNameJp(portName.getCountryNameJp())
@@ -103,10 +102,12 @@ public class PortInfoService {
                 List<PortNameEntity> portNames = portNameRepository.findByCountryNameEn(country);
 
                 return portNames.stream().map(portName -> {
-                        PortInfoEntity info = portInfoRepository.findByPortId(portName.getPortId());
+                        String portId = portName.getPortInfo().getPortId();
+                        PortInfoEntity info = portInfoRepository.findByPortId(portId);
+
                         return PortInfoResponseDTO.builder()
                                         .portNameDTO(PortNameDTO.builder()
-                                                        .portId(portName.getPortId())
+                                                        .portId(portId)
                                                         .countryNameKr(portName.getCountryNameKr())
                                                         .countryNameEn(portName.getCountryNameEn())
                                                         .countryNameJp(portName.getCountryNameJp())

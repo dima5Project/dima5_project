@@ -21,7 +21,7 @@ public class PortNameService {
 
         return entities.stream()
                 .map(port -> PortNameDTO.builder()
-                        .portId(port.getPortId())
+                        .portId(port.getPortInfo().getPortId())
                         .portNameKr(port.getPortNameKr())
                         .build())
                 .collect(Collectors.toList());

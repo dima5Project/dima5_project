@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,10 +23,8 @@ import net.dima.dima5_project.dto.PortNameDTO;
 public class PortNameEntity {
 
     @Id
-    @Column(name = "port_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "port_id", referencedColumnName = "port_id")
-    private String portId;
+    @Column(name="port_id")
+    private Long portId; // PK
 
     @Column(name = "country_name_kr")
     private String countryNameKr;
@@ -45,9 +44,15 @@ public class PortNameEntity {
     @Column(name = "port_name_jp")
     private String portNameJp;
 
-    public static PortNameEntity toEntity(PortNameDTO portNameDTO) {
+    // FK 관계를 통해 필요할 때, PortInfoEntity 데이터를 가져올 수 있음
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "port_id", referencedColumnName = "port_id", insertable = false, updatable = false)
+    private PortInfoEntity portInfo;
+
+
+    public static PortNameEntity toEntity(PortNameDTO portNameDTO, PortInfoEntity portInfoEntity) {
         return PortNameEntity.builder()
-                .portId(portNameDTO.getPortId())
+                .portInfo(portInfoEntity)
                 .portNameKr(portNameDTO.getPortNameKr())
                 .countryNameKr(portNameDTO.getCountryNameKr())
                 .portNameEn(portNameDTO.getPortNameEn())

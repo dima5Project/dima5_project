@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.dto.PortDockingDTO;
-import net.dima.dima5_project.dto.PortNameDTO;
 import net.dima.dima5_project.entity.PortDockingEntity;
 import net.dima.dima5_project.repository.PortDockingRepository;
 
