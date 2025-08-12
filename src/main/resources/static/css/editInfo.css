@@ -1,0 +1,321 @@
+@charset "UTF-8";
+
+/* 기본 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+/* 상단 히어로 */
+.qna-header-bg {
+    background-color: #0f1035;
+    height: 350px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qna-header {
+    padding-top: 120px;
+    /* 한 번만 선언 */
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: #fff;
+}
+
+.qna-header h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.qna-header p {
+    font-size: 16px;
+    color: #ddd;
+}
+
+/* 전체 레이아웃 */
+.mypage {
+    max-width: 1040px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.mp-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+}
+
+/* 좌측 사이드 */
+.mp-side {
+    background: #fff;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.mp-side__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.mp-side__nav {
+    display: grid;
+    gap: 8px;
+}
+
+.mp-side__nav a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #222;
+    font-size: 14px;
+}
+
+.mp-side__nav a.is-active,
+.mp-side__nav a:hover {
+    background: #f2f5f9;
+}
+
+/* 우측 요약 카드 */
+.mp-content {
+    min-width: 0;
+}
+
+.mp-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    background: #fff;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.mp-summary__hello {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.mp-summary__hello .hello {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+}
+
+.mp-summary__hello .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.mp-summary__hello .email {
+    color: #666;
+}
+
+.mp-summary__hello .sep {
+    color: #c9cdd2;
+}
+
+.mp-summary__stats {
+    display: flex;
+    gap: 40px;
+}
+
+.mp-summary__stats li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: #333;
+    text-align: center;
+    min-width: 96px;
+}
+
+.mp-summary__stats .num {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #013895;
+    cursor: default;
+    /* a → span 변경에 맞게 */
+}
+
+/* 섹션 공통 */
+.mp-section {
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 18px;
+}
+
+.mp-section__head {
+    display: flex;
+    justify-content: flex-start;
+    /* 제목과 버튼 좌측 정렬 (이 페이지는 버튼 없음) */
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef1f4;
+}
+
+.mp-section__head h4 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+/* 개인정보 수정: 본문 영역 */
+.info-wrap {
+    padding: 16px;
+}
+
+.info-desc {
+    font-size: 12px;
+    font-weight: bold;
+    color: darkblue;
+    margin: 6px 0 12px;
+}
+
+.info-card {
+    border: 1px solid #e5e8eb;
+    border-radius: 8px;
+    background: #fff;
+    padding: 18px 16px;
+}
+
+.info-form {
+    display: grid;
+    gap: 12px;
+    max-width: 720px;
+    /* 시안 폭 */
+}
+
+/* 라벨 + 인풋 2열 그리드 */
+.field {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    align-items: center;
+    gap: 12px;
+}
+
+.field label {
+    font-size: 14px;
+    color: #222;
+}
+
+/* 입력 공통 */
+.text-input {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #e5e8eb;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+}
+
+.text-input:focus {
+    border-color: #9db7ff;
+}
+
+/* 읽기전용 스타일(시안의 회색 입력) */
+.text-input[readonly] {
+    background: #f5f7fa;
+    color: #7b7f86;
+}
+
+/* 비밀번호 확인: 에러 텍스트 */
+.stack {
+    display: grid;
+    gap: 6px;
+}
+
+.field-error {
+    font-size: 12px;
+    color: #e11d48;
+    /* 빨간색 */
+}
+
+/* 이메일 행: 인풋 + 버튼 가로 배치 */
+.field-email .email-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+}
+
+
+.btn-outline {
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #cfd6de;
+    background: #0F1035;
+    border-radius: 4px;
+    font-size: 13px;
+    color: white;
+    cursor: pointer;
+}
+
+/* 이메일 확인 버튼 hover */
+.btn-outline:hover,
+.btn-outline:focus {
+    background: #4483EF;
+    color: white;
+}
+
+/* 라디오 */
+.radio-row {
+    display: flex;
+    gap: 18px;
+    font-size: 14px;
+    color: #222;
+}
+
+.radio-row input {
+    margin-right: 6px;
+}
+
+/* 하단 확인 버튼 (우측 정렬) */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.info-section .form-actions {
+    padding: 0 16px 16px;
+    /* 좌우 16px, 하단 16px */
+}
+
+.btn-confirm {
+    display: inline-block;
+    min-width: 72px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    border: 1px solid #cfd6de;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 13px;
+    color: #111;
+    text-decoration: none;
+    /* a 밑줄 제거 */
+}
+
+.btn-confirm:hover {
+    background: #f8fafc;
+}

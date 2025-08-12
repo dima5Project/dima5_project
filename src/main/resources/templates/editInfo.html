@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마이페이지</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <script defer th:src="@{/js/header.js}"></script>
+
+    <link rel="stylesheet" href="/css/editInfo.css" th:href="@{/css/editInfo.css}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+    <script defer th:src="@{/js/editInfo.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+
+<body>
+    <div sec:authorize="isAnonymous()">
+        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+    </div>
+    <div sec:authorize="isAuthenticated()">
+        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+    </div>
+
+    <div class="qna-header-bg">
+        <section class="qna-header">
+            <h2>마이페이지</h2>
+            <p>개인정보 수정 | 내 선박 저장 | 문의내역</p>
+        </section>
+    </div>
+
+    <main class="mypage">
+        <!-- 좌측 사이드 메뉴 + 우측 콘텐츠 -->
+        <div class="mp-container">
+            <!-- 좌측: 사이드 메뉴 -->
+            <aside class="mp-side">
+                <h3 class="mp-side__title">마이페이지</h3>
+                <nav class="mp-side__nav">
+                    <a th:href="@{/checkPassword}" class="is-active">개인정보 수정</a>
+                    <a href="#">내 선박 저장</a>
+                    <a href="#">문의내역</a>
+                </nav>
+            </aside>
+
+            <!-- 우측: 메인 콘텐츠 -->
+            <section class="mp-content">
+                <!-- 요약 카드 -->
+                <div class="mp-summary">
+                    <div class="mp-summary__hello">
+                        <p class="hello">
+                            <strong>김규린</strong>님, 반갑습니다.
+                        </p>
+                        <div class="meta">
+                            <span class="id">kkrcl122</span>
+                            <span class="sep">|</span>
+                            <span class="email">kkrcl122@naver.com</span>
+                            <span class="sep">|</span>
+                            <span class="role">화주</span>
+                        </div>
+                    </div>
+
+                    <ul class="mp-summary__stats">
+                        <li>
+                            <span>내 선박 저장</span>
+                            <span class="num">3건</span>
+                        </li>
+                        <li>
+                            <span>문의내역</span>
+                            <span class="num">3건</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 개인정보수정 -->
+                <section class="mp-section info-section">
+                    <div class="mp-section__head">
+                        <h4>개인정보 수정</h4>
+                    </div>
+
+                    <div class="info-wrap">
+                        <p class="info-desc">
+                            ※ 개인정보 수정은 이름, 비밀번호, 이메일, 사용자 유형만 가능합니다.
+                        </p>
+
+                        <div class="info-card">
+                            <form class="info-form" action="#" method="get">
+                                <!-- 이름 (읽기전용처럼 보이는 입력) -->
+                                <div class="field">
+                                    <label for="name">이름</label>
+                                    <input id="name" name="name" type="text" value="백 연동처리 필요" class="text-input">
+                                </div>
+
+                                <!-- 아이디 (읽기전용) -->
+                                <div class="field">
+                                    <label for="userId">아이디</label>
+                                    <input id="userId" name="userId" type="text" class="text-input" value="kkrcl122"
+                                        readonly>
+                                </div>
+
+                                <!-- 비밀번호 -->
+                                <div class="field">
+                                    <label for="pw">비밀번호</label>
+                                    <div class="stack">
+                                        <input id="pw" name="pw" type="password" class="text-input"
+                                            placeholder="새 비밀번호 입력">
+                                        <p class="field-error" id="pw-msg" hidden></p> <!-- ← 경고문구 자리 -->
+                                    </div>
+                                </div>
+
+                                <!-- 비밀번호 확인 + 에러 텍스트 -->
+                                <div class="field">
+                                    <label for="pw2">비밀번호 확인</label>
+                                    <div class="stack">
+                                        <input id="pw2" name="pw2" type="password" class="text-input"
+                                            placeholder="새 비밀번호 확인">
+                                        <p class="field-error" id="pw-error" hidden>일치하지 않는 비밀번호입니다.</p>
+                                    </div>
+                                </div>
+
+                                <!-- 이메일 + 중복확인 버튼 -->
+                                <div class="field field-email">
+                                    <label for="email">이메일</label>
+                                    <div class="email-row">
+                                        <input id="email" name="email" type="email" class="text-input"
+                                            value="백 연동처리 필요">
+                                        <button type="button" class="btn-outline" id="btn-email-check">중복확인</button>
+                                    </div>
+                                </div>
+
+                                <!-- 사용자 유형 -->
+                                <div class="field">
+                                    <label>사용자 유형</label>
+                                    <div class="radio-row">
+                                        <!-- 사용자 유형에 check되는 값은 로그인한 유저와 일치하도록 백 연동 후 코드 수정 필요 -->
+                                        <label><input type="radio" name="role" value="화주" checked> 화주</label>
+                                        <label><input type="radio" name="role" value="선사"> 선사</label>
+                                        <label><input type="radio" name="role" value="항만사"> 항만사</label>
+                                        <label><input type="radio" name="role" value="일반 사용자"> 일반 사용자</label>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 하단 확인 버튼 -->
+                    <div class="form-actions">
+                        <a href="#" class="btn-confirm" id="btn-save">확인</a> <!--th로 수정 필요-->
+                    </div>
+
+                </section>
+
+            </section> <!-- section 닫힘 태그 추가 -->
+        </div> <!-- mp-container 닫힘 태그 -->
+
+    </main>
+
+
+    <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+
+</body>
+
+</html>
