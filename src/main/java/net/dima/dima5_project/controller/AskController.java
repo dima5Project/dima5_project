@@ -96,7 +96,7 @@ public class AskController {
     // }
     @GetMapping("")
     public String ask(
-            @RequestParam(defaultValue = "0") int page, // 0-base
+            @RequestParam(name = "page", defaultValue = "0") int page, // 0-base
             @RequestParam(name = "searchItem", defaultValue = "") String searchItem, // ★ "" 로
             @RequestParam(name = "searchWord", defaultValue = "") String searchWord,
             Model model) {
@@ -217,7 +217,7 @@ public class AskController {
 
     @GetMapping("/checkPassword")
     @ResponseBody
-    public boolean checkPassword(@RequestParam Long askSeq, @RequestParam String pwd) {
+    public boolean checkPassword(@RequestParam(name = "askSeq") Long askSeq, @RequestParam(name = "pwd") String pwd) {
         AskBoardDTO askBoardDTO = askService.checkOne(askSeq);
         if (askBoardDTO == null)
             return false;
@@ -232,8 +232,8 @@ public class AskController {
     }
 
     @PostMapping("/delete")
-    public String delete(@RequestParam Long askSeq,
-            @RequestParam String pwd,
+    public String delete(@RequestParam(name = "askSeq") Long askSeq,
+            @RequestParam(name = "pwd") String pwd,
             RedirectAttributes ra) {
 
         // 비번 검증 (공개글이면 askPwd==null이라 verifyPassword가 true 반환)

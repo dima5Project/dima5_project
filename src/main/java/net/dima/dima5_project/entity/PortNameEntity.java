@@ -23,8 +23,8 @@ import net.dima.dima5_project.dto.PortNameDTO;
 public class PortNameEntity {
 
     @Id
-    @Column(name="port_id")
-    private Long portId; // PK
+    @Column(name = "port_id")
+    private String portId; // PK
 
     @Column(name = "country_name_kr")
     private String countryNameKr;
@@ -48,7 +48,6 @@ public class PortNameEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "port_id", referencedColumnName = "port_id", insertable = false, updatable = false)
     private PortInfoEntity portInfo;
-
 
     public static PortNameEntity toEntity(PortNameDTO portNameDTO, PortInfoEntity portInfoEntity) {
         return PortNameEntity.builder()
