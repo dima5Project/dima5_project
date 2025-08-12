@@ -18,9 +18,9 @@ import net.dima.dima5_project.handler.CustomLogoutSuccessHandler;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final CustomLoginSuccessHandler loginSuccessHandler;
-        private final CustomLoginFailureHandler loginFailureHandler;
-        private final CustomLogoutSuccessHandler CustomLogoutSuccessHandler;
+        private final CustomLoginSuccessHandler customLoginSuccessHandler;
+        private final CustomLoginFailureHandler customLoginFailureHandler;
+        private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
         @Bean // 해당 메소드에서 사용, 반환하는 값을 Bean으로 관리
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -63,17 +63,16 @@ public class SecurityConfig {
                                                 .usernameParameter("userId") // security가 사용하는 파라미터 대신 개발자가 설정한 파라미터 사용
                                                 .passwordParameter("userPwd")
                                                 .defaultSuccessUrl("/", true) // 로그인 성공 시 루트로 이동
-                                                .successHandler(loginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
-                                                .failureHandler(loginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
-                                                .failureUrl("/user/login?error=true") // 로그인 에러가 나면 다시 로그인 페이지로 이동, 에러를
-                                                                                      // 파라미터로 설정
+                                                .successHandler(customLoginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
+                                                .failureHandler(customLoginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
+                                                .failureUrl("/user/login?error=true")
                                                 .permitAll());
 
                 // 로그아웃에 대한 처리
                 http
                                 .logout((auth) -> auth
                                                 .logoutUrl("/logout") // 로그아웃 요청 url
-                                                .logoutSuccessHandler(CustomLogoutSuccessHandler) // 로그아웃 성공시 처리할 핸들러 등록
+                                                .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공시 처리할 핸들러 등록
                                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // GET 허용
                                                 .logoutSuccessUrl("/") // 로그아웃 성공 메인으로 이동
                                                 .invalidateHttpSession(true) // 세션 무효화
