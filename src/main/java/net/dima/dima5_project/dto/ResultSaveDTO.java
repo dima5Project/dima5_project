@@ -13,7 +13,7 @@ import net.dima.dima5_project.entity.ResultSaveEntity;
 @NoArgsConstructor
 @Builder
 public class ResultSaveDTO {
-    
+
     private Long saveSeq;
     private String searchVsl;
     private String userId;
@@ -25,13 +25,14 @@ public class ResultSaveDTO {
 
     public static ResultSaveDTO toDTO(ResultSaveEntity resultSaveEntity) {
         return ResultSaveDTO.builder()
-            .saveSeq(resultSaveEntity.getSaveSeq())
-            .searchVsl(resultSaveEntity.getSearchVsl().getVslId())
-            .lat(resultSaveEntity.getLat())
-            .lon(resultSaveEntity.getLon())
-            .top1Port(resultSaveEntity.getTop1Port())
-            .top1Pred(resultSaveEntity.getTop1Pred())
-            .eta(resultSaveEntity.getEta())
-            .build();
-            }
+                .saveSeq(resultSaveEntity.getSaveSeq())
+                .searchVsl(resultSaveEntity.getSearchVsl().getVslId())
+                .userId(resultSaveEntity.getUserId().getUserId())
+                .lat(resultSaveEntity.getLat())
+                .lon(resultSaveEntity.getLon())
+                .top1Port(resultSaveEntity.getTop1Port())
+                .top1Pred(resultSaveEntity.getTop1Pred())
+                .eta(resultSaveEntity.getEta())
+                .build();
+    }
 }
