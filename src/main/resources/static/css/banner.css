@@ -82,6 +82,7 @@ body {
   border: none;
   border-radius: 10px;
   font-size: 22px;
+  text-decoration: none;
   cursor: pointer;
   /*버튼 위에 마우스를 올리면 손가락 모양 포인터가 나오게 설정*/
   margin: 0 auto;
@@ -89,6 +90,15 @@ body {
 
 .start-btn:hover {
   background: #013895;
+}
+
+.start-btn:link,
+.start-btn:visited,
+.start-btn:hover,
+.start-btn:active,
+.start-btn:focus {
+  text-decoration: none;
+  /* 모든 상태에서 밑줄 방지 */
 }
 
 .scroll-indicator {
