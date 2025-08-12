@@ -33,22 +33,21 @@ public class SecurityConfig {
                                                 "/api/**",
                                                 "/lang",
                                                 "/main",
-                                                "/intro/**",            // 소개
-                                                //"/ask/**",            // 문의 - 나중에 삭제
-                                                "/predict/**",          // 차항지 예측 - 나중에 삭제
+                                                "/intro/**", // 소개
+                                                // "/ask/**", // 문의 - 나중에 삭제
+                                                "/predict/**", // 차항지 예측 - 나중에 삭제
                                                 "/user/**",
                                                 "/news/**",
-                                                "/api/info/**",         // 부가정보 - 나중에 삭제
+                                                "/api/info/**", // 부가정보 - 나중에 삭제
                                                 "/port/info/**",
-                                                "/info/**",             // 부가정보 - 나중에 삭제
-                                                "/proxy/met/**",        // API 끌어오는 ajax 처리
+                                                "/info/**", // 부가정보 - 나중에 삭제
+                                                "/proxy/met/**", // API 끌어오는 ajax 처리
                                                 "/data/**",
                                                 "/logout",
                                                 "/images/**",
                                                 "/css/**",
                                                 "/js/**"
-                                                
-                                                
+
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
@@ -63,8 +62,8 @@ public class SecurityConfig {
                                                 .usernameParameter("userId") // security가 사용하는 파라미터 대신 개발자가 설정한 파라미터 사용
                                                 .passwordParameter("userPwd")
                                                 .defaultSuccessUrl("/", true) // 로그인 성공 시 루트로 이동
-                                                .successHandler(customLoginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
-                                                .failureHandler(customLoginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
+                                                // .successHandler(customLoginSuccessHandler) // 로그인 성공시 처리할 핸들러 등록
+                                                // .failureHandler(customLoginFailureHandler) // 로그인 실패시 처리할 핸들러 등록
                                                 .failureUrl("/user/login?error=true")
                                                 .permitAll());
 
@@ -73,7 +72,8 @@ public class SecurityConfig {
                                 .logout((auth) -> auth
                                                 .logoutUrl("/logout") // 로그아웃 요청 url
                                                 .logoutSuccessHandler(customLogoutSuccessHandler) // 로그아웃 성공시 처리할 핸들러 등록
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // GET 허용
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // GET
+                                                                                                                   // 허용
                                                 .logoutSuccessUrl("/") // 로그아웃 성공 메인으로 이동
                                                 .invalidateHttpSession(true) // 세션 무효화
                                                 .clearAuthentication(true) // 인증기록 무효화
