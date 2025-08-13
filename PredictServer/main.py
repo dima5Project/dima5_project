@@ -1,50 +1,131 @@
-# main.py
-from typing import Optional, List, Dict, Any, Literal
+from typing import Optional, List, Dict, Any, Tuple, Iterable
 from pathlib import Path
 from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from predict_logic import predict, TIMEPOINTS
 
+# -------------------- FastAPI & CORS --------------------
 app = FastAPI(title="Port Prediction API")
 
-# ==== 데이터 경로 & 캐시 ====
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # 필요 시 특정 도메인으로 제한
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -------------------- Paths & Caches --------------------
 BASE_DIR = Path(__file__).resolve().parent
-AIS_TP_PATH  = BASE_DIR / "data" / "ais_timepoint.csv"  # vsl_id별 시점별 스냅샷(예측 입력용)
-AIS_ALL_PATH = BASE_DIR / "data" / "ais_all.csv"        # 항로(트랙) 전체
+AIS_TP_PATH    = BASE_DIR / "data" / "ais_timepoint.csv"  # vsl별 스냅샷
+PSO_ROUTE_PATH = BASE_DIR / "data" / "pso_route.csv"      # 항구별 대표경로(각 100점, 시간순)
 
 _DF_TP_CACHE: Optional[pd.DataFrame] = None
-_DF_ALL_CACHE: Optional[pd.DataFrame] = None
+_DF_PSO_CACHE: Optional[pd.DataFrame] = None
+
+# -------------------- Normalize Utils -------------------
+def _normalize_colname(name: str) -> str:
+    if name is None:
+        return ""
+    return str(name).replace("\ufeff", "").strip().lower()
+
+def _normalize_vsl_id(val: str) -> str:
+    if val is None:
+        return ""
+    return (
+        str(val).strip()
+        .replace("\ufeff", "")
+        .replace("\n", "")
+        .replace("\r", "")
+        .replace("\t", "")
+        .lower()
+    )
+
+def _normalize_port_id(val: str) -> str:
+    if val is None:
+        return ""
+    return (
+        str(val).strip()
+        .replace("\ufeff", "")
+        .replace("\n", "")
+        .replace("\r", "")
+        .replace("\t", "")
+        .upper()
+    )
+
+# -------------------- Safe CSV Loader -------------------
+def _read_csv_clean(path: Path, required_cols: List[str]) -> pd.DataFrame:
+    """
+    - 구분자 자동 추론(sep=None, engine='python')
+    - 헤더 정규화(BOM 제거, strip, lower)
+    - 동의어 일부 매핑
+    - 존재하는 수치/시간 컬럼만 안전 변환
+    """
+    if not path.exists():
+        raise HTTPException(500, f"CSV not found: {path}")
+
+    df = pd.read_csv(path, engine="python", sep=None)
+    original_cols = list(df.columns)
+    df.columns = [_normalize_colname(c) for c in original_cols]
+
+    synonyms = {
+        "timestamp": "time_stamp",
+        "time": "time_stamp",
+        "longitude": "lon",
+        "latitude": "lat",
+    }
+    for k, v in synonyms.items():
+        if k in df.columns and v not in df.columns:
+            df = df.rename(columns={k: v})
+
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise HTTPException(
+            422,
+            f"Missing required columns in {path.name}: {missing} | available: {list(df.columns)}"
+        )
+
+    if "time_stamp" in df.columns:
+        df["time_stamp"] = pd.to_datetime(df["time_stamp"], errors="coerce")
+    for num_col in ("lat", "lon", "pso_lat", "pso_lon", "time_point"):
+        if num_col in df.columns:
+            df[num_col] = pd.to_numeric(df[num_col], errors="coerce")
+
+    return df
 
 def _load_df_tp() -> pd.DataFrame:
+    """AIS 스냅샷 로딩 (vsl_id별 최신 위치/특징)"""
     global _DF_TP_CACHE
     if _DF_TP_CACHE is None:
-        if not AIS_TP_PATH.exists():
-            raise HTTPException(500, f"CSV not found: {AIS_TP_PATH}")
-        _DF_TP_CACHE = pd.read_csv(AIS_TP_PATH, parse_dates=["time_stamp"])
+        _DF_TP_CACHE = _read_csv_clean(
+            AIS_TP_PATH,
+            required_cols=["port_id", "vsl_id", "time_stamp", "time_point", "lat", "lon", "cog", "heading"],
+        )
     return _DF_TP_CACHE
 
-def _load_df_all() -> pd.DataFrame:
-    global _DF_ALL_CACHE
-    if _DF_ALL_CACHE is None:
-        if not AIS_ALL_PATH.exists():
-            raise HTTPException(500, f"CSV not found: {AIS_ALL_PATH}")
-        # 모든 행의 시간축이 필요하므로 파싱
-        _DF_ALL_CACHE = pd.read_csv(AIS_ALL_PATH, parse_dates=["time_stamp"])
-    return _DF_ALL_CACHE
+def _load_df_pso() -> pd.DataFrame:
+    """항구별 대표경로 로딩 (port_id, pso_lat, pso_lon) — 이미 시간순, 각 항구 100행"""
+    global _DF_PSO_CACHE
+    if _DF_PSO_CACHE is None:
+        _DF_PSO_CACHE = _read_csv_clean(
+            PSO_ROUTE_PATH,
+            required_cols=["port_id", "pso_lat", "pso_lon"],
+        )
+    return _DF_PSO_CACHE
 
+# -------------------- Helpers ---------------------------
 def _nearest_model_tp(tp_float: float) -> int:
-    # 1시간 룰: tp <= t+1 → t, 그 외 다음
     for t in TIMEPOINTS:
         if tp_float <= t + 1:
             return t
     return TIMEPOINTS[-1]
 
 def _pick_row_for_t(sub: pd.DataFrame, t: int) -> pd.Series:
-    # t 이하면서 가장 큰 값(없으면 전체 중 최단거리)
     s = sub["time_point"].astype(float)
     mask = s <= t
     if mask.any():
@@ -53,148 +134,125 @@ def _pick_row_for_t(sub: pd.DataFrame, t: int) -> pd.Series:
         idx = (s.sub(t).abs()).idxmin()
     return sub.loc[idx]
 
-def _round_prob(v: float, nd=6) -> float:
-    try: return round(float(v), nd)
-    except: return float(v)
+def _round_prob(v: float, nd: int = 6) -> float:
+    try:
+        return round(float(v), nd)
+    except Exception:
+        return float(v)
 
+# -------------------- PSO Routes ------------------------
+def _get_pso_route_for_port(port_id: str) -> List[Dict[str, float]]:
+    """
+    pso_route.csv에서 port_id에 해당하는 대표경로(이미 시간순, 각 항구 100행)를 그대로 반환.
+    출력 포맷: [{"lat": float, "lon": float}, ...]  ← time_stamp 없음
+    """
+    df = _load_df_pso()
+    pid_norm = _normalize_port_id(port_id)
+    sub = df[df["port_id"].apply(_normalize_port_id) == pid_norm].copy()
+
+    if sub.empty:
+        return []
+
+    sub["pso_lat"] = pd.to_numeric(sub["pso_lat"], errors="coerce")
+    sub["pso_lon"] = pd.to_numeric(sub["pso_lon"], errors="coerce")
+    sub = sub.dropna(subset=["pso_lat", "pso_lon"])
+
+    out: List[Dict[str, float]] = [
+        {"lat": float(r["pso_lat"]), "lon": float(r["pso_lon"])}
+        for _, r in sub.iterrows()
+    ]
+    return out
+
+def _get_pso_routes_for_ports(ports: Iterable[Tuple[int, str]]) -> List[Dict[str, Any]]:
+    """
+    ports: [(rank, port_id), ...]
+    반환: [{"rank": rank, "port_id": pid, "track": [{"lat","lon"}, ...]}, ...]
+    """
+    out: List[Dict[str, Any]] = []
+    for rank, pid in ports:
+        route = _get_pso_route_for_port(pid)
+        out.append({"rank": rank, "port_id": pid, "track": route})
+    return out
+
+# -------------------- Endpoint --------------------------
 @app.get("/predict_map_by_vsl")
 def predict_map_by_vsl(
     vsl_id: str = Query(..., description="CSV의 vsl_id"),
-    include: Literal["both","latest","timeline"] = Query("both"),
-    include_current_in_timeline: bool = Query(False, description="타임라인에 현재 모델 시점을 포함할지"),
-    current_timestamp: Optional[str] = Query(None, description="YYYY-MM-DD HH:MM:SS (사용자 입력 시각)")
 ) -> Dict[str, Any]:
-    """
-    반환:
-    - latest: 현재 위치(마지막 행) + 현재 모델 예측(Top-3)
-      * matched_row.time_stamp는 current_timestamp가 있으면 그 값으로 덮어씀
-      * atd: current_timestamp - latest_time_point(시간)
 
-    - timeline: 5/8/11/…(현재모델 이하) 각 시점의 '근접 행' + 해당 시점 모델 예측(Top-3)
+    # 항상 both + 타임라인에 현재 모델 시점 포함
+    include_current_in_timeline = True
 
-    - track: ais_all.csv에서 동일 vsl_id의 전체 항로(시간순)
-        [ {time_stamp, lat, lon}, ... ]
-    """
-    # ---- 1) 데이터 필터링 ----
-    df_tp  = _load_df_tp()
-    sub_tp = df_tp[df_tp["vsl_id"].astype(str).str.strip() == str(vsl_id).strip()]
+    # 1) vsl_id 행 필터
+    df_tp = _load_df_tp()
+    vsl_id_clean = _normalize_vsl_id(vsl_id)
+    sub_tp = df_tp[df_tp["vsl_id"].apply(_normalize_vsl_id) == vsl_id_clean]
     if sub_tp.empty:
         raise HTTPException(404, f"No rows in ais_timepoint.csv for vsl_id={vsl_id}")
 
-    # 최신 행(마지막 time_point)
+    # 최신 행 및 모델 시점
     row_latest = sub_tp.loc[sub_tp["time_point"].idxmax()]
     latest_tp  = float(row_latest["time_point"])
     current_model_tp = _nearest_model_tp(latest_tp)
 
-    # ---- 2) latest(현재) 카드 ----
     response: Dict[str, Any] = {"vsl_id": str(vsl_id)}
 
-    if include in ("both", "latest"):
-        lat_c = float(row_latest["lat"]); lon_c = float(row_latest["lon"])
-        cog_c = float(row_latest["cog"]); heading_c = float(row_latest["heading"])
+    # 2) latest 카드 (항상 생성)
+    lat_c = float(row_latest["lat"]); lon_c = float(row_latest["lon"])
+    cog_c = float(row_latest["cog"]); heading_c = float(row_latest["heading"])
 
-        used_current, top3_current = predict(lat_c, lon_c, cog_c, heading_c, latest_tp)
+    used_current, top3_current = predict(lat_c, lon_c, cog_c, heading_c, latest_tp)
+    preds = [
+        {"rank": i + 1, "port_id": pid, "prob": _round_prob(p)}
+        for i, (pid, p) in enumerate(top3_current)
+    ]
 
-        # current_timestamp 처리
-        ts_actual: datetime = pd.to_datetime(row_latest["time_stamp"]).to_pydatetime()
-        if current_timestamp:
-            try:
-                ts_display = datetime.strptime(current_timestamp, "%Y-%m-%d %H:%M:%S")
-            except ValueError:
-                raise HTTPException(422, "current_timestamp must be 'YYYY-MM-DD HH:MM:SS'")
-        else:
-            ts_display = ts_actual  # 입력이 없으면 실제 값을 그대로
+    now_ts = datetime.now()
+    departure_ts = now_ts - timedelta(hours=latest_tp)
 
-        # ATD = 입력시각 - latest_tp(시간)
-        atd = ts_display - timedelta(hours=latest_tp)
+    response["latest"] = {
+        "time_point": int(used_current),
+        "actual_time_point": latest_tp,
+        "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),             # 서버 현재시각
+        "departure_time": departure_ts.strftime("%Y-%m-%d %H:%M:%S"),   # 현재시각 - latest_tp(hours)
+        "lat": lat_c, "lon": lon_c, "cog": cog_c, "heading": heading_c, # 현재 위치/특징
+        "predictions": preds,
+    }
 
-        response["latest"] = {
-            "time_point": int(used_current),            # 현재 사용된 모델 시점(정수)
-            "actual_time_point": latest_tp,             # 최신 행의 실측 tp(소수)
-            "time_stamp": ts_display.strftime("%Y-%m-%d %H:%M:%S"),
-            "atd": atd.strftime("%Y-%m-%d %H:%M:%S"),
-            "lat": lat_c, "lon": lon_c, "cog": cog_c, "heading": heading_c,
-            "predictions": [
-                {"rank": i+1, "port_id": pid, "prob": _round_prob(p)}
-                for i, (pid, p) in enumerate(top3_current)
-            ]
-        }
+    # 3) timeline (항상 생성 + 현재 모델 시점 포함)
+    steps = [t for t in TIMEPOINTS if (t < current_model_tp) or (include_current_in_timeline and t <= current_model_tp)]
+    timeline: List[Dict[str, Any]] = []
+    for t in steps:
+        row_t = _pick_row_for_t(sub_tp, t)
+        lat = float(row_t["lat"]); lon = float(row_t["lon"])
+        cog = float(row_t["cog"]); heading = float(row_t["heading"])
+        used_tp, top3 = predict(lat, lon, cog, heading, t)
 
-    # ---- 3) timeline(이전 시점들) ----
-    if include in ("both", "timeline"):
-        steps = [t for t in TIMEPOINTS if (t < current_model_tp) or (include_current_in_timeline and t <= current_model_tp)]
-        timeline: List[Dict[str, Any]] = []
-        for t in steps:
-            row_t = _pick_row_for_t(sub_tp, t)
-            lat = float(row_t["lat"]); lon = float(row_t["lon"])
-            cog = float(row_t["cog"]); heading = float(row_t["heading"])
-            used_tp, top3 = predict(lat, lon, cog, heading, t)  # 모델은 t로 고정
+        preds_t = [
+            {"rank": i + 1, "port_id": pid, "prob": _round_prob(p)}
+            for i, (pid, p) in enumerate(top3)
+        ]
 
-            timeline.append({
-                "time_point": int(used_tp),                    # 카드 제목에 쓰는 t(정수)
-                "time_stamp": str(row_t["time_stamp"]),
-                "actual_time_point": float(row_t["time_point"]),  # 선택된 행의 tp(소수)
-                "lat": lat, "lon": lon, "cog": cog, "heading": heading,
-                "predictions": [
-                    {"rank": i+1, "port_id": pid, "prob": _round_prob(p)}
-                    for i, (pid, p) in enumerate(top3)
-                ]
-            })
-        # 오름차순(5→8→11…)
-        timeline = sorted(timeline, key=lambda x: x["time_point"])
-        response["timeline"] = timeline
+        timeline.append({
+            "time_point": int(used_tp),
+            "time_stamp": str(row_t["time_stamp"]),
+            "actual_time_point": float(row_t["time_point"]),
+            "lat": lat, "lon": lon, "cog": cog, "heading": heading,
+            "predictions": preds_t
+        })
+    timeline = sorted(timeline, key=lambda x: x["time_point"])
+    response["timeline"] = timeline
 
-    # ---- latest 만든 뒤 (response["latest"]["predictions"]가 준비된 상태) ----
-    # 예: predictions = [{"rank":1,"port_id":"JPHKT","prob":0.65}, ...]
-    latest_ports = [(p["rank"], p["port_id"]) for p in response["latest"]["predictions"]]
-    # 옵션: 너무 포인트가 많으면 샘플링, 없으면 None
-    MAX_TRACK_POINTS = 200  # 필요시 조절, 또는 쿼리파라미터로 뺄 수 있음
-
-    response["tracks_topk"] = _get_tracks_for_ports(vsl_id, latest_ports, max_points=MAX_TRACK_POINTS)
-
+    # 4) Top-3 항구 대표경로(pso_route.csv) — time_stamp 없이 lat/lon만
+    latest_ports: List[Tuple[int, str]] = []
+    if response["latest"]["predictions"]:
+        latest_ports = [(p["rank"], p["port_id"]) for p in response["latest"]["predictions"]]
+    response["tracks_topk"] = _get_pso_routes_for_ports(latest_ports)
 
     return response
 
 
-# TOP-K 항구 트랙 묶어서 불러오기
-# === main.py 안 (_load_df_all 아래 근처에 추가) ===
-from typing import Iterable, Tuple
 
-def _get_track_for_port(vsl_id: str, port_id: str, max_points: int | None = None) -> list[dict]:
-    """
-    ais_all.csv에서 (vsl_id AND port_id) 조건으로 행로를 시간순으로 반환.
-    max_points가 주어지면 앞뒤로 고르게 샘플링(간단 decimate).
-    """
-    df_all = _load_df_all()
-    sub = df_all[
-        (df_all["vsl_id"].astype(str).str.strip() == str(vsl_id).strip()) &
-        (df_all["port_id"].astype(str).str.strip() == str(port_id).strip())
-    ]
-    if sub.empty:
-        return []
-
-    sub = sub.sort_values("time_stamp")
-    lat = sub["lat"].astype(float).to_numpy()
-    lon = sub["lon"].astype(float).to_numpy()
-    ts  = sub["time_stamp"].astype(str).to_numpy()
-
-    # 필요 시 간단 샘플링(균등 인덱스)
-    if max_points and len(sub) > max_points:
-        idx = np.linspace(0, len(sub) - 1, max_points, dtype=int)
-        lat, lon, ts = lat[idx], lon[idx], ts[idx]
-
-    return [{"time_stamp": t, "lat": float(a), "lon": float(b)} for t, a, b in zip(ts, lat, lon)]
-
-def _get_tracks_for_ports(vsl_id: str, ports: Iterable[Tuple[int, str]], max_points: int | None = None) -> list[dict]:
-    """
-    ports: [(rank, port_id), ...] 형태.
-    각 port_id 별로 트랙을 뽑아 [{rank, port_id, track:[...]}, ...] 로 반환.
-    """
-    out = []
-    for rank, pid in ports:
-        track = _get_track_for_port(vsl_id, pid, max_points=max_points)
-        out.append({"rank": rank, "port_id": pid, "track": track})
-    return out
 
 
 
@@ -202,3 +260,4 @@ def _get_tracks_for_ports(vsl_id: str, ports: Iterable[Tuple[int, str]], max_poi
 # cd C:\dima5_project\PredictServer
 # python -m uvicorn main:app --reload
 # http://127.0.0.1:8000/docs
+

@@ -45,3 +45,19 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+test {
+      useJUnitPlatform()
+
+      // (A) 커맨드라인 -D 값을 테스트 JVM으로 그대로 전달
+      if (System.getProperty("TYPE")  != null) systemProperty "TYPE",  System.getProperty("TYPE")
+      if (System.getProperty("QUERY") != null) systemProperty "QUERY", System.getProperty("QUERY")
+      if (System.getProperty("spring.profiles.active") != null)
+         systemProperty "spring.profiles.active", System.getProperty("spring.profiles.active")
+
+      // (B) 표준출력/표준에러를 터미널에 항상 보여주기
+      testLogging {
+         events "passed", "skipped", "failed", "standardOut", "standardError"
+         showStandardStreams = true
+      }
+}
