@@ -56,8 +56,8 @@ let currentHolidayData = []; // 현재 달 공휴일 목록 캐시
 // 페이지 로딩 시 동작
 // ==========================
 $(document).ready(function () {
-    initEventBindings();   // 전체 이벤트 바인딩
-    loadCountries();       // 처음 국가 목록 불러오기
+    initEventBindings(); // 전체 이벤트 바인딩
+    loadCountries(); // 처음 국가 목록 불러오기
     drawHolidayCalendar([]);
 
     initPortFromQuery();
@@ -171,24 +171,20 @@ function loadTimezone(country) {
             hour: '2-digit', minute: '2-digit', hour12: true
         });
 
-        $("#timezoneCard").html(`
-        <h3>🕓 시차 정보</h3>
-        <div style="margin-bottom:10px;">
-        <strong>🇰🇷 한국</strong><br/>${koreaTime} (UTC+09:00)
-        </div>
-        <div>
-        <strong>🌍 ${data.countryName}</strong><br/>
-        ${data.dayOfWeek}, ${data.currentTime} (UTC${data.utcOffset})
-        </div>
-    `);
+        $("#koreaTime").text(koreaTime);
+        $("#countryName").text(data.countryName);
+        $("#foreignTime").text(`${data.dayOfWeek}, ${data.currentTime}`);
+        $("#foreignUtc").text(`UTC${data.utcOffset}`);
     });
 }
 // 공휴일 + 달력
 function loadHoliday(country) {
     $.get(`/api/info/holiday/${country}`, function (data) {
         if (Array.isArray(data) && data.length > 0) {
+            currentHolidayData = data;
             drawHolidayCalendar(data);
         } else {
+            currentHolidayData = [];
             drawHolidayCalendar([]);
         }
     });
@@ -202,11 +198,11 @@ function drawHolidayCalendar(holidays) {
     const lastDate = new Date(year, month + 1, 0).getDate();
     const holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
 
-    // 월 이동 UI
-    const monthTitle = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <button onclick="prevMonth()"> ◀ </button>
-        <strong style="font-size:16px;">${currentYear}년 ${currentMonth + 1}월</strong>
-        <button onclick="nextMonth()"> ▶ </button>
+    // 월 이동 UI (HTML 템플릿)
+    const monthTitle = `<div class="calendar-header">
+ <button onclick="prevMonth()"> ◀ </button>
+ <strong>${currentYear}년 ${currentMonth + 1}월</strong>
+ <button onclick="nextMonth()"> ▶ </button>
     </div>`;
 
     let calendarHTML = `<table class="calendar-table"><thead><tr>`;
@@ -238,10 +234,10 @@ function drawHolidayCalendar(holidays) {
     }
 
     calendarHTML += `</tr></tbody></table>`;
-    $("#holidayCalendarContainer").html(calendarHTML);
+    $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
 
-    const todayText = `${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
-    $("#todayText").html(`<p style="margin-bottom: 10px;"><strong> 오늘 날짜:</strong> ${todayText}</p>`);
+    const todayText = `<strong>오늘 날짜:</strong> ${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
+    $("#todayText").html(`<p>${todayText}</p>`);
 }
 
 // 이전 / 다음 달 이동 함수
@@ -269,30 +265,24 @@ function loadWeather(lat, lon) {
         let rainVolume = parseFloat(data.rainVolume);
         if (isNaN(rainVolume)) rainVolume = 0;
 
-        $("#weatherCard").html(`
-        <h3>🌤 날씨</h3>
-        <p>온도: ${data.temperature}°C</p>
-        <p>날씨: ${data.mainWeather} ${data.weatherEmoji}</p>
-        <p>풍속: ${data.windSpeed} m/s</p>
-        <p>풍향: ${data.windDirLabel} (${data.windDeg}°)</p>
-        <p>💧 강수량: ${rainVolume} mm</p>
-    `);
+        $("#temperature").text(data.temperature + "°C");
+        $("#mainWeather").text(data.mainWeather + " " + data.weatherEmoji);
+        $("#windSpeed").text(data.windSpeed + " m/s");
+        $("#windDirLabel").text(data.windDirLabel + " (" + data.windDeg + "°)");
+        $("#rainVolume").text(rainVolume + " mm");
     });
 }
 
 // 혼잡도 카드
 function loadDocking(portId) {
     $.get(`/api/info/docking/${portId}`, function (data) {
-        const colorText = data.congestionLevel === "혼잡" ? "🟠 혼잡"
+        const congestionText = data.congestionLevel === "혼잡" ? "🟠 혼잡"
             : data.congestionLevel === "매우 혼잡" ? "🔴 매우 혼잡"
                 : "🟢 원활";
 
-        $("#dockingCard").html(`
-        <h3>⚓ 혼잡도</h3>
-        <p>정박 선박 수: ${data.currentShips}</p>
-        <p>입항 예정 수: ${data.expectedShips}</p>
-        <p>상태: ${colorText}</p>
-    `);
+        $("#currentShips").text(data.currentShips);
+        $("#expectedShips").text(data.expectedShips);
+        $("#congestionLevel").text(congestionText);
     });
 }
 
