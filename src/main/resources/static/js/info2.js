@@ -56,9 +56,11 @@ let currentHolidayData = []; // 현재 달 공휴일 목록 캐시
 // 페이지 로딩 시 동작
 // ==========================
 $(document).ready(function () {
-    initEventBindings();   // 전체 이벤트 바인딩
-    loadCountries();       // 처음 국가 목록 불러오기
+    initEventBindings(); // 전체 이벤트 바인딩
+    loadCountries(); // 처음 국가 목록 불러오기
     drawHolidayCalendar([]);
+
+    initPortFromQuery();
 });
 
 // ==========================
@@ -96,6 +98,48 @@ function initEventBindings() {
 // 3. 기능 함수들
 // ==========================
 
+// [ADDED] ✅ 딥링크 초기화: /port/info?port={portId}로 진입했을 때 자동 세팅
+function initPortFromQuery() {
+    const params = new URLSearchParams(location.search);
+    const portId = params.get('port');
+    if (!portId) return;
+
+    // 1) 포트 기본 정보 조회 (한글 국가/항구명 + 좌표 확보)
+    $.get(`/api/info/port/${encodeURIComponent(portId)}`, function (p) {
+        // p: { portId, countryNameKr, portNameKr, locLat, locLon, ... }
+
+        // 2) 국가 목록 로딩이 끝나면 해당 국가 선택
+        const waitCountries = setInterval(() => {
+            const $country = $("#countrySelect");
+            if ($country.children('option').length > 0) {
+                clearInterval(waitCountries);
+                $country.val(p.countryNameKr).trigger('change');
+
+                // 3) 항구 목록 로딩이 끝나면 해당 항구 선택
+                const waitPorts = setInterval(() => {
+                    const $opt = $(`#portSelect option[value='${portId}']`);
+                    if ($opt.length) {
+                        clearInterval(waitPorts);
+                        $("#portSelect").val(portId);
+
+                        // 4) 카드/그래프 로딩
+                        const coords = portCoordinates[p.portNameKr]; // 좌표 직접 관리 중이면 이렇게
+                        if (coords) {
+                            loadWeather(coords.lat, coords.lon);
+                        } else if (p.locLat && p.locLon) {
+                            loadWeather(p.locLat, p.locLon);
+                        }
+                        loadDocking(portId);
+                        loadDockingGraph(portId);
+                        loadTimezone(p.countryNameKr);
+                        loadHoliday(p.countryNameKr);
+                    }
+                }, 50);
+            }
+        }, 50);
+    });
+}
+
 // 국가 목록
 function loadCountries() {
     $.get("/api/info/countries", function (data) {
@@ -127,24 +171,20 @@ function loadTimezone(country) {
             hour: '2-digit', minute: '2-digit', hour12: true
         });
 
-        $("#timezoneCard").html(`
-        <h3>🕓 시차 정보</h3>
-        <div style="margin-bottom:10px;">
-        <strong>🇰🇷 한국</strong><br/>${koreaTime} (UTC+09:00)
-        </div>
-        <div>
-        <strong>🌍 ${data.countryName}</strong><br/>
-        ${data.dayOfWeek}, ${data.currentTime} (UTC${data.utcOffset})
-        </div>
-    `);
+        $("#koreaTime").text(koreaTime);
+        $("#countryName").text(data.countryName);
+        $("#foreignTime").text(`${data.dayOfWeek}, ${data.currentTime}`);
+        $("#foreignUtc").text(`UTC${data.utcOffset}`);
     });
 }
 // 공휴일 + 달력
 function loadHoliday(country) {
     $.get(`/api/info/holiday/${country}`, function (data) {
         if (Array.isArray(data) && data.length > 0) {
+            currentHolidayData = data;
             drawHolidayCalendar(data);
         } else {
+            currentHolidayData = [];
             drawHolidayCalendar([]);
         }
     });
@@ -158,11 +198,11 @@ function drawHolidayCalendar(holidays) {
     const lastDate = new Date(year, month + 1, 0).getDate();
     const holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
 
-    // 월 이동 UI
-    const monthTitle = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <button onclick="prevMonth()"> ◀ </button>
-        <strong style="font-size:16px;">${currentYear}년 ${currentMonth + 1}월</strong>
-        <button onclick="nextMonth()"> ▶ </button>
+    // 월 이동 UI (HTML 템플릿)
+    const monthTitle = `<div class="calendar-header">
+ <button onclick="prevMonth()"> ◀ </button>
+ <strong>${currentYear}년 ${currentMonth + 1}월</strong>
+ <button onclick="nextMonth()"> ▶ </button>
     </div>`;
 
     let calendarHTML = `<table class="calendar-table"><thead><tr>`;
@@ -194,10 +234,10 @@ function drawHolidayCalendar(holidays) {
     }
 
     calendarHTML += `</tr></tbody></table>`;
-    $("#holidayCalendarContainer").html(calendarHTML);
+    $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
 
-    const todayText = `${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
-    $("#todayText").html(`<p style="margin-bottom: 10px;"><strong> 오늘 날짜:</strong> ${todayText}</p>`);
+    const todayText = `<strong>오늘 날짜:</strong> ${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
+    $("#todayText").html(`<p>${todayText}</p>`);
 }
 
 // 이전 / 다음 달 이동 함수
@@ -225,30 +265,24 @@ function loadWeather(lat, lon) {
         let rainVolume = parseFloat(data.rainVolume);
         if (isNaN(rainVolume)) rainVolume = 0;
 
-        $("#weatherCard").html(`
-        <h3>🌤 날씨</h3>
-        <p>온도: ${data.temperature}°C</p>
-        <p>날씨: ${data.mainWeather} ${data.weatherEmoji}</p>
-        <p>풍속: ${data.windSpeed} m/s</p>
-        <p>풍향: ${data.windDirLabel} (${data.windDeg}°)</p>
-        <p>💧 강수량: ${rainVolume} mm</p>
-    `);
+        $("#temperature").text(data.temperature + "°C");
+        $("#mainWeather").text(data.mainWeather + " " + data.weatherEmoji);
+        $("#windSpeed").text(data.windSpeed + " m/s");
+        $("#windDirLabel").text(data.windDirLabel + " (" + data.windDeg + "°)");
+        $("#rainVolume").text(rainVolume + " mm");
     });
 }
 
 // 혼잡도 카드
 function loadDocking(portId) {
     $.get(`/api/info/docking/${portId}`, function (data) {
-        const colorText = data.congestionLevel === "혼잡" ? "🟠 혼잡"
+        const congestionText = data.congestionLevel === "혼잡" ? "🟠 혼잡"
             : data.congestionLevel === "매우 혼잡" ? "🔴 매우 혼잡"
                 : "🟢 원활";
 
-        $("#dockingCard").html(`
-        <h3>⚓ 혼잡도</h3>
-        <p>정박 선박 수: ${data.currentShips}</p>
-        <p>입항 예정 수: ${data.expectedShips}</p>
-        <p>상태: ${colorText}</p>
-    `);
+        $("#currentShips").text(data.currentShips);
+        $("#expectedShips").text(data.expectedShips);
+        $("#congestionLevel").text(congestionText);
     });
 }
 

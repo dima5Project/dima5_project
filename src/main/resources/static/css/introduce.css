@@ -107,18 +107,20 @@ img {
     display: flex;
     /* 제목/부제 간 간격 */
     flex-direction: column;
-    gap: 30px;
+    /* gap: 30px; */
+    margin-top: 80px;
 }
 
 /* 강한 타이틀 */
 .hero_title {
     font-size: 28px;
     font-weight: 700;
+    margin-bottom: 20px;
 }
 
 /* 보조 카피 */
 .hero_subtitle {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 500;
 }
 

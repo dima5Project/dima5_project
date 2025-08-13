@@ -1,0 +1,147 @@
+@charset "UTF-8";
+
+/* ================== 전체 레이아웃 및 기본 스타일 ================== */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+main {
+    max-width: 1040px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.qna-header-bg {
+    background-color: #0f1035;
+    height: 435px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.qna-header {
+    padding-top: 20vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+}
+
+.qna-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.qna-header p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #ddd;
+}
+
+/* ================== 테이블 스타일 (추가됨) ================== */
+.table-wrap {
+    max-width: 1040px;
+    margin: 40px auto 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+}
+
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+.tbl thead tr {
+    background-color: #f8f9fa;
+}
+
+.tbl th,
+.tbl td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.tbl th {
+    font-weight: 700;
+    color: #495057;
+}
+
+.tbl tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+.tbl a {
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.tbl a:hover {
+    text-decoration: underline;
+}
+
+.tbl .tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tbl .tag-done {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+}
+
+.tbl .tag-wait {
+    background-color: #fff3e0;
+    color: #ff6f00;
+}
+
+.tbl tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================== 페이지 하단 링크 스타일 ================== */
+.back-link-container {
+    max-width: 1040px;
+    margin: 20px auto;
+    text-align: right;
+    /* 이 부분이 중요합니다. 오른쪽으로 정렬됩니다. */
+}
+
+.back-link {
+    /* 버튼처럼 보이게 스타일 추가 */
+    display: inline-block;
+    /* 버튼 스타일을 적용하기 위해 inline-block으로 변경 */
+    padding: 10px 20px;
+    background-color: #ddd;
+    /* 버튼 배경색 */
+    color: #0f1035;
+    /* 글자색 */
+    text-decoration: none;
+    border-radius: 5px;
+    /* 모서리를 둥글게 */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    /* 호버 효과를 위한 transition */
+}
+
+.back-link:hover {
+    background-color: #e9ecef;
+    /* 호버 시 배경색 변경 */
+    text-decoration: none;
+    /* 호버 시 밑줄 제거 */
+}

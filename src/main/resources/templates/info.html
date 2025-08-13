@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
+
     <meta charset="UTF-8" />
     <title>항구 부가정보</title>
     <link rel="stylesheet" th:href="@{/css/info.css}" />
@@ -16,11 +17,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap"
         rel="stylesheet">
-
 </head>
 
 <body>
-    <!--  header.html 프래그먼트 포함 -->
     <div sec:authorize="isAnonymous()">
         <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
     </div>
@@ -28,38 +27,92 @@
         <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
     </div>
 
+    <div class="info-header-bg">
+        <section class="info-header">
+            <h2>항구 부가정보</h2>
+            <p>항구에 대한 다양한 정보들을 한 눈에 확인해보세요</p>
+        </section>
+    </div>
+
     <main>
-        <!-- 검색 선택 -->
-        <div style="margin-bottom: 100px;">
+        <div class="search-container">
             <select id="countrySelect"></select>
             <select id="portSelect"></select>
             <button id="searchBtn">검색</button>
         </div>
 
-        <!-- 부가정보 레이아웃 -->
         <div class="extra-info-container">
-            <!-- 1행 -->
             <div class="row">
                 <div class="map-box">
                     <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
                 </div>
-                <div class="info-card" id="dockingCard"></div>
+                <div class="info-card" id="dockingCard">
+                    <h3>⚓ 혼잡도</h3>
+                    <div class="docking-grid">
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="currentShips">로딩 중</span>
+                            </div>
+                            <span>정박 선박 수</span>
+                        </div>
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="expectedShips">로딩 중</span>
+                            </div>
+                            <span>입항 예정 수</span>
+                        </div>
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="congestionLevel">로딩 중</span>
+                            </div>
+                            <span>상태</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- 2+3행 전체 -->
             <div class="row content-row">
-                <!-- 날씨 카드 (2행+3행 통합 높이) -->
-                <div class="info-card tall-weather" id="weatherCard"></div>
+                <div class="info-card tall-weather" id="weatherCard">
+                    <h3>🌤 날씨</h3>
+                    <p>온도: <span id="temperature">로딩 중...</span></p>
+                    <p>날씨: <span id="mainWeather">로딩 중...</span></p>
+                    <p>풍속: <span id="windSpeed">로딩 중...</span></p>
+                    <p>풍향: <span id="windDirLabel">로딩 중...</span></p>
+                    <p>강수량: <span id="rainVolume">로딩 중...</span></p>
+                </div>
 
-                <!-- 오른쪽 : 그래프 + 하단 2칸 -->
                 <div class="col-2">
                     <div class="info-card" id="chartCard">
                         <canvas id="graphCanvas" height="180"></canvas>
                     </div>
 
                     <div class="row inner-row">
-                        <div class="info-card" id="timezoneCard"></div>
+                        <div class="info-card" id="timezoneCard">
+                            <h3>시차 정보</h3>
+
+                            <!-- 한국 -->
+                            <div class="tz-block">
+                                <span class="tz-badge">KR 한국</span><br />
+                                <div id="koreaTime" class="tz-time">로딩 중</div>
+                                <div class="tz-date">
+                                    <span class="utc">UTC+09:00</span>
+                                </div>
+                            </div>
+
+                            <div class="tz-sep"></div>
+
+                            <!-- 해외 -->
+                            <div class="tz-block">
+                                <span class="tz-badge" id="countryName">로딩중</span><br />
+                                <div id="foreignTime" class="tz-time">로딩중</div>
+                                <div class="tz-date">
+                                    <span class="utc" id="foreignUtc">로딩중</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="info-card" id="holidayCard">
+                            <h3>공휴일 달력</h3>
                             <div id="todayText"></div>
                             <div id="holidayCalendarContainer"></div>
                         </div>
@@ -69,9 +122,7 @@
         </div>
     </main>
 
-    <!-- footer fragment -->
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
-
 </body>
 
 </html>

@@ -1,3 +1,104 @@
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+main {
+    max-width: 1150px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.info-header-bg {
+    background-color: #0f1035;
+    height: 435px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-header {
+    padding-top: 20vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: white;
+}
+
+.info-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.info-header p {
+    font-size: 18px;
+    font-weight: 500;
+    color: #ddd;
+}
+
+/* ================== 검색 구역 스타일 ================== */
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.search-container select,
+.search-container button {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.search-container select {
+    border: 1px solid #ddd;
+    background-color: #fefefe;
+    color: #555;
+    min-width: 150px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+.search-container select:hover {
+    border-color: #a0a0a0;
+}
+
+.search-container button {
+    background-color: #0f1035;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-container button:hover {
+    background-color: #2b2e53;
+    transform: translateY(-2px);
+}
+
+/*카드 및 컨테이너 스타일*/
+
 .extra-info-container {
     display: flex;
     flex-direction: column;
@@ -22,15 +123,44 @@
 .info-card {
     border: 1px solid #aaa;
     border-radius: 12px;
-    padding: 16px;
+    padding: 20px;
     background-color: #fefefe;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* 그림자 효과 강화 */
     flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #0f1035;
+    border-bottom: 2px solid #0f1035;
+    padding-bottom: 8px;
+}
+
+.info-card p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+    margin: 4px 0;
+}
+
+.info-card p span {
+    font-weight: 600;
+    color: #111;
 }
 
 .tall-weather {
     flex: 1;
     min-height: 380px;
+}
+
+/* 그래프 카드 크기 고정 */
+#chartCard {
+    height: 300px;
 }
 
 .col-2 {
@@ -42,10 +172,12 @@
 
 .map-box {
     width: 220px;
-    height: 180px;
+    height: 257px;
     border-radius: 12px;
     background-color: #eee;
     overflow: hidden;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .map-img {
@@ -54,17 +186,171 @@
     object-fit: cover;
 }
 
+/* ⚓ 혼잡도 카드 스타일 */
+#dockingCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#dockingCard h3 {
+    margin-bottom: 18px;
+    border-bottom: 2px solid #232323;
+    padding-bottom: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f1035;
+}
+
+.docking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+}
+
+.docking-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.docking-info:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 80%;
+    background-color: #eee;
+}
+
+.status-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e6f7ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: #0f1035;
+    border: 1px solid #cceeff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-circle span {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.docking-info span {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* ================== 시차 정보 카드 추가 스타일 ================== */
+#timezoneCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#timezoneCard h3 {
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #232323;
+    /* 시안처럼 진한 구분선 */
+}
+
+/* 각 블록(한국/해외) */
+#timezoneCard .tz-block {
+    text-align: center;
+    padding: 12px 8px 18px;
+}
+
+/* 상·하 블록 사이 구분선 */
+#timezoneCard .tz-sep {
+    height: 1.5px;
+    background: #232323;
+    margin: 6px 0 14px;
+    border-radius: 1px;
+}
+
+/* 파란 알약 배지 */
+#timezoneCard .tz-badge {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    background: #81B4FF;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* 큰 시각 */
+#timezoneCard .tz-time {
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 600;
+    color: #111;
+    margin: 6px 0 8px;
+}
+
+/* 날짜 + UTC 줄 */
+#timezoneCard .tz-date {
+    font-size: 18px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+#timezoneCard .tz-date .utc {
+    margin-left: 6px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+
+/* 📅 달력 스타일 */
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+
+
+.calendar-header strong {
+    font-size: 16px;
+}
+
+
+
 .calendar-table {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
 }
 
+
+
 .calendar-table th {
     color: #444;
     font-size: 14px;
     padding-bottom: 6px;
 }
+
+
 
 .calendar-table td {
     text-align: center;
@@ -75,6 +361,8 @@
     color: #111;
 }
 
+
+
 .calendar-date.today {
     background-color: #ffecec;
     border-radius: 50%;
@@ -82,107 +370,19 @@
     color: #d60000;
 }
 
+
+
 .calendar-date .dot {
     width: 6px;
     height: 6px;
     background-color: #b48ced;
     border-radius: 50%;
     margin: 2px auto 0 auto;
+
 }
 
-/* 추가한 css */
+/* 오늘 날짜 표시 */
 
-/* 전체 레이아웃 컨테이너 */
-.extra-info-container {
-    display: flex;
-    flex-direction: column;
-    /* 자식 요소들을 세로로 정렬 */
-    gap: 20px;
-    /* 행과 행 사이의 간격 */
-    max-width: 1200px;
-    /* 전체 컨테이너 최대 너비 */
-    margin: 0 auto;
-    /* 중앙 정렬 */
-    padding: 20px;
-}
-
-/* 행(row) 스타일 */
-.row {
-    display: flex;
-    gap: 20px;
-    /* 카드들 사이의 간격 */
-    width: 100%;
-}
-
-/* 콘텐츠 행(2+3행) */
-.row.content-row {
-    align-items: stretch;
-    /* 모든 카드의 높이를 맞춤 */
-}
-
-/* 지도 박스 */
-.map-box {
-    flex: 1;
-    /* 남은 공간을 모두 차지 */
-    background-color: #f0f0f0;
-    /* 예시 배경색 */
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.map-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* 정보 카드 공통 스타일 */
-.info-card {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 도킹 카드와 그래프 카드는 남은 공간을 균등하게 나눠 가짐 */
-#dockingCard,
-#chartCard {
-    flex: 1;
-}
-
-/* 날씨 카드 (높이를 2행, 3행에 걸쳐서 사용) */
-.tall-weather {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    min-height: 400px;
-    /* 최소 높이 설정 (가운데 정렬을 위해 필요) */
-}
-
-/* 오른쪽 컬럼 (그래프 + 하단 2개) */
-.col-2 {
-    display: flex;
-    flex-direction: column;
-    flex: 2;
-    /* 오른쪽 컬럼이 더 넓게 차지 */
-    gap: 20px;
-}
-
-/* 오른쪽 컬럼 하단 2칸 */
-.inner-row {
-    display: flex;
-    gap: 20px;
-}
-
-/* 개별 카드 너비 설정 */
-#timezoneCard {
-    flex: 1;
-}
-
-#holidayCard {
-    flex: 1;
+#todayText p {
+    margin-bottom: 10px;
 }
