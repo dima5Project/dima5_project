@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.dima.dima5_project.dto.*;
 import net.dima.dima5_project.entity.PortNameEntity;
 import net.dima.dima5_project.service.*;
+import net.dima.dima5_project.support.PortCoordinates;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class InfoController {
     private final PortDockingService portDockingService;
     private final HolidayService holidayService;
     private final PortInfoService portInfoService;
+    private final PortCoordinates portCoordinates; // 좌표 레지스트리 주입
 
     // 1. 혼잡도 (정박 + 입항 예정)
     @GetMapping("/docking/{portId}")
@@ -63,5 +65,43 @@ public class InfoController {
                 .stream()
                 .map(p -> new PortSimpleDTO(p.getPortId(), p.getPortNameKr()))
                 .toList();
+    }
+
+    @GetMapping("/port/{portId}")
+    public PortNameDTO getPort(@PathVariable String portId) {
+        return portInfoService.getPortById(portId); // PortInfo + PortName 조인해서 PortNameDTO 반환 (locLat/locLon 포함)
+    }
+
+    @GetMapping("/hover/{portId}")
+    public PortHoverDTO getHover(@PathVariable String portId) {
+        // 1) 기본 메타 (PortInfo + PortName 조합)
+        PortNameDTO base = portInfoService.getPortById(portId);
+
+        // 2) 좌표(직접 입력 레지스트리)
+        var coord = portCoordinates.getByKoName(base.getPortNameKr());
+        if (coord == null) {
+            throw new IllegalArgumentException("좌표 없음: " + base.getPortNameKr());
+        }
+
+        // 3) 동적 데이터
+        var docking = portDockingService.getLatestDockingInfo(portId); // current/expected + congestionLevel
+        var timezone = timeZoneService.getTimezone(base.getCountryNameKr()); // utcOffset/currentTime/dayOfWeek
+        var weather = weatherService.getWeatherByCoords(coord.lat(), coord.lon()); // temp/wind/emoji
+
+        // (선택) 오늘 공휴일 표시를 원하면 포함
+        var holiday = holidayService.getTodayHolidayByCountry(base.getCountryNameKr()); // null일 수 있음
+
+        // 4) 조립
+        PortHoverDTO dto = new PortHoverDTO();
+        dto.setPortId(portId);
+        dto.setCountryNameKr(base.getCountryNameKr());
+        dto.setPortNameKr(base.getPortNameKr());
+        dto.setLat(coord.lat());
+        dto.setLon(coord.lon());
+        dto.setWeather(weather);
+        dto.setDocking(docking);
+        dto.setTimezone(timezone);
+        dto.setTodayHoliday(holiday);
+        return dto;
     }
 }

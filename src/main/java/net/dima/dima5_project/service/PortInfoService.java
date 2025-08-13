@@ -120,4 +120,11 @@ public class PortInfoService {
                                         .build();
                 }).toList();
         }
+
+        public PortNameDTO getPortById(String portId) {
+                PortNameEntity e = portNameRepository.findById(portId)
+                                .orElseThrow(() -> new RuntimeException("포트 정보 없음: " + portId));
+                return PortNameDTO.toDTO(e);
+        }
+
 }

@@ -1,6 +1,3 @@
-/* portpredict.html */
-
-/* 페이지 전체 마진 제거용 */
 :root {
     --header-h: 80px;
 }
@@ -547,6 +544,18 @@ html {
     pointer-events: none;
 }
 
+/* 조회 후 입력창 완전 잠금 */
+.sidebar__input.is-locked {
+    pointer-events: none;
+    /* 클릭/포커스 자체 차단 */
+    user-select: none;
+    /* 드래그/선택 금지 */
+    caret-color: transparent;
+    /* 커서 숨김 */
+    cursor: not-allowed;
+    /* 커서 금지 표시 */
+}
+
 /* 초기화 btn */
 .sidebar__btn {
     height: var(--h);
@@ -803,15 +812,15 @@ html {
     --ring: 7px;
     --gutter: 100px;
     --pad: 16px;
-    /* ← 왼쪽 컬럼(점선/원형 자리) */
     --line-x: 48px;
-    /* 점선의 x 위치 (gutter 안쪽 기준) */
     --pill-h: 24px;
     --chip-h: var(--pill-h);
     --col-gap: 12px;
     --font: 12px;
     padding: 10px 16px 16px 16px;
     --label-col: 68px;
+    /* ↓ 마지막 원 아래로 더 내려가는 점선 길이 보정값(필요시 0~8px 정도 조절) */
+    --line-trim: 6px;
 }
 
 /* 왼쪽에 전용 컬럼 확보 */
@@ -820,6 +829,7 @@ html {
     padding-left: calc(var(--pad) + var(--node) + var(--col-gap));
     position: relative;
     margin: 0;
+    padding-bottom: 0;
 }
 
 /* 세로 점선(왼쪽 컬럼 중앙쯤) */
@@ -827,11 +837,12 @@ html {
     content: "";
     position: absolute;
     left: calc(var(--pad) + (var(--node) / 2));
-    top: 0;
-    bottom: 0;
+    /* 시작점: 첫 번째 원 중앙 */
+    top: calc(var(--node) / 2);
+    /* 끝점: 컨테이너 바닥에서 '마지막 원의 반지름 + 보정'만큼 위 */
+    bottom: calc((var(--node) / 2) + var(--line-trim));
     border-right: 2px dotted #7FC7D9;
     opacity: .9;
-    transform: none;
     z-index: 0;
 }
 
@@ -846,7 +857,6 @@ html {
     position: absolute;
     left: 0;
     /* 점선 위치로 이동 */
-    transform: translateX(calc(-1 * (var(--col-gap) + (var(--node)/2)) - 21px));
     top: 0;
     width: var(--node);
     height: var(--node);
@@ -860,8 +870,8 @@ html {
     padding: 0;
     line-height: 0;
     box-sizing: content-box;
-    transition: background .18s ease, box-shadow .18s ease;
-    /* 부드럽게 전환 */
+    transform: translateX(calc(-1 * (var(--col-gap) + (var(--node)/2)) - 21px)) scale(var(--pop, 1));
+    transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 
 /* 활성: 그림자 제거 + 단색(원하면 색 바꿔도 됨) */
@@ -870,6 +880,12 @@ html {
     /* 단색 배경 */
     box-shadow: none;
     /* 링 제거 */
+    --pop: 1.04;
+}
+
+/* 클릭 애니메이션(팝)용 클래스 */
+.voy-node.is-pop {
+    --pop: 1.10;
 }
 
 /* 아이콘 크기 */
@@ -906,6 +922,18 @@ html {
     filter: brightness(0) saturate(100%) invert(11%) sepia(97%) saturate(5813%) hue-rotate(210deg) brightness(95%) contrast(101%);
 }
 
+/* 접근성: 동작 줄이기 선호 시 확대 애니메이션 비활성화 */
+@media (prefers-reduced-motion: reduce) {
+    .voy-node {
+        transition: background .18s ease, box-shadow .18s ease;
+    }
+
+    .voy-node:active,
+    .voy-node.is-pop {
+        --pop: 1;
+    }
+}
+
 
 .voy-rows,
 .voy-row {
@@ -923,6 +951,11 @@ html {
     align-items: center;
     gap: 4px;
     margin-bottom: 6px;
+}
+
+/* 마지막 아이템 아래 여백 제거(점선 더 짧게) */
+.voy-item:last-child .voy-rows {
+    margin-bottom: 0;
 }
 
 /* 소제목 */
@@ -1039,6 +1072,138 @@ html {
     color: #fff;
     border-color: #013895;
     cursor: pointer;
+}
+
+
+/* ── 목적항 Hover, 박스 내용 ───────────────────────────── */
+.port-hover-card {
+    min-width: 160px;
+    max-width: 208px;
+    background: #fff;
+    border-radius: 9.6px;
+    box-shadow: 0 9.6px 22.4px rgba(0, 0, 0, .18);
+    border: 0.8px solid rgba(2, 32, 71, .064);
+    overflow: visible;
+    /*내용이 카드 밖으로 넘치지 않게*/
+    font-family: inherit;
+    color: #0b1736;
+    position: relative;
+}
+
+/* 카드 상단 제목 영역 (항구명) */
+.port-hover-card__hd {
+    padding: 6px 11.2px 4px;
+    font-weight: 700;
+    font-size: 14.4px;
+    letter-spacing: .16px;
+    /*글자 간격 조정*/
+    color: #0b1736;
+}
+
+/*제목과 내용 구분하는 가로 줄*/
+.port-hover-card__divider {
+    height: 0.8px;
+    background: rgba(2, 32, 71, .064);
+    margin: 0 9.6px;
+}
+
+/*카드 본문(내용) 영역 전체*/
+.port-hover-card__bd {
+    padding: 6px 8px 6px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+/*한 줄 정보(아이콘, 라벨, 값) 묶음*/
+.port-row {
+    display: grid;
+    grid-template-columns: 17.6px 1fr auto;
+    align-items: center;
+    column-gap: 8px;
+    font-size: 11.2px;
+}
+
+/* 줄 왼쪽 동그란 아이콘*/
+.port-row__icon {
+    width: 17.6px;
+    height: 17.6px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: #eef3ff;
+    color: #0f3c9a;
+    font-size: 10.4px;
+}
+
+/*정보 라벨(예: "바람", "날씨")*/
+.port-row__label {
+    color: #2a3447;
+    font-weight: 700;
+}
+
+/*정보 값(예: "3.2 m/s · 180° (S)")*/
+.port-row__val {
+    color: #0b1736;
+    font-weight: 700;
+}
+
+/* 혼잡도 뱃지 (원활 > 보통 > 매우 혼잡) */
+.cong-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4.8px;
+}
+
+.cong--low {
+    background: #2ecc71;
+}
+
+.cong--mid {
+    background: #f1c40f;
+}
+
+.cong--high {
+    background: #e74c3c;
+}
+
+/* 작은 보조 텍스트 "(S)",
+ "(UTC+3)" */
+.subtle {
+    color: #5b6474;
+    font-weight: 600;
+    font-size: 9.6px;
+}
+
+/* Mapbox 기본 팝업 틀 숨기기 */
+.mapboxgl-popup-content {
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.mapboxgl-popup-tip {
+    display: none !important;
+    /* 기본 세모도 숨김 */
+}
+
+/* 카드 아래 세모 */
+.port-hover-card::after {
+    content: '';
+    position: absolute;
+    bottom: -6.4px;
+    /* 카드 밑으로 조금 나오게 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6.4px solid transparent;
+    border-right: 6.4px solid transparent;
+    border-top: 6.4px solid #fff;
+    /* 카드 배경색과 동일하게 */
 }
 
 
