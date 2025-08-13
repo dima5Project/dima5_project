@@ -59,6 +59,8 @@ $(document).ready(function () {
     initEventBindings();   // 전체 이벤트 바인딩
     loadCountries();       // 처음 국가 목록 불러오기
     drawHolidayCalendar([]);
+
+    initPortFromQuery();
 });
 
 // ==========================
@@ -95,6 +97,48 @@ function initEventBindings() {
 // ==========================
 // 3. 기능 함수들
 // ==========================
+
+// [ADDED] ✅ 딥링크 초기화: /port/info?port={portId}로 진입했을 때 자동 세팅
+function initPortFromQuery() {
+    const params = new URLSearchParams(location.search);
+    const portId = params.get('port');
+    if (!portId) return;
+
+    // 1) 포트 기본 정보 조회 (한글 국가/항구명 + 좌표 확보)
+    $.get(`/api/info/port/${encodeURIComponent(portId)}`, function (p) {
+        // p: { portId, countryNameKr, portNameKr, locLat, locLon, ... }
+
+        // 2) 국가 목록 로딩이 끝나면 해당 국가 선택
+        const waitCountries = setInterval(() => {
+            const $country = $("#countrySelect");
+            if ($country.children('option').length > 0) {
+                clearInterval(waitCountries);
+                $country.val(p.countryNameKr).trigger('change');
+
+                // 3) 항구 목록 로딩이 끝나면 해당 항구 선택
+                const waitPorts = setInterval(() => {
+                    const $opt = $(`#portSelect option[value='${portId}']`);
+                    if ($opt.length) {
+                        clearInterval(waitPorts);
+                        $("#portSelect").val(portId);
+
+                        // 4) 카드/그래프 로딩
+                        const coords = portCoordinates[p.portNameKr]; // 좌표 직접 관리 중이면 이렇게
+                        if (coords) {
+                            loadWeather(coords.lat, coords.lon);
+                        } else if (p.locLat && p.locLon) {
+                            loadWeather(p.locLat, p.locLon);
+                        }
+                        loadDocking(portId);
+                        loadDockingGraph(portId);
+                        loadTimezone(p.countryNameKr);
+                        loadHoliday(p.countryNameKr);
+                    }
+                }, 50);
+            }
+        }, 50);
+    });
+}
 
 // 국가 목록
 function loadCountries() {

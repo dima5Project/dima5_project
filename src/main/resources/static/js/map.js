@@ -81,6 +81,43 @@ document.addEventListener("DOMContentLoaded", () => {
         offset: 35
     });
 
+    // [ADDED] 백엔드 Hover API 호출 + 캐시(TTL)
+    const hoverCache = new Map();
+    const HOVER_TTL_MS = 60000;
+    async function fetchHoverDTO(portId) {
+        const now = Date.now();
+        const cached = hoverCache.get(portId);
+        if (cached && (now - cached.t) < HOVER_TTL_MS) return cached.v;
+        const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('hover API 실패: ' + portId);
+        const data = await res.json();
+        hoverCache.set(portId, { t: now, v: data });
+        return data;
+    }
+
+    // [ADDED] DTO → 기존 카드 파라미터로 매핑(최소 변경용 어댑터)
+    function mapHoverDtoToCardParams(dto) {
+        const w = dto.weather || {};
+        const dock = dto.docking || {};
+        const tz = dto.timezone || {};
+        // 혼잡도 등급을 기존(high/mid/low)로 매핑
+        const congLevel = (dock.congestionLevel || '').trim();
+        const congestion =
+            congLevel === '매우 혼잡' ? 'high' :
+                congLevel === '혼잡' ? 'mid' :
+                    'low';
+
+        return {
+            portId: dto.portNameKr || dto.portId,
+            windSpdMS: w.windSpeed,
+            windDirDeg: w.windDeg,
+            tempC: w.temperature,
+            congestion,
+            tzText: tz.utcOffset
+        };
+    }
+
+
     // ─────────────────────────────────────────
     // 1) SVG 로드/마커 element 생성
     // ─────────────────────────────────────────
@@ -140,15 +177,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 el.classList.add('bump');
                 setTimeout(() => el.classList.remove('bump'), 180);
 
-                const pid = f.properties?.port_id ?? 'Unknown Port';
-                const locLa = f.properties?.loc_lat ?? lat;
-                const locLo = f.properties?.loc_lon ?? lng;
+                // const pid = f.properties?.port_id ?? 'Unknown Port';
+                // const locLa = f.properties?.loc_lat ?? lat;
+                // const locLo = f.properties?.loc_lon ?? lng;
+
+                const portId = f.properties?.port_id || '';
+                if (!portId) return;
 
                 new mapboxgl.Popup()
                     .setLngLat([lng, lat])
                     .setHTML(`<div style="font-weight:700">${pid}</div>
                     <div style="font-size:12px;color:#666">(${locLa}, ${locLo})</div>`)
                     .addTo(map);
+
+                // 1초 후 페이지 이동
+                setTimeout(() => {
+                    window.location.href = `/port/info?port=${encodeURIComponent(portId)}`;
+                }, 1000);
             });
 
             // 마커 추가
@@ -156,21 +201,49 @@ document.addEventListener("DOMContentLoaded", () => {
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-            // ⬇ Hover 카드: 마커 생성 직후에 연결
+            // ⬇ Hover 카드: 마커 생성 직후에 연결 (이 블록만 교체)
             el.addEventListener('mouseenter', async () => {
                 const pid = f.properties?.port_id || 'Unknown';
-                const meta = await ensurePortMeta(pid, lng, lat);
-                const html = buildPortHoverCardHTML({
-                    portId: pid,
-                    windSpdMS: meta.windSpdMS,
-                    windDirDeg: meta.windDirDeg,
-                    tempC: meta.tempC,
-                    congestion: meta.congestion,
-                    tzText: meta.tzText
-                });
-                hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
+
+                try {
+                    const dto = await fetchHoverDTO(pid);
+                    const cardParams = mapHoverDtoToCardParams(dto);
+                    const html = buildPortHoverCardHTML(cardParams);
+                    hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
+                } catch (e) {
+                    console.error('HOVER API ERROR for', pid, e);
+                    const html = `
+      <div class="port-hover-card">
+        <div class="port-hover-card__hd">${pid}</div>
+        <div class="port-hover-card__divider"></div>
+        <div class="port-hover-card__bd">
+          <div class="port-row__val" style="padding:8px 0;">데이터를 불러오지 못했습니다.</div>
+        </div>
+      </div>`;
+                    hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
+                }
             });
+
             el.addEventListener('mouseleave', () => hoverPopup.remove());
+
+            // ✅ 클릭: 부가정보 페이지로 이동 (/port/info?port={portId})
+            el.addEventListener('click', (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                el.classList.add('bump');
+                setTimeout(() => el.classList.remove('bump'), 180);
+
+                const portId = f.properties?.port_id || '';
+                if (!portId) return;
+
+                // 필요하면 잠깐 팝업 유지 후 이동하려면 setTimeout으로 지연
+                // setTimeout(() => {
+                //   window.location.assign(`/port/info?port=${encodeURIComponent(portId)}`);
+                // }, 800);
+
+                window.location.assign(`/port/info?port=${encodeURIComponent(portId)}`);
+            });
         });
     }
 
@@ -197,10 +270,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 .setLngLat([129.040, 35.106])
                 .setHTML(`<div style="font-weight:700">Busan Port</div>
                   <div style="font-size:12px;color:#666">(35.106, 129.040)</div>`)
-                .addTo(map);
+                .addTo(map); setTimeout
         });
         new mapboxgl.Marker({ element: busanEl, anchor: 'bottom' })
             .setLngLat([129.040, 35.106])
             .addTo(map);
     });
 });
+
