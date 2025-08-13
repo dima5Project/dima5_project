@@ -15,7 +15,7 @@ main {
 
 .qna-header-bg {
     background-color: #0f1035;
-    height: 350px;
+    height: 435px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -44,7 +44,7 @@ main {
 /* ===== 공통 레이아웃 ===== */
 .mypage {
     max-width: 1040px;
-    margin: 40px auto 80px;
+    margin: 60px auto 80px;
     /* 위쪽 40px, 아래쪽 80px */
     padding: 0 20px;
     position: relative;
