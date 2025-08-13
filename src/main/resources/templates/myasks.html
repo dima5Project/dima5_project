@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8" />
@@ -18,7 +18,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 
-<div>
+<body>
     <div sec:authorize="isAnonymous()">
         <div th:replace="~{fragment/header :: bu3_navigation}"></div>
     </div>
@@ -72,6 +72,6 @@
     </div>
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
-    </body>
+</body>
 
 </html>

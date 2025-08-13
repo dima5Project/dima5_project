@@ -27,6 +27,13 @@
         <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
     </div>
 
+    <div class="info-header-bg">
+        <section class="info-header">
+            <h2>항구 부가정보</h2>
+            <p>항구에 대한 다양한 정보들을 한 눈에 확인해보세요</p>
+        </section>
+    </div>
+
     <main>
         <div class="search-container">
             <select id="countrySelect"></select>
@@ -41,9 +48,26 @@
                 </div>
                 <div class="info-card" id="dockingCard">
                     <h3>⚓ 혼잡도</h3>
-                    <p>정박 선박 수: <span id="currentShips">로딩 중...</span></p>
-                    <p>입항 예정 수: <span id="expectedShips">로딩 중...</span></p>
-                    <p>상태: <span id="congestionLevel">로딩 중...</span></p>
+                    <div class="docking-grid">
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="currentShips">로딩 중</span>
+                            </div>
+                            <span>정박 선박 수</span>
+                        </div>
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="expectedShips">로딩 중</span>
+                            </div>
+                            <span>입항 예정 수</span>
+                        </div>
+                        <div class="docking-info">
+                            <div class="status-circle">
+                                <span id="congestionLevel">로딩 중</span>
+                            </div>
+                            <span>상태</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -65,15 +89,28 @@
                     <div class="row inner-row">
                         <div class="info-card" id="timezoneCard">
                             <h3>시차 정보</h3>
-                            <div>
-                                <strong>🇰🇷 한국</strong><br />
-                                <span id="koreaTime">로딩 중...</span> (UTC+09:00)
+
+                            <!-- 한국 -->
+                            <div class="tz-block">
+                                <span class="tz-badge">KR 한국</span><br />
+                                <div id="koreaTime" class="tz-time">로딩 중</div>
+                                <div class="tz-date">
+                                    <span class="utc">UTC+09:00</span>
+                                </div>
                             </div>
-                            <div>
-                                <strong><span id="countryName">로딩중...</span></strong><br />
-                                <span id="foreignTime">로딩 중...</span> (<span id="foreignUtc">로딩 중...</span>)
+
+                            <div class="tz-sep"></div>
+
+                            <!-- 해외 -->
+                            <div class="tz-block">
+                                <span class="tz-badge" id="countryName">로딩중</span><br />
+                                <div id="foreignTime" class="tz-time">로딩중</div>
+                                <div class="tz-date">
+                                    <span class="utc" id="foreignUtc">로딩중</span>
+                                </div>
                             </div>
                         </div>
+
                         <div class="info-card" id="holidayCard">
                             <h3>공휴일 달력</h3>
                             <div id="todayText"></div>
