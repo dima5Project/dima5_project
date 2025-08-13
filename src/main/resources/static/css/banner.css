@@ -44,9 +44,21 @@ body {
   display: block;
 }
 
+/* 검은색 오버레이 */
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  /* 투명도 0.2 */
+  z-index: 1;
+}
+
 .hero-text {
   position: absolute;
-  top: 40%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: #000;
@@ -54,16 +66,21 @@ body {
   width: 100%;
   padding: 0 20px;
   box-sizing: border-box;
+  z-index: 2;
+  /* 오버레이보다 위 */
 }
 
 .hero-text .subheading {
   font-size: 34px;
+  color: #ffffff;
   font-weight: 400;
   margin-bottom: 10px;
 }
 
 .hero-text h1 {
-  color: #000;
+  /* color: #000; */
+  /* color: #e1e4e8; */
+  color: #ffffff;
   font-size: 56px;
   font-weight: 700;
   margin: 0 0 100px 0;
@@ -83,7 +100,7 @@ body {
   gap: 10px;
   flex-shrink: 0;
   /*버튼이 다른 요소 때문에 너비가 줄어들지 않도록 고정*/
-  background-color: #0F1035;
+  background-color: #002d7a;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -95,7 +112,7 @@ body {
 }
 
 .start-btn:hover {
-  background: #013895;
+  background: #0050da;
 }
 
 .start-btn:link,
@@ -110,7 +127,8 @@ body {
 .scroll-indicator {
   margin-top: 16px;
   font-size: 20px;
-  color: #333;
+  /* color: #333; */
+  color: #e1e4e8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -120,6 +138,7 @@ body {
 .scroll-indicator img.scroll-arrow {
   width: 24px;
   height: auto;
+  color: #e1e4e8;
   transform: rotate(90deg);
   cursor: pointer;
 }
@@ -132,7 +151,7 @@ body {
 }
 
 .service h3 {
-  color: #1a2c77;
+  color: #013895;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -221,4 +240,42 @@ body {
 .card:hover .overlay-text {
   opacity: 1;
   /*사용자가 .card에 마우스를 올리면 overlay-text가 나타남*/
+}
+
+/* 기존 .hero는 그대로 사용 */
+.hero {
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+  height: 800px;
+}
+
+/* (선택) 기존 .hero-image는 더 이상 안쓰지만 남겨둠 */
+.hero-image {
+  display: none;
+}
+
+/* ▶ 비디오 무대 */
+.ship-stage {
+  position: absolute;
+  inset: 0;
+  /* top:0; right:0; bottom:0; left:0; */
+  overflow: hidden;
+  background: #000;
+  /* 영상 가장자리 노출 대비 */
+}
+
+/* ▶ 배 비디오 자체 */
+.ship-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* 가로 꽉 채움 */
+  height: 100%;
+  /* 세로 꽉 채움 */
+  object-fit: cover;
+  /* 비율 유지하며 꽉 채우고 여백 제거 */
+  object-position: center center;
+  /* 잘림 위치 중앙 기준 */
 }

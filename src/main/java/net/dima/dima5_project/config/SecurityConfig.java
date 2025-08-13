@@ -46,7 +46,8 @@ public class SecurityConfig {
                                                 "/logout",
                                                 "/images/**",
                                                 "/css/**",
-                                                "/js/**"
+                                                "/js/**",
+                                                "/videos/**"
 
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
