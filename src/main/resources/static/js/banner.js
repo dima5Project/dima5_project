@@ -27,3 +27,4 @@
 //         window.location.href = '/news';
 //     });
 // }
+
