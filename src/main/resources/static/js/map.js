@@ -38,12 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="port-hover-card__divider"></div>
       <div class="port-hover-card__bd">
         <div class="port-row">
-          <div class="port-row__icon">🧭</div>
+          <div class="port-row__icon">💨</div>
           <div class="port-row__label">바람</div>
           <div class="port-row__val">
             ${Number(windSpdMS ?? 0).toFixed(1)} m/s · ${Number(windDirDeg ?? 0)}°
             <span class="subtle">(${dirLabel})</span>
-          </div>
+          </div>  
         </div>
         <div class="port-row">
           <div class="port-row__icon">☁️</div>
