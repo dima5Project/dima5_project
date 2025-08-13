@@ -19,43 +19,43 @@
 
 <body>
     <div sec:authorize="isAnonymous()">
-        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+        <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
     </div>
     <div sec:authorize="isAuthenticated()">
-        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+        <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
     </div>
 
-    <section id="section-hero" class="hero-section">
-        <div class="hero-background">
-            <img src="images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png"
-                th:src="@{/images/newsImages/4d0c92af3c888418730c73934a316ec5ed74ba8b.png}"
-                alt="Port background with cranes and cargo ships." class="hero-bg-image">
-            <div class="hero-bg-overlay"></div>
+    <section id="section_hero" class="hero_section">
+        <div class="hero_background">
+            <img src="/images/newsImages/top_bg.png" th:src="@{/images/newsImages/top_bg.png}" alt="Port"
+                class="hero_bg_image">
+            <div class="hero_bg_overlay"></div>
         </div>
 
-        <div class="hero-content">
-            <p class="hero-subtitle">For Those Who Move the World</p>
-            <h1 class="hero-title">해상과 무역의 흐름,<br>지금 여기서 확인하세요</h1>
-            <form class="search-form" th:action="@{/news/main}" method="get">
-                <input type="search" class="search-input" name="keyword" placeholder="검색어를 입력하세요" th:value="${keyword}">
-                <button type="submit" class="search-button" aria-label="Search">
-                    <img th:src="@{/images/newsImages/316_422.svg}" src="images/newsImages/316_422.svg"
+        <div class="hero_content">
+            <p class="hero_subtitle">For Those Who Move the World</p>
+            <h1 class="hero_title">해상과 무역의 흐름,<br>지금 여기서 확인하세요</h1>
+
+            <form class="search_form" th:action="@{/news/main}" method="get">
+                <input type="search" class="search_input" name="keyword" placeholder="검색어를 입력하세요" th:value="${keyword}">
+                <button type="submit" class="search_button" aria-label="Search">
+                    <img th:src="@{/images/newsImages/search_icon.svg}" src="images/newsImages/search_icon.svg"
                         alt="Search Icon">
                 </button>
             </form>
         </div>
     </section>
 
-    <section id="section-news" class="news-section">
+    <section id="section_news" class="news_section">
         <div class="container">
-            <div class="news-grid">
+            <div class="news_grid">
 
-                <article class="news-card" th:each="news: ${newsList}">
+                <article class="news_card" th:each="news: ${newsList}">
                     <a th:href="${news.newsUrl}" target="_blank">
-                        <img th:src="${news.imgUrl}" class="news-card-image">
-                        <div class="news-card-content">
-                            <h3 class="news-card-title" th:text="${news.newsTitle}">뉴스 제목</h3>
-                            <div class="news-card-meta">
+                        <img th:src="${news.imgUrl}" class="news_card_image">
+                        <div class="news_card_content">
+                            <h3 class="news_card_title" th:text="${news.newsTitle}">뉴스 제목</h3>
+                            <div class="news_card_meta">
                                 <span class="source" th:text="${news.publisher}">출처</span>
                                 <span class="date" th:datetime="${news.registerDate}"
                                     th:text="'등록일 ' + ${#temporals.format(news.registerDate, 'yyyy/MM/dd')}">등록일</span>
@@ -66,32 +66,32 @@
             </div>
 
             <nav class="pagination" aria-label="Page navigation">
-                <ul class="pagination-list" th:if="${newsList.totalPages > 1}">
+                <ul class="pagination_list" th:if="${newsList.totalPages > 1}">
                     <!-- 이전(◀) -->
                     <li>
-                        <a class="page-link-arrow" th:if="${!newsList.first}"
+                        <a class="page_link_arrow" th:if="${!newsList.first}"
                             th:href="@{/news/main(page=${page-1}, keyword=${keyword})}" aria-label="Previous page">
                             &laquo;
                         </a>
-                        <span class="page-link-arrow disabled" th:unless="${!newsList.first}">
+                        <span class="page_link_arrow disabled" th:unless="${!newsList.first}">
                             &laquo;
                         </span>
                     </li>
 
                     <!-- 번호들 -->
                     <li th:each="i : ${#numbers.sequence(1, newsList.totalPages)}">
-                        <a class="page-link" th:href="@{/news/main(page=${i}, keyword=${keyword})}" th:text="${i}"
+                        <a class="page_link" th:href="@{/news/main(page=${i}, keyword=${keyword})}" th:text="${i}"
                             th:classappend="${i == page} ? ' active' : ''"></a>
                     </li>
 
                     <!-- 다음(▶) -->
                     <li>
-                        <a class="page-link-arrow" th:if="${!newsList.last}"
+                        <a class="page_link_arrow" th:if="${!newsList.last}"
                             th:href="@{/news/main(page=${page+1}, keyword=${keyword})}" aria-label="Next page">
-                            <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Next page arrow">
+                            <img th:src="@{/images/newsImages/next_arrow.svg}" alt="Next page arrow">
                         </a>
-                        <span class="page-link-arrow disabled" th:unless="${!newsList.last}">
-                            <img th:src="@{/images/newsImages/I381_845_280_110.svg}" alt="Next page arrow">
+                        <span class="page_link_arrow disabled" th:unless="${!newsList.last}">
+                            <img th:src="@{/images/newsImages/next_arrow.svg}" alt="Next page arrow">
                         </span>
                     </li>
                 </ul>

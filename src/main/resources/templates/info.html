@@ -22,10 +22,10 @@
 <body>
     <!--  header.html 프래그먼트 포함 -->
     <div sec:authorize="isAnonymous()">
-        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
+        <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
     </div>
     <div sec:authorize="isAuthenticated()">
-        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
+        <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
     </div>
 
     <main>

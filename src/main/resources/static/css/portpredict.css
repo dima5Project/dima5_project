@@ -1077,12 +1077,12 @@ html {
 
 /* ── 목적항 Hover, 박스 내용 ───────────────────────────── */
 .port-hover-card {
-    min-width: 200px;
-    max-width: 260px;
+    min-width: 160px;
+    max-width: 208px;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
-    border: 1px solid rgba(2, 32, 71, .08);
+    border-radius: 9.6px;
+    box-shadow: 0 9.6px 22.4px rgba(0, 0, 0, .18);
+    border: 0.8px solid rgba(2, 32, 71, .064);
     overflow: visible;
     /*내용이 카드 밖으로 넘치지 않게*/
     font-family: inherit;
@@ -1092,48 +1092,48 @@ html {
 
 /* 카드 상단 제목 영역 (항구명) */
 .port-hover-card__hd {
-    padding: 12px 14px 10px;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: .2px;
+    padding: 6px 11.2px 4px;
+    font-weight: 700;
+    font-size: 14.4px;
+    letter-spacing: .16px;
     /*글자 간격 조정*/
     color: #0b1736;
 }
 
 /*제목과 내용 구분하는 가로 줄*/
 .port-hover-card__divider {
-    height: 1px;
-    background: rgba(2, 32, 71, .08);
-    margin: 0 12px;
+    height: 0.8px;
+    background: rgba(2, 32, 71, .064);
+    margin: 0 9.6px;
 }
 
 /*카드 본문(내용) 영역 전체*/
 .port-hover-card__bd {
-    padding: 12px 14px 14px;
+    padding: 6px 8px 6px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 4px;
 }
 
 /*한 줄 정보(아이콘, 라벨, 값) 묶음*/
 .port-row {
     display: grid;
-    grid-template-columns: 22px 1fr auto;
+    grid-template-columns: 17.6px 1fr auto;
     align-items: center;
-    column-gap: 10px;
-    font-size: 14px;
+    column-gap: 8px;
+    font-size: 11.2px;
 }
 
 /* 줄 왼쪽 동그란 아이콘*/
 .port-row__icon {
-    width: 22px;
-    height: 22px;
+    width: 17.6px;
+    height: 17.6px;
     display: grid;
     place-items: center;
     border-radius: 999px;
     background: #eef3ff;
     color: #0f3c9a;
-    font-size: 13px;
+    font-size: 10.4px;
 }
 
 /*정보 라벨(예: "바람", "날씨")*/
@@ -1151,10 +1151,10 @@ html {
 /* 혼잡도 뱃지 (원활 > 보통 > 매우 혼잡) */
 .cong-dot {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    margin-right: 6px;
+    margin-right: 4.8px;
 }
 
 .cong--low {
@@ -1170,11 +1170,11 @@ html {
 }
 
 /* 작은 보조 텍스트 "(S)",
- "(UTC+3)" */
+ "(UTC+3)" */
 .subtle {
     color: #5b6474;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 9.6px;
 }
 
 /* Mapbox 기본 팝업 틀 숨기기 */
@@ -1194,15 +1194,15 @@ html {
 .port-hover-card::after {
     content: '';
     position: absolute;
-    bottom: -8px;
+    bottom: -6.4px;
     /* 카드 밑으로 조금 나오게 */
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #fff;
+    border-left: 6.4px solid transparent;
+    border-right: 6.4px solid transparent;
+    border-top: 6.4px solid #fff;
     /* 카드 배경색과 동일하게 */
 }
 
