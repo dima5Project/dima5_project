@@ -31,13 +31,15 @@ main {
 }
 
 .qna-header h2 {
-    font-size: 32px;
+    font-size: 28px;
+    font-weight: 700;
     margin-bottom: 30px;
     color: white;
 }
 
 .qna-header p {
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 500;
     color: #ddd;
 }
 
@@ -53,7 +55,7 @@ main {
 
 .mp-container {
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 150px 1fr;
     gap: 24px;
 }
 
@@ -78,8 +80,13 @@ main {
 }
 
 .mp-side__nav a {
-    display: block;
-    padding: 10px 12px;
+    display: flex;
+    /* flexbox로 변경 */
+    justify-content: space-between;
+    /* 텍스트와 화살표를 양 끝으로 정렬 */
+    align-items: center;
+    /* 세로 가운데 정렬 */
+    padding: 10px 5px;
     border-radius: 6px;
     text-decoration: none;
     color: #222;
