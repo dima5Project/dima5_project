@@ -31,6 +31,7 @@ public class PortDockingDTO {
                 .currentShips(portDockingEntity.getCurrentShips())
                 .expectedShips(portDockingEntity.getExpectedShips())
                 .timeStamp(portDockingEntity.getTimeStamp())
+                .congestionLevel(level)
                 .build();
     }
 }

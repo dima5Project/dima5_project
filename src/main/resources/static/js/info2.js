@@ -239,8 +239,8 @@ function loadWeather(lat, lon) {
 // 혼잡도 카드
 function loadDocking(portId) {
     $.get(`/api/info/docking/${portId}`, function (data) {
-        const colorText = data.congestionStatus === "혼잡" ? "🟠 혼잡"
-            : data.congestionStatus === "매우 혼잡" ? "🔴 매우 혼잡"
+        const colorText = data.congestionLevel === "혼잡" ? "🟠 혼잡"
+            : data.congestionLevel === "매우 혼잡" ? "🔴 매우 혼잡"
                 : "🟢 원활";
 
         $("#dockingCard").html(`
