@@ -69,9 +69,9 @@ main {
 }
 
 .search-container select {
-    border: 1px solid #ddd;
+    border: 1px solid #E5E7EB;
     background: #fefefe;
-    color: #555;
+    color: #0F172A;
     min-width: 150px;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -87,7 +87,7 @@ main {
 }
 
 .search-container button {
-    background-color: #0f1035;
+    background-color: #2b2e53;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -135,7 +135,7 @@ main {
     font-weight: 700;
     margin-bottom: 18px;
     color: #0f1035;
-    border-bottom: 2px solid #0f1035;
+    border-bottom: 2px solid #E5E7EB;
     padding-bottom: 8px;
 }
 
@@ -179,7 +179,7 @@ main {
 #dockingCard h3 {
     margin-bottom: 18px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #232323;
+    border-bottom: 2px solid #E5E7EB;
     color: #0f1035;
 }
 
@@ -215,20 +215,50 @@ main {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background-color: #e6f7ff;
+    background-color: #F1F5F9;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #111;
+    color: #334155;
     font-size: 40px;
     font-weight: bold;
-    border: 1px solid #cceeff;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, .1), 0 2px 4px rgba(0, 0, 0, .05);
+    border: 1px solid #CBD5E1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 1px 2px rgba(15, 23, 42, .08);
 }
 
 .status-circle span {
     font-size: 40px;
     font-weight: bold;
+}
+
+.status-circle.is-very-congested {
+    /*매우혼잡*/
+    background-color: #FEE2E2;
+    border-color: #FCA5A5;
+}
+
+.status-circle.is-very-congested span {
+    color: #B91C1C;
+}
+
+.status-circle.is-congested {
+    /*혼잡*/
+    background: #ffd59f;
+    border-color: #fcb04d;
+}
+
+.status-circle.is-congested span {
+    color: #92400E;
+}
+
+.status-circle.is-clear {
+    /*원활*/
+    background: #DCFCE7;
+    border-color: #86EFAC;
+}
+
+.status-circle.is-clear span {
+    color: #166534;
 }
 
 .docking-info span {
@@ -261,7 +291,8 @@ main {
 
 /* 큰 온도 카드 */
 #weatherCard .wx-main {
-    background: #e6f7ff;
+    background: var(--accent-100, #F8FAFC);
+    border: 1px solid #D7E3FF;
     border-radius: 16px;
     padding: 18px 20px 22px;
     text-align: center;
@@ -269,7 +300,8 @@ main {
 
 #weatherCard .wx-main-label {
     font-size: 14px;
-    color: #134e6f;
+    color: #1E40AF;
+    ;
     font-weight: 700;
     letter-spacing: .02em;
     margin-bottom: 6px;
@@ -281,7 +313,7 @@ main {
     /* 필요하면 52~56px 로 키워도 OK */
     line-height: 1.05;
     font-weight: 800;
-    color: #000;
+    color: #0F1035;
 }
 
 /* 2×2 정보 카드 */
@@ -292,7 +324,8 @@ main {
 }
 
 #weatherCard .wx-tile {
-    background: #e6f7ff;
+    background: var(--accent-100, #F8FAFC);
+    border: 1px solid #D7E3FF;
     border-radius: 16px;
     padding: 16px 18px;
     display: flex;
@@ -309,7 +342,7 @@ main {
     justify-content: center;
     gap: 8px;
     margin-bottom: 6px;
-    color: #134e6f;
+    color: #304484;
     font-weight: 700;
 }
 
@@ -326,7 +359,7 @@ main {
     font-size: 22px;
     font-weight: 600;
     text-align: center;
-    color: #111;
+    color: #0F1035;
 }
 
 /* 반응형(좁은 화면에서 1열로) */
@@ -350,7 +383,7 @@ main {
 #timezoneCard h3 {
     margin-bottom: 18px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #232323;
+    border-bottom: 2px solid #E5E7EB;
 }
 
 #timezoneCard .tz-block {
@@ -360,7 +393,7 @@ main {
 
 #timezoneCard .tz-sep {
     height: 1px;
-    background: #bbbbbb;
+    background: #E5E7EB;
     margin: 12px 0;
     border-radius: 1px;
 }
@@ -369,18 +402,19 @@ main {
     display: inline-block;
     padding: 8px 14px;
     border-radius: 9999px;
-    background: #4483EF;
-    color: #fff;
+    background: var(--accent-100, #F8FAFC);
+    color: #0F1035;
+    border: 1px solid #D7E3FF;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 10px;
 }
 
 #timezoneCard .tz-time {
-    font-size: 28px;
+    font-size: 30px;
     line-height: 1.1;
-    font-weight: 600;
-    color: #111;
+    font-weight: 500;
+    color: #0F1035;
     margin: 6px 0 8px;
 }
 
