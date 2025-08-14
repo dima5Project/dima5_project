@@ -25,7 +25,8 @@ main {
 }
 
 .info-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
+    /*뷰포트(viewport) 높이의 15% 만큼 위쪽 여백을 설정*/
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
@@ -252,7 +253,93 @@ main {
 #weatherCard {
     grid-area: weather;
     min-height: 180px;
+    /* 내용 높이에 맞게 */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
+
+/* 큰 온도 카드 */
+#weatherCard .wx-main {
+    background: #e6f7ff;
+    border-radius: 16px;
+    padding: 18px 20px 22px;
+    text-align: center;
+}
+
+#weatherCard .wx-main-label {
+    font-size: 14px;
+    color: #134e6f;
+    font-weight: 700;
+    letter-spacing: .02em;
+    margin-bottom: 6px;
+}
+
+#weatherCard .wx-main-value {
+    /* 예: 31.5°C 처럼 크게 */
+    font-size: 48px;
+    /* 필요하면 52~56px 로 키워도 OK */
+    line-height: 1.05;
+    font-weight: 800;
+    color: #000;
+}
+
+/* 2×2 정보 카드 */
+#weatherCard .wx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+#weatherCard .wx-tile {
+    background: #e6f7ff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 96px;
+    /* 카드 높이 */
+}
+
+/* 타일 헤더(아이콘 + 라벨) */
+#weatherCard .wx-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: #134e6f;
+    font-weight: 700;
+}
+
+#weatherCard .wx-label {
+    display: block;
+    flex: 1 1 auto;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+/* 값 */
+#weatherCard .wx-value {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    color: #111;
+}
+
+/* 반응형(좁은 화면에서 1열로) */
+/*@media (max-width: 720px) {
+    #weatherCard .wx-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #weatherCard .wx-main-value {
+        font-size: 40px;
+    }
+}*/
+
 
 /* 시차 */
 #timezoneCard {
@@ -282,7 +369,7 @@ main {
     display: inline-block;
     padding: 8px 14px;
     border-radius: 9999px;
-    background: #81B4FF;
+    background: #4483EF;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
