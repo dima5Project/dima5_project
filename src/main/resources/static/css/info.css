@@ -25,7 +25,8 @@ main {
 }
 
 .info-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
+    /*뷰포트(viewport) 높이의 15% 만큼 위쪽 여백을 설정*/
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
@@ -260,7 +261,7 @@ main {
 
 /* 큰 온도 카드 */
 #weatherCard .wx-main {
-    background: #e9f5ff;
+    background: #e6f7ff;
     border-radius: 16px;
     padding: 18px 20px 22px;
     text-align: center;
@@ -291,7 +292,7 @@ main {
 }
 
 #weatherCard .wx-tile {
-    background: #e9f5ff;
+    background: #e6f7ff;
     border-radius: 16px;
     padding: 16px 18px;
     display: flex;
@@ -323,7 +324,7 @@ main {
 /* 값 */
 #weatherCard .wx-value {
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 600;
     text-align: center;
     color: #111;
 }
@@ -368,7 +369,7 @@ main {
     display: inline-block;
     padding: 8px 14px;
     border-radius: 9999px;
-    background: #81B4FF;
+    background: #4483EF;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
