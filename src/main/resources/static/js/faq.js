@@ -1,39 +1,22 @@
 // ✅ FAQ 챗봇 전체 동작 JS 파일 (드래그 스크롤 포함)
 
-// XSS 방지(문자 → HTML 이스케이프)
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-}
-
-// 멀티라인 문자열/글머리표를 HTML로 변환
+// XSS 방지(문자 → HTML 이스케이프) 
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+// 멀티라인 문자열/글머리표를 HTML로 변환 
 function formatAnswer(a) {
-  // 배열이면 각 요소를 단락으로
-  if (Array.isArray(a)) {
-    return a.map(p => `<p>${escapeHtml(p)}</p>`).join('');
-  }
-  // 문자열이면 규칙 적용
+  // 배열이면 각 요소를 단락으로 
+  if (Array.isArray(a)) { return a.map(p => <p>${escapeHtml(p)}</p>).join(''); }
+  // 문자열이면 규칙 적용 
   let text = String(a).trim();
-
-  // 1) 빈 줄(두 번 이상의 \n)은 단락 구분
+  // 1) 빈 줄(두 번 이상의 \n)은 단락 구분 
   const blocks = text.split(/\n{2,}/);
 
-  // 2) 각 블록 내부 처리: 글머리표(- 또는 •) → <ul>, 그 외는 <p> + 줄바꿈 처리
+  // 2) 각 블록 내부 처리: 글머리표(- 또는 •) → <ul>, 그 외는 <p> + 줄바꿈 처리 
   const html = blocks.map(block => {
-    const lines = block.split(/\n/);
-    const isList = lines.every(l => /^\s*[-•]\s+/.test(l));
-    if (isList) {
-      const items = lines
-        .map(l => l.replace(/^\s*[-•]\s+/, ''))
-        .map(item => `<li>${escapeHtml(item)}</li>`)
-        .join('');
-      return `<ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>`;
-    }
-    // 줄바꿈(\n)은 <br>로, 문장 끝(.?! 뒤 공백)은 가볍게 개행 보정
-    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>');
-    return `<p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>`;
-  }).join('');
-
-  return html;
+    const lines = block.split(/\n/); const isList = lines.every(l => /^\s*[-•]\s+/.test(l)); if (isList) { const items = lines.map(l => l.replace(/^\s*[-•]\s+/, '')).map(item => <li>${escapeHtml(item)}</li>).join(''); return <ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>; }
+    // 줄바꿈(\n)은 <br>로, 문장 끝(.?! 뒤 공백)은 가볍게 개행 보정 
+    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>'); return <p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>;
+  }).join(''); return html;
 }
 
 const toggle = document.getElementById('faq-toggle');
@@ -84,52 +67,53 @@ const faqData = {
   "회원 / 로그인 관련": [
     {
       question: "로그인 / 회원가입이 안 돼요",
-      answer: `문의 게시판에 내용을 남겨주시거나
-portcast@naver.com 또는 02-1234-5678 로 연락해주세요.`
+      answer: `문의 게시판에 글을 남겨주시거나 portcast@naver.com 
+      또는 02-2642-9451로 연락 부탁드립니다.`
     },
     {
       question: "비회원도 예측 기능을 이용할 수 있나요?",
-      answer: `비회원은 뉴스룸 페이지만 이용 가능합니다.
+      answer: `비회원은 **소개, 뉴스룸 페이지**만 이용 가능합니다.
 
-회원가입 후 이용 가능한 기능
+**회원가입 후** 이용 가능한 기능
 - 차항지 예측
 - 부가 정보
 - 문의 게시판
 
 총 38개 항구 실시간 정보
 - 날씨
-- 환율
-- 선박 접안 현황`
+- 시차
+- 선박 접안 현황 등`
     }
   ],
+
   "예측 서비스 이용 가이드": [
     {
       question: "어떤 기능을 제공하나요?",
-      answer: `AIS 데이터를 기반으로 위도, 경도, COG, Heading을 입력하면
+      answer: `AIS 데이터를 기반으로 **선박의 MMSI 혹은 IMO**를 입력하면
 차기 정박항 Top 3을 예측합니다.
 
-제공되는 부가정보
+제공되는 부가정보 :
 - ETA
-- 날씨
+- 현재 위치의 정보(파고, 가시거리 등)
 - 항구 접안 선박 수`
     },
     {
-      question: "어떤 값을 입력해야 하나요?",
-      answer: `출발 후 특정 시점의 값을 입력하세요.
-- 위도/경도 (최대 소수점 6자리)
-- COG
-- Heading (최대 소수점 2자리)`
+      question: `예측은 출항 후 몇 시간부터 
+      가능한가요?`,
+      answer: `지원 구간은 **출항 후 5~30시간**입니다.
+
+- 0 ~ 4시간: 출항 직후 분산 구간
+- 5 ~ 30시간: 항로가 안정화되는 구간
+- 31시간 ~: 이미 목적지로 항로 고정`
     },
     {
-      question: "지도가 안 나와요 / 항로가 엉뚱하게 표시돼요",
+      question: `지도가 안 나와요 / 
+      항로가 엉뚱하게 표시돼요`,
       answer: `문의 게시판 또는 portcast@naver.com 으로 문의해주세요.`
     },
     {
-      question: "일본은 왜 군집 단위로 예측되나요?",
-      answer: `항구 간 거리가 매우 가까워 동일본/서일본으로 군집화해 예측합니다.`
-    },
-    {
-      question: "제공하는 나라와 항구는 어디인가요?",
+      question: `제공하는 나라와 항구는 
+      어디인가요?`,
       answer: `총 38개 항구에서 예측/부가정보를 제공합니다.
 
 - 홍콩(HK) : HKG
@@ -141,13 +125,26 @@ portcast@naver.com 또는 02-1234-5678 로 연락해주세요.`
 - 러시아(RU) : NJK, VVO
 - 필리핀(PH) : MNL`
 
+    },
+    {
+      question: "항구 혼잡도는 어떤 지표이며 갱신 주기는 어떻게 되나요?",
+      answer: `항구 혼잡도는 Portcast가 데이터를 바탕으로 내부 기준으로 산출한 **참고용 지표**로, 
+      항만 주변의 붐빔 정도를 색으로 표현합니다.
+
+갱신 주기
+- 약 3시간마다 데이터를 수집·갱신합니다.
+- 수집 지연이나 데이터 품질에 따라 약간의 시차가 발생할 수 있습니다.
+
+유의 사항
+- 공식 기관이 공표하는 수치가 아니며, 의사결정 시 참고용으로 활용해 주세요.`
     }
   ],
+
   "기타 문의": [
     {
       question: "기타 문의",
       answer: `1:1 문의, 제휴 제안 등은
-portcast@naver.com 또는 02-1234-5678 로 연락 바랍니다.`
+portcast@naver.com 또는 02-2642-9451 로 연락 바랍니다.`
     }
   ]
 };
