@@ -136,7 +136,8 @@
                         <!-- Top 1~3 박스 -->
                         <div class="box one">
                             <div class="box__head">
-                                <span class="head__label">Top - 1</span>
+                                <span class="head__label">Top - <span class="head__label num">1</span>
+                                </span>
                                 <strong>71.8%</strong>
                             </div>
                             <div class="box__body">
@@ -212,137 +213,13 @@
             </div>
 
             <!-- 2) 로그 슬라이드 바 -->
-            <div class="panel panel--log">
+            <div class="sidebar__content logpanel">
                 <div class="sidebar__header">
                     <h2 class="sidebar__secondtitle">시점별 예측 타임라인</h2>
                     <hr class="secondtitle_hr">
                 </div>
-
-                <!-- 가운데만 스크롤 되는 영역 -->
-                <div class="sidebar__content logpanel">
-                    <ol class="voy-timeline">
-                        <!-- 출발항 -->
-                        <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/vessel_Icon.png"
-                                    th:src="@{/images/portpredictImages/vessel_Icon.png}" alt="출발항 아이콘" />
-                            </button>
-
-                            <div class="voy-rows">
-                                <div class="voy-label">KRBUS 부산항</div>
-
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">ATD</button>
-                                    <div class="voy-chip">2025-08-11 14:34</div>
-                                </div>
-                            </div>
-                        </li>
-
-                        <!-- 05시 -->
-                        <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/marker.png"
-                                    th:src="@{/images/portpredictImages/marker.png}" alt="출발항 아이콘" />
-                            </button>
-                            <div class="voy-rows">
-                                <div class="voy-label"></div>
-                                <div class="voy-label">출항 후 5시간</div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑1</button>
-                                    <div class="voy-chip">상하이 · 71.8%</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑2</button>
-                                    <div class="voy-chip">홍콩 · 17.8%</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑3</button>
-                                    <div class="voy-chip">가오슝 · 10.4%</div>
-                                </div>
-                            </div>
-                        </li>
-
-                        <!-- 8시 -->
-                        <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/marker.png"
-                                    th:src="@{/images/portpredictImages/marker.png}" alt="출발항 아이콘" />
-                            </button>
-                            <div class="voy-rows">
-                                <div class="voy-label"></div>
-                                <div class="voy-label">출항 후 8시간</div>
-
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑1</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑2</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑3</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                            </div>
-                        </li>
-
-                        <!-- 11시(현 시점) -->
-                        <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/marker.png"
-                                    th:src="@{/images/portpredictImages/marker.png}" alt="출발항 아이콘" />
-                            </button>
-                            <div class="voy-rows">
-                                <div class="voy-label"></div>
-                                <div class="voy-label">출항 후 11시간</div>
-
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑1</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑2</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑3</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                            </div>
-                        </li>
-
-                        <!-- 14시간 -->
-                        <li class="voy-item">
-                            <button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/marker.png"
-                                    th:src="@{/images/portpredictImages/marker.png}" alt="출발항 아이콘" />
-                            </button>
-                            <div class="voy-rows">
-                                <div class="voy-label"></div>
-                                <div class="voy-label">현 위치 (출항 후 14시간)</div>
-
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑1</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑2</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">Top‑3</button>
-                                    <div class="voy-chip">…</div>
-                                </div>
-                                <div class="voy-row">
-                                    <button class="pillbtn" type="button">ETA</button>
-                                    <div class="voy-chip">2025-08-12 03:34</div>
-                                </div>
-                            </div>
-                        </li>
-
-                    </ol>
-                </div>
+                <ol class="voy-timeline">
+                </ol>
             </div>
             <!-- 로그 슬라이드 바 끝-->
 
