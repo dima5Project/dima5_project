@@ -39,8 +39,8 @@ COMMIT;
 -- DROP TABLE IF EXISTS ask_board;
 CREATE TABLE IF NOT EXISTS ask_board
 (
-	ask_seq       bigint 		PRIMARY KEY,
-	ask_type      varchar(100)  DEFAULT '전체' CHECK (ask_type IN ('전체', '회원가입','서비스 이용', '기타')),
+	ask_seq       bigint 		AUTO_INCREMENT PRIMARY KEY,
+	ask_type      varchar(100)  NOT NULL CHECK (ask_type IN ('회원가입','서비스 이용', '기타')),
 	ask_title     varchar(200)  NOT NULL,
 	ask_content   varchar(5000) NOT NULL,
 	ask_writer    varchar(50)   NOT NULL,
@@ -105,12 +105,12 @@ SELECT * FROM port_name;
 -- 7. 항만혼잡도 (부가정보)
 -- DROP TABLE IF EXISTS port_docking;
 CREATE TABLE IF NOT EXISTS port_docking (
-   docking_id int AUTO_INCREMENT PRIMARY KEY,
-   time_stamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   port_id VARCHAR(10) NOT NULL,
-   expected_ships int,
-   current_ships int,
-      FOREIGN KEY (port_id) REFERENCES port_info(port_id)
+	docking_id int AUTO_INCREMENT PRIMARY KEY,
+	time_stamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	port_id VARCHAR(10) NOT NULL,
+	expected_ships int,
+	current_ships int,
+		FOREIGN KEY (port_id) REFERENCES port_info(port_id)
 );
 
 SELECT * FROM port_docking;
@@ -120,10 +120,10 @@ SELECT * FROM port_docking;
 -- DROP TABLE IF EXISTS port_holiday;
 CREATE TABLE IF NOT EXISTS port_holiday(
 	holiday_seq int AUTO_INCREMENT PRIMARY KEY,
-   holiday_date DATE NOT NULL,
-   country_name_kr varchar(50) NOT NULL,
-   holiday_name varchar(255) NOT NULL
-);
+	holiday_date DATE NOT NULL,
+	country_name_kr varchar(50) NOT NULL,
+	holiday_name varchar(255) NOT NULL
+	);
 
 SELECT * FROM port_holiday;
 -- DELETE FROM port_holiday;

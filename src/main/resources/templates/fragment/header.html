@@ -7,6 +7,9 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script defer th:src="@{/js/header.js}"></script>
+
+    <script defer th:src="@{/js/translatorAll.js}"></script>
+
     <title>Navigation(배너)</title>
 </head>
 
@@ -65,16 +68,17 @@
                         alt="화살표" class="arrow_icon">
                     <div id="submenu_lang_wrapper" class="submenu_wrapper">
                         <div id="submenu_lang" class="submenu">
-                            <div class="lang_item">KOR</div>
-                            <div class="lang_item">ENG</div>
-                            <div class="lang_item">JPN</div>
+                            <div id="google_translate_element" style="display:none;"></div>
+                            
+                            <div class="lang_item" data-lang="ko">KOR</div>
+                            <div class="lang_item" data-lang="en">ENG</div>
+                            <div class="lang_item" data-lang="ja">JPN</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
-    <script defer th:src="@{/js/translatorAll.js}"></script>
     
 </body>
 

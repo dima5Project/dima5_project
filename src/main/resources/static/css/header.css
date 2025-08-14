@@ -286,15 +286,3 @@ a.login_button:hover {
 .lang_selector.active>.submenu_wrapper {
     display: block;
 }
-
-/* 언어 관련 */
-/* 서브메뉴 기본 상태 (숨기기) */
-.submenu_wrapper {
-    display: none;
-    /* 다른 스타일 (위치, 배경색 등) */
-}
-
-/* active 클래스가 추가되면 보이기 */
-.submenu_wrapper.active {
-    display: block;
-}
