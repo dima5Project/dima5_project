@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>관리자 대시보드</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Reset & Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- 대시보드 전용 CSS -->
+    <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
+
+    <!-- Chart.js & jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+    <!-- 헤더 -->
+    <header class="adm-header">
+        <div class="adm-header__left">
+            <h1 class="adm-title">관리자 대시보드</h1>
+        </div>
+        <div class="adm-header__right">
+            <button id="askBtn" class="adm-btn">
+                문의관리
+                <span id="noticeDot" class="adm-dot" aria-hidden="true"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 컨텐츠 -->
+    <main class="adm-wrap">
+        <section class="adm-grid">
+            <!-- 카드 1: 사용자 유형 도넛 -->
+            <article class="adm-card">
+                <div class="adm-card__hd">
+                    <h3>사용자 유형 분포</h3>
+                </div>
+                <div class="adm-card__bd">
+                    <canvas id="userTypeChart" height="220"></canvas>
+                </div>
+            </article>
+
+            <!-- 카드 2: 월별 주차 가입자 수 -->
+            <article class="adm-card">
+                <div class="adm-card__hd">
+                    <h3>월별 주차 가입자 수</h3>
+                    <div class="adm-card__tools">
+                        <label class="adm-inline">
+                            최근
+                            <select id="weeksSelect" class="adm-select">
+                                <option value="8">8주</option>
+                                <option value="12" selected>12주</option>
+                                <option value="16">16주</option>
+                                <option value="24">24주</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="adm-card__bd">
+                    <canvas id="weeklySignupChart" height="220"></canvas>
+                </div>
+            </article>
+
+            <!-- 카드 3: 최근 문의 + 실시간 -->
+            <article class="adm-card adm-card--full">
+                <div class="adm-card__hd">
+                    <h3>최근 문의</h3>
+                    <div>
+                        <button id="refreshAsk" class="adm-btn adm-btn--ghost">새로고침</button>
+                    </div>
+                </div>
+                <div id="askList" class="adm-list" aria-live="polite" aria-busy="false">
+                    <!-- JS가 채움 -->
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <!-- 토스트 -->
+    <div id="toast" class="adm-toast" role="status" aria-live="polite"></div>
+
+    <!-- 대시보드 JS (내가 준 JS 넣어주면 됨) -->
+    <script src="/js/adminDashboard.js" th:src="@{/js/adminDashboard.js}"></script>
+    <script>
+        // 선택 주차 변경 핸들링 (선택)
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.getElementById('weeksSelect');
+            if (select && typeof loadWeeklySignups === 'function') {
+                select.addEventListener('change', () => loadWeeklySignups(Number(select.value)));
+            }
+        });
+    </script>
+</body>
+
+</html>

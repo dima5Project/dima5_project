@@ -5,7 +5,7 @@ function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp
 // 멀티라인 문자열/글머리표를 HTML로 변환 
 function formatAnswer(a) {
   // 배열이면 각 요소를 단락으로 
-  if (Array.isArray(a)) { return a.map(p => <p>${escapeHtml(p)}</p>).join(''); }
+  if (Array.isArray(a)) { return a.map(p => `<p>${escapeHtml(p)}</p>`).join(''); }
   // 문자열이면 규칙 적용 
   let text = String(a).trim();
   // 1) 빈 줄(두 번 이상의 \n)은 단락 구분 
@@ -13,9 +13,9 @@ function formatAnswer(a) {
 
   // 2) 각 블록 내부 처리: 글머리표(- 또는 •) → <ul>, 그 외는 <p> + 줄바꿈 처리 
   const html = blocks.map(block => {
-    const lines = block.split(/\n/); const isList = lines.every(l => /^\s*[-•]\s+/.test(l)); if (isList) { const items = lines.map(l => l.replace(/^\s*[-•]\s+/, '')).map(item => <li>${escapeHtml(item)}</li>).join(''); return <ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>; }
+    const lines = block.split(/\n/); const isList = lines.every(l => /^\s*[-•]\s+/.test(l)); if (isList) { const items = lines.map(l => l.replace(/^\s*[-•]\s+/, '')).map(item => `<li>${escapeHtml(item)}</li>`).join(''); return `<ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>`; }
     // 줄바꿈(\n)은 <br>로, 문장 끝(.?! 뒤 공백)은 가볍게 개행 보정 
-    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>'); return <p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>;
+    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>'); return `<p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>`;
   }).join(''); return html;
 }
 
@@ -98,8 +98,7 @@ const faqData = {
 - 항구 접안 선박 수`
     },
     {
-      question: `예측은 출항 후 몇 시간부터 
-      가능한가요?`,
+      question: `예측은 출항 후 몇 시간부터 가능한가요?`,
       answer: `지원 구간은 **출항 후 5~30시간**입니다.
 
 - 0 ~ 4시간: 출항 직후 분산 구간
@@ -107,13 +106,11 @@ const faqData = {
 - 31시간 ~: 이미 목적지로 항로 고정`
     },
     {
-      question: `지도가 안 나와요 / 
-      항로가 엉뚱하게 표시돼요`,
+      question: `지도가 안 나와요 / 항로가 엉뚱하게 표시돼요`,
       answer: `문의 게시판 또는 portcast@naver.com 으로 문의해주세요.`
     },
     {
-      question: `제공하는 나라와 항구는 
-      어디인가요?`,
+      question: `제공하는 나라와 항구는 어디인가요?`,
       answer: `총 38개 항구에서 예측/부가정보를 제공합니다.
 
 - 홍콩(HK) : HKG
