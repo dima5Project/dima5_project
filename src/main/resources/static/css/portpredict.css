@@ -800,11 +800,33 @@ html {
 
 /* ===== 2) 슬라이드_시점별 타임라인 (왼쪽 고정 컬럼 + 점선 + 원형) ===== */
 
-/* title 문구(시점별 예측 타임라인) */
+/* 로그 패널의 헤더만 고정 */
+.logpanel .sidebar__header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #ffffff;
+    /* 헤더 뒤로 콘텐츠가 비치지 않도록 흰색 배경 추가 */
+    padding: 20px 0 16px 0;
+    width: 100%;
+}
+
+/* 로그 패널의 내용 컨테이너 상단 패딩 제거 */
+.logpanel.sidebar__content {
+    /* 기존 padding: 10px 16px 10px 16px; */
+    padding: 0 16px 10px 16px;
+}
+
 .sidebar__secondtitle {
-    margin: 20px 16px 20px 16px;
+    /* 기존 margin: 20px 16px 20px 16px; */
+    margin: 0;
     font-size: 15px;
     font-weight: 600;
+}
+
+.secondtitle_hr {
+    margin-top: 10px;
+    width: 100%;
 }
 
 .logpanel {
@@ -817,7 +839,7 @@ html {
     --chip-h: var(--pill-h);
     --col-gap: 12px;
     --font: 12px;
-    padding: 10px 16px 16px 16px;
+    padding: 0;
     --label-col: 68px;
     /* ↓ 마지막 원 아래로 더 내려가는 점선 길이 보정값(필요시 0~8px 정도 조절) */
     --line-trim: 6px;
@@ -946,10 +968,13 @@ html {
 
 /* 한 줄(버튼 + 값칩) : 콘텐츠는 왼쪽 패딩 이후부터 배치 */
 .voy-row {
-    display: grid;
-    grid-template-columns: var(--label-col) minmax(0, 1fr);
+    display: flex;
+    /* pillbtn과 voy-chip을 양쪽 끝으로 배치 */
+    justify-content: space-between;
+    /* 요소들을 수직 중앙 정렬 */
     align-items: center;
-    gap: 4px;
+    /* 두 요소 사이의 간격 */
+    gap: 8px;
     margin-bottom: 6px;
 }
 
@@ -970,6 +995,10 @@ html {
 /* 값칩(텍스트) */
 .voy-chip {
     height: var(--pill-h);
+    width: 143px;
+    /* 너비를 143px로 고정 */
+    text-align: left;
+    /* 텍스트를 왼쪽 정렬 */
     border-radius: 8px;
     background: #eef3f7;
     padding: 0 10px;
@@ -981,14 +1010,16 @@ html {
     white-space: nowrap;
     overflow: hidden;
     box-sizing: border-box;
-    width: auto;
-    max-width: 120px;
+    /* max-width는 width가 고정되므로 삭제합니다. */
 }
 
-/* Top-1/2/3 버튼 */
-.pillbtn {
+.pillbtn,
+.depart_pillbtn {
     height: var(--pill-h);
-    max-width: calc(var(--label-col) - 8px);
+    width: 53px;
+    /* 너비를 53px로 고정 */
+    text-align: center;
+    /* 텍스트를 가운데 정렬 */
     padding: 0 6px;
     white-space: nowrap;
     border-radius: 8px;
@@ -1204,6 +1235,24 @@ html {
     border-right: 6.4px solid transparent;
     border-top: 6.4px solid #fff;
     /* 카드 배경색과 동일하게 */
+}
+
+/* 부산항 호버 카드 전용 스타일 */
+.busan-hover-card {
+    min-width: auto !important;
+    /* min-width를 무효화하여 max-width가 적용되게 합니다. */
+    max-width: 80px !important;
+}
+
+.busan-hover-card .port-hover-card__hd {
+    font-size: 14px;
+    padding: 6px 8px;
+    text-align: center;
+}
+
+/* 부산항 팝업 컨테이너의 최대 너비를 강제 적용 */
+.busan-popup-container .mapboxgl-popup-content {
+    max-width: 90px !important;
 }
 
 
