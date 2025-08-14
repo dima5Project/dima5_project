@@ -5,7 +5,7 @@ function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp
 // 멀티라인 문자열/글머리표를 HTML로 변환 
 function formatAnswer(a) {
   // 배열이면 각 요소를 단락으로 
-  if (Array.isArray(a)) { return a.map(p => <p>${escapeHtml(p)}</p>).join(''); }
+  if (Array.isArray(a)) { return a.map(p => `<p>${escapeHtml(p)}</p>`).join(''); }
   // 문자열이면 규칙 적용 
   let text = String(a).trim();
   // 1) 빈 줄(두 번 이상의 \n)은 단락 구분 
@@ -13,9 +13,9 @@ function formatAnswer(a) {
 
   // 2) 각 블록 내부 처리: 글머리표(- 또는 •) → <ul>, 그 외는 <p> + 줄바꿈 처리 
   const html = blocks.map(block => {
-    const lines = block.split(/\n/); const isList = lines.every(l => /^\s*[-•]\s+/.test(l)); if (isList) { const items = lines.map(l => l.replace(/^\s*[-•]\s+/, '')).map(item => <li>${escapeHtml(item)}</li>).join(''); return <ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>; }
+    const lines = block.split(/\n/); const isList = lines.every(l => /^\s*[-•]\s+/.test(l)); if (isList) { const items = lines.map(l => l.replace(/^\s*[-•]\s+/, '')).map(item => `<li>${escapeHtml(item)}</li>`).join(''); return `<ul class="faq-list" style="margin:6px 0 8px 18px">${items}</ul>`; }
     // 줄바꿈(\n)은 <br>로, 문장 끝(.?! 뒤 공백)은 가볍게 개행 보정 
-    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>'); return <p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>;
+    const withBreaks = block.replace(/([.!?])\s+/g, '$1<br>').replace(/\n/g, '<br>'); return `<p>${escapeHtml(withBreaks).replace(/&lt;br&gt;/g, '<br>')}</p>`;
   }).join(''); return html;
 }
 
