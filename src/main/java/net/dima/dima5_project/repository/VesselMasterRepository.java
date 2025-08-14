@@ -15,7 +15,10 @@ public interface VesselMasterRepository extends JpaRepository<VesselMasterEntity
     Optional<String> findVslIdByVslImo(@Param("imo") String imo);
 
     // vsl_mmsi로 vsl_id 조회
-    @Query("SELECT v.vslId FROM VesselMasterEntity v WHERE v.vslMmsi = :mmsi")
+    // @Query("SELECT v.vslId FROM net.dima.dima5_project.entity.VesselMasterEntity v WHERE v.vslMmsi = :mmsi")
+    // Optional<String> findVslIdByVslMmsi(@Param("mmsi") String mmsi);
+    @Query(value = "select vsl_id from vessel_master where vsl_mmsi = :mmsi limit 1", nativeQuery = true)
     Optional<String> findVslIdByVslMmsi(@Param("mmsi") String mmsi);
+
 }
 

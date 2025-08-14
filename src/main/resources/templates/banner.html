@@ -31,7 +31,19 @@
 
     <!-- Hero Section -->
     <section class="hero">
-      <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image">
+      <!-- <img th:src="@{/images/bannerImages/main_bg.png}" alt="컨테이너선" class="hero-image"> -->
+
+      <!-- 배 이동 비디오 -->
+      <div class="ship-stage">
+        <video id="shipVideo" class="ship-video" autoplay muted playsinline loop preload="auto"
+          th:attr="poster=@{/images/bannerImages/main_bg.png}">
+          <source th:src="@{/videos/ship.mp4}" type="video/mp4">
+          <!-- 브라우저가 비디오를 못 재생하면 포스터 이미지가 보임 -->
+        </video>
+        <!-- 검은색 오버레이 -->
+        <div class="video-overlay"></div>
+      </div>
+
       <div class="hero-text">
         <p class="subheading">Next Port, First Insight.</p>
         <h1>차기 정박항을 예측하는<br />가장 똑똑한 방법</h1>
@@ -91,6 +103,7 @@
 
   </div>
   <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+  <script defer th:src="@{/js/translatorAll.js}"></script>
 </body>
 
 </html>

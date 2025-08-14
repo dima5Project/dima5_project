@@ -1,6 +1,6 @@
 package net.dima.dima5_project.controller;
 
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,39 +20,44 @@ public class VesselController {
     private final VesselService vesselService;
 
     /**
-     * 선박 검색 시, DB의 vsl_id 와 매핑하여 가져오기
-     * @param type - IMO / MMSI 구분 선택
-     * @param query- 사용자가 입력한 실제값 (IMO번호나 MMSI 번호)
-     * @return
+     * 예:
+     *  - /api/predict?imo=9121041
+     *  - /api/predict?mmsi=441107000
+     * 둘 다 오면 서비스에서 IMO 우선 처리
      */
-    @GetMapping("/vessel-info")
-    public ResponseEntity<String> getVesselInfo(
-            @RequestParam String type, @RequestParam String query 
-        ) {
-        // type 정규화
-        final String t = type == null ? "" : type.trim().toLowerCase();
+    @GetMapping("/predict")
+    public ResponseEntity<Map<String, Object>> predict(
+            @RequestParam(required = false) String imo,
+            @RequestParam(required = false) String mmsi
+    ) {
+        // 서비스: (imo, mmsi) -> vsl_id 조회 -> FastAPI 호출 -> Map 반환
+        Map<String, Object> result = vesselService.predictByImoOrMmsi(imo, mmsi);
 
-        // vsl_id 조회 (Service에 findVslId(imo/mmsi 타입, 값) 구현되어 있어야 함)
-        Optional<String> vslIdOpt = vesselService.findVslId(t, query);
-
-        if (vslIdOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                .body("선박을 찾을 수 없습니다.");
+        // 에러 키가 있으면 적절한 HTTP 상태코드로 매핑
+        HttpStatus status = HttpStatus.OK;
+        Object err = result.get("error");
+        if (err instanceof String e) {
+            switch (e) {
+                case "BAD_REQUEST" -> status = HttpStatus.BAD_REQUEST; // imo/mmsi 모두 없음 등
+                case "NOT_FOUND"   -> status = HttpStatus.NOT_FOUND;   // DB에 매칭 vsl_id 없음
+                case "CLIENT_EXCEPTION" -> status = HttpStatus.BAD_GATEWAY; // 네트워크 등 클라이언트 예외
+                default -> {
+                    // "HTTP_404", "HTTP_500" 형태면 숫자 코드로 변환
+                    if (e.startsWith("HTTP_")) {
+                        try {
+                            int code = Integer.parseInt(e.substring("HTTP_".length()));
+                            HttpStatus parsed = HttpStatus.resolve(code);
+                            status = (parsed != null) ? parsed : HttpStatus.BAD_GATEWAY;
+                        } catch (NumberFormatException ignore) {
+                            status = HttpStatus.BAD_GATEWAY;
+                        }
+                    } else {
+                        status = HttpStatus.BAD_GATEWAY;
+                    }
+                }
+            }
         }
-        return ResponseEntity.ok(vslIdOpt.get());
-    }
 
-    /**
-     * vsl_id 기준으로 최신 timepoint 조회
-     * 예) GET /api/latest-timepoint?vslId=VSL-123
-     */
-    @GetMapping("/latest-timepoint")
-    public ResponseEntity<?> getLatestTimepoint(@RequestParam String vslId) {
-        // 서비스가 Optional<Integer>로 반환하도록 구현하면 안전
-        return vesselService.getLatestTimepoint(vslId)
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                            .body("해당 vsl_id의 레코드가 없습니다."));
+        return new ResponseEntity<>(result, status);
     }
-
 }

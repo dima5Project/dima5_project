@@ -66,48 +66,46 @@ def _load_bundle(tp: int):
 # =============================================
 
 def predict(lat: float, lon: float, cog: float, heading: float, tp: int):
+    used = _nearest(tp)
+    bundle = _load_bundle(used)
 
-    used = _nearest(tp)                                             # 1) 사용할 모델 시점 결정
-    bundle = _load_bundle(used)                                     # 2) 해당 시점 모델/인코더 묶음 로드
+    x = np.array([[lat, lon, cog, heading]], dtype=float)
 
-    x = np.array([[lat, lon, cog, heading]], dtype=float)           # 3) 입력을 2D 배열로 준비 (모델 입력 형태)
+    c_model = bundle["cluster"]
+    c_probs = c_model.predict_proba(x)[0]
+    c_labels = c_model.classes_
 
-    c_model = bundle["cluster"]                                     # 4) 1차 군집 모델 꺼내기
-    c_probs = c_model.predict_proba(x)[0]                           # 5) 각 군집에 대한 예측 확률 벡터 (shape: [n_clusters])
-    c_labels = c_model.classes_                                     # 6) 군집 라벨(예: [1,2,3,4,6,7]) → 확률 벡터와 같은 순서
+    top_c_idx = np.argsort(c_probs)[-2:][::-1]
+    joint = {}
 
-    top_c_idx = np.argsort(c_probs)[-2:][::-1]                      # 7) 군집 확률 상위 2개 인덱스 (내림차순)
-
-    joint = {}                                                      # 8) 항구별 joint 확률(군집*항구)을 저장할 딕셔너리
-
-    for idx in top_c_idx:                                           # 9) 상위 2개 군집 각각에 대해
-        c_label = c_labels[idx]                                     #   9-1) 군집 라벨값 (예: 3)
-        p_cluster = float(c_probs[idx])                             #   9-2) 해당 군집의 확률
+    for idx in top_c_idx:
+        c_label = c_labels[idx]
+        p_cluster = float(c_probs[idx])
 
         if c_label not in bundle["ports"] or c_label not in bundle["encs"]:
-            continue                                                #   9-3) 모델/인코더 없으면 스킵
+            continue
 
-        p_model = bundle["ports"][c_label]                          #   9-4) 해당 군집의 2차 항구 모델
-        enc = bundle["encs"][c_label]                               #   9-5) 해당 군집의 인코더(LabelEncoder)
+        p_model = bundle["ports"][c_label]
+        enc = bundle["encs"][c_label]
 
-        p_probs = p_model.predict_proba(x)[0]                       #   9-6) 군집 내부 항구들의 확률 벡터
-        p_classes = getattr(p_model, "classes_", np.arange(len(p_probs)))  # 9-7) 항구 라벨(확률 벡터 열 순서와 동일)
+        p_probs = p_model.predict_proba(x)[0]
+        p_classes = getattr(p_model, "classes_", np.arange(len(p_probs)))
 
-        top_p_idx = np.argsort(p_probs)[-2:][::-1]                  #   9-8) 항구 확률 상위 2개 인덱스
+        top_p_idx = np.argsort(p_probs)[-2:][::-1]
 
-        for j in top_p_idx:                                         #   9-9) 상위 2개 항구 각각에 대해
-            label = p_classes[j]                                    #       항구 라벨(인코딩 값)
+        for j in top_p_idx:
+            label = p_classes[j]
             try:
-                port_id = enc.inverse_transform([label])[0]         #       인코더로 원래 항구 ID 복원
+                port_id = enc.inverse_transform([label])[0]
             except Exception:
-                port_id = str(label)                                #       실패하면 문자열로 강제 변환
+                port_id = str(label)
 
-            score = p_cluster * float(p_probs[j])                   #       joint 확률 = 군집확률 × 항구확률
+            score = p_cluster * float(p_probs[j])
+            joint[port_id] = max(joint.get(port_id, 0), score)
 
-            if port_id in joint:                                    #       같은 항구가 여러 군집에서 등장할 수 있으니
-                joint[port_id] = max(joint[port_id], score)         #       더 큰 joint 값으로 업데이트
-            else:
-                joint[port_id] = score                              #       처음 나오면 그대로 저장
+    # joint가 비어 있으면 빈 리스트 반환
+    if not joint:
+        return used, []
 
-    top3 = sorted(joint.items(), key=lambda x: x[1], reverse=True)[:3]  # 10) joint 상위 3개 추림
-    return used, [(str(pid), float(prob)) for pid, prob in top3]        # 11) (사용시점, [(항구ID, 확률)]) 형태로 반환
+    top3 = sorted(joint.items(), key=lambda x: x[1], reverse=True)[:3]
+    return used, [(str(pid), float(prob)) for pid, prob in top3]
