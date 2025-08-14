@@ -17,6 +17,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap"
         rel="stylesheet">
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js'></script>
+
 </head>
 
 <body>
@@ -42,83 +50,115 @@
         </div>
 
         <div class="extra-info-container">
-            <div class="row">
-                <div class="map-box">
-                    <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
-                </div>
-                <div class="info-card" id="dockingCard">
-                    <h3>⚓ 혼잡도</h3>
-                    <div class="docking-grid">
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="currentShips">로딩 중</span>
-                            </div>
-                            <span>정박 선박 수</span>
+
+            <div class="map-box">
+                <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
+            </div>
+            <div class="info-card" id="dockingCard">
+                <h3>⚓ 혼잡도</h3>
+                <div class="docking-grid">
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="currentShips">로딩 중</span>
                         </div>
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="expectedShips">로딩 중</span>
-                            </div>
-                            <span>입항 예정 수</span>
+                        <span>정박 선박 수</span>
+                    </div>
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="expectedShips">로딩 중</span>
                         </div>
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="congestionLevel">로딩 중</span>
-                            </div>
-                            <span>상태</span>
+                        <span>입항 예정 수</span>
+                    </div>
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="congestionLevel">로딩 중</span>
                         </div>
+                        <span>상태</span>
                     </div>
                 </div>
             </div>
 
-            <div class="row content-row">
-                <div class="info-card tall-weather" id="weatherCard">
-                    <h3>🌤 날씨</h3>
-                    <p>온도: <span id="temperature">로딩 중...</span></p>
-                    <p>날씨: <span id="mainWeather">로딩 중...</span></p>
-                    <p>풍속: <span id="windSpeed">로딩 중...</span></p>
-                    <p>풍향: <span id="windDirLabel">로딩 중...</span></p>
-                    <p>강수량: <span id="rainVolume">로딩 중...</span></p>
+
+
+            <div class="info-card tall-weather" id="weatherCard">
+                <h3>🌤️ 날씨</h3>
+
+                <!-- 큰 온도 카드 -->
+                <div class="wx-main">
+                    <div class="wx-main-label">🌡 온도</div>
+                    <div class="wx-main-value" id="temperature">로딩 중...</div>
                 </div>
 
-                <div class="col-2">
-                    <div class="info-card" id="chartCard">
-                        <canvas id="graphCanvas" height="180"></canvas>
+                <!-- 2×2 정보 카드 -->
+                <div class="wx-grid">
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">날씨</span>
+                        </div>
+                        <div class="wx-value" id="mainWeather">로딩 중...</div>
                     </div>
 
-                    <div class="row inner-row">
-                        <div class="info-card" id="timezoneCard">
-                            <h3>시차 정보</h3>
-
-                            <!-- 한국 -->
-                            <div class="tz-block">
-                                <span class="tz-badge">KR 한국</span><br />
-                                <div id="koreaTime" class="tz-time">로딩 중</div>
-                                <div class="tz-date">
-                                    <span class="utc">UTC+09:00</span>
-                                </div>
-                            </div>
-
-                            <div class="tz-sep"></div>
-
-                            <!-- 해외 -->
-                            <div class="tz-block">
-                                <span class="tz-badge" id="countryName">로딩중</span><br />
-                                <div id="foreignTime" class="tz-time">로딩중</div>
-                                <div class="tz-date">
-                                    <span class="utc" id="foreignUtc">로딩중</span>
-                                </div>
-                            </div>
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">풍속</span>
                         </div>
+                        <div class="wx-value" id="windSpeed">로딩 중...</div>
+                    </div>
 
-                        <div class="info-card" id="holidayCard">
-                            <h3>공휴일 달력</h3>
-                            <div id="todayText"></div>
-                            <div id="holidayCalendarContainer"></div>
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">강수량</span>
                         </div>
+                        <div class="wx-value" id="rainVolume">로딩 중...</div>
+                    </div>
+
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">풍향</span>
+                        </div>
+                        <div class="wx-value" id="windDirLabel">로딩 중...</div>
                     </div>
                 </div>
             </div>
+
+
+            <div class="info-card" id="chartCard">
+                <canvas id="graphCanvas"></canvas>
+            </div>
+
+
+            <div class="info-card" id="timezoneCard">
+                <h3>🕜 시차 정보</h3>
+
+                <!-- 한국 -->
+                <div class="tz-block">
+                    <span class="tz-badge">한국</span><br />
+                    <div id="koreaTime" class="tz-time">로딩 중</div>
+                    <div class="tz-date">
+                        <span class="utc">UTC+09:00</span>
+                    </div>
+                </div>
+
+                <div class="tz-sep"></div>
+
+                <!-- 해외 -->
+                <div class="tz-block">
+                    <span class="tz-badge" id="countryName">로딩중</span><br />
+                    <div id="foreignTime" class="tz-time">로딩중</div>
+                    <div class="tz-date">
+                        <span class="utc" id="foreignUtc">로딩중</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card" id="holidayCard">
+                <h3>🗓️ 공휴일 달력</h3>
+                <div id="fullCalendar"></div>
+                <div id="holidayListContainer"></div>
+            </div>
+
+
+
         </div>
     </main>
 

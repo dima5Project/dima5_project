@@ -1,3 +1,6 @@
+@charset "UTF-8";
+
+/* 기본 */
 body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
@@ -11,6 +14,7 @@ main {
     padding: 0 20px;
 }
 
+/* 상단 히어로 */
 .info-header-bg {
     background-color: #0f1035;
     height: 435px;
@@ -21,18 +25,18 @@ main {
 }
 
 .info-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
+    /*뷰포트(viewport) 높이의 15% 만큼 위쪽 여백을 설정*/
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
-    color: white;
+    color: #fff;
 }
 
 .info-header h2 {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 30px;
-    color: white;
 }
 
 .info-header p {
@@ -41,7 +45,7 @@ main {
     color: #ddd;
 }
 
-/* ================== 검색 구역 스타일 ================== */
+/* 검색 영역 */
 .search-container {
     display: flex;
     justify-content: center;
@@ -51,7 +55,7 @@ main {
     padding: 20px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, .1);
     position: relative;
     z-index: 10;
 }
@@ -61,14 +65,13 @@ main {
     padding: 10px 15px;
     border-radius: 8px;
     font-size: 16px;
-    font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .search-container select {
-    border: 1px solid #ddd;
-    background-color: #fefefe;
-    color: #555;
+    border: 1px solid #E5E7EB;
+    background: #fefefe;
+    color: #0F172A;
     min-width: 150px;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -84,12 +87,11 @@ main {
 }
 
 .search-container button {
-    background-color: #0f1035;
+    background-color: #2b2e53;
     color: #fff;
     border: none;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .search-container button:hover {
@@ -97,37 +99,33 @@ main {
     transform: translateY(-2px);
 }
 
-/*카드 및 컨테이너 스타일*/
-
+/* ===== 3열 그리드 레이아웃 ===== */
 .extra-info-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 16px;
-    margin-top: 20px;
+    grid-template-columns: 360px 1fr 1fr;
+    /* 여기서 1열 너비 조정 */
+    grid-template-rows: 240px 300px auto;
+    grid-template-areas:
+        "map   dock   dock"
+        "map   chart  chart"
+        "weather tz    holiday";
+    min-width: 0;
+    box-sizing: border-box;
 }
 
-.row {
-    display: flex;
-    gap: 16px;
+.extra-info-container>* {
+    min-width: 0;
+    box-sizing: border-box;
 }
 
-.content-row {
-    align-items: stretch;
-}
-
-.inner-row {
-    display: flex;
-    gap: 16px;
-}
-
+/* 공통 카드 */
 .info-card {
     border: 1px solid #aaa;
     border-radius: 12px;
     padding: 20px;
     background-color: #fefefe;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    /* 그림자 효과 강화 */
-    flex: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
     display: flex;
     flex-direction: column;
 }
@@ -137,7 +135,7 @@ main {
     font-weight: 700;
     margin-bottom: 18px;
     color: #0f1035;
-    border-bottom: 2px solid #0f1035;
+    border-bottom: 2px solid #E5E7EB;
     padding-bottom: 8px;
 }
 
@@ -153,31 +151,13 @@ main {
     color: #111;
 }
 
-.tall-weather {
-    flex: 1;
-    min-height: 380px;
-}
-
-/* 그래프 카드 크기 고정 */
-#chartCard {
-    height: 300px;
-}
-
-.col-2 {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
+/* 지도 */
 .map-box {
-    width: 220px;
-    height: 257px;
-    border-radius: 12px;
-    background-color: #eee;
-    overflow: hidden;
+    grid-area: map;
     border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
 }
 
 .map-img {
@@ -186,19 +166,20 @@ main {
     object-fit: cover;
 }
 
-/* ⚓ 혼잡도 카드 스타일 */
+/* 혼잡도 */
 #dockingCard {
+    grid-area: dock;
+    min-height: 240px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-top: 20px;
 }
 
 #dockingCard h3 {
     margin-bottom: 18px;
-    border-bottom: 2px solid #232323;
     padding-bottom: 8px;
-    font-size: 20px;
-    font-weight: 700;
+    border-bottom: 2px solid #E5E7EB;
     color: #0f1035;
 }
 
@@ -234,78 +215,209 @@ main {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background-color: #e6f7ff;
+    background-color: #F1F5F9;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
+    color: #334155;
+    font-size: 40px;
     font-weight: bold;
-    color: #0f1035;
-    border: 1px solid #cceeff;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #CBD5E1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 1px 2px rgba(15, 23, 42, .08);
 }
 
 .status-circle span {
-    font-size: 30px;
+    font-size: 40px;
     font-weight: bold;
 }
 
+.status-circle.is-very-congested {
+    /*매우혼잡*/
+    background-color: #FEE2E2;
+    border-color: #FCA5A5;
+}
+
+.status-circle.is-very-congested span {
+    color: #B91C1C;
+}
+
+.status-circle.is-congested {
+    /*혼잡*/
+    background: #ffd59f;
+    border-color: #fcb04d;
+}
+
+.status-circle.is-congested span {
+    color: #92400E;
+}
+
+.status-circle.is-clear {
+    /*원활*/
+    background: #DCFCE7;
+    border-color: #86EFAC;
+}
+
+.status-circle.is-clear span {
+    color: #166534;
+}
+
 .docking-info span {
-    font-size: 14px;
-    color: #555;
+    font-size: 16px;
+    color: #000000;
     margin-top: 5px;
 }
 
-/* ================== 시차 정보 카드 추가 스타일 ================== */
-#timezoneCard {
+/* 그래프 */
+#chartCard {
+    grid-area: chart;
+    min-height: 300px;
+}
+
+#chartCard canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* 날씨 */
+#weatherCard {
+    grid-area: weather;
+    min-height: 180px;
+    /* 내용 높이에 맞게 */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    gap: 16px;
+}
+
+/* 큰 온도 카드 */
+#weatherCard .wx-main {
+    background: var(--accent-100, #F8FAFC);
+    border: 1px solid #D7E3FF;
+    border-radius: 16px;
+    padding: 18px 20px 22px;
+    text-align: center;
+}
+
+#weatherCard .wx-main-label {
+    font-size: 14px;
+    color: #1E40AF;
+    ;
+    font-weight: 700;
+    letter-spacing: .02em;
+    margin-bottom: 6px;
+}
+
+#weatherCard .wx-main-value {
+    /* 예: 31.5°C 처럼 크게 */
+    font-size: 48px;
+    /* 필요하면 52~56px 로 키워도 OK */
+    line-height: 1.05;
+    font-weight: 800;
+    color: #0F1035;
+}
+
+/* 2×2 정보 카드 */
+#weatherCard .wx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+#weatherCard .wx-tile {
+    background: var(--accent-100, #F8FAFC);
+    border: 1px solid #D7E3FF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 96px;
+    /* 카드 높이 */
+}
+
+/* 타일 헤더(아이콘 + 라벨) */
+#weatherCard .wx-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: #304484;
+    font-weight: 700;
+}
+
+#weatherCard .wx-label {
+    display: block;
+    flex: 1 1 auto;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+/* 값 */
+#weatherCard .wx-value {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+    color: #0F1035;
+}
+
+/* 반응형(좁은 화면에서 1열로) */
+/*@media (max-width: 720px) {
+    #weatherCard .wx-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #weatherCard .wx-main-value {
+        font-size: 40px;
+    }
+}*/
+
+
+/* 시차 */
+#timezoneCard {
+    grid-area: tz;
+    min-height: 180px;
 }
 
 #timezoneCard h3 {
     margin-bottom: 18px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #232323;
-    /* 시안처럼 진한 구분선 */
+    border-bottom: 2px solid #E5E7EB;
 }
 
-/* 각 블록(한국/해외) */
 #timezoneCard .tz-block {
     text-align: center;
-    padding: 12px 8px 18px;
+    padding: 16px 8px;
 }
 
-/* 상·하 블록 사이 구분선 */
 #timezoneCard .tz-sep {
-    height: 1.5px;
-    background: #232323;
-    margin: 6px 0 14px;
+    height: 1px;
+    background: #E5E7EB;
+    margin: 12px 0;
     border-radius: 1px;
 }
 
-/* 파란 알약 배지 */
 #timezoneCard .tz-badge {
     display: inline-block;
     padding: 8px 14px;
     border-radius: 9999px;
-    background: #81B4FF;
-    color: #fff;
+    background: var(--accent-100, #F8FAFC);
+    color: #0F1035;
+    border: 1px solid #D7E3FF;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 10px;
 }
 
-/* 큰 시각 */
 #timezoneCard .tz-time {
-    font-size: 28px;
+    font-size: 30px;
     line-height: 1.1;
-    font-weight: 600;
-    color: #111;
+    font-weight: 500;
+    color: #0F1035;
     margin: 6px 0 8px;
 }
 
-/* 날짜 + UTC 줄 */
 #timezoneCard .tz-date {
     font-size: 18px;
     color: #6b7280;
@@ -315,11 +427,13 @@ main {
 #timezoneCard .tz-date .utc {
     margin-left: 6px;
     color: #6b7280;
-    font-weight: 500;
 }
 
-
-/* 📅 달력 스타일 */
+/* 공휴일 */
+#holidayCard {
+    grid-area: holiday;
+    min-height: 180px;
+}
 
 .calendar-header {
     display: flex;
@@ -328,13 +442,9 @@ main {
     margin-bottom: 8px;
 }
 
-
-
 .calendar-header strong {
     font-size: 16px;
 }
-
-
 
 .calendar-table {
     width: 100%;
@@ -342,15 +452,11 @@ main {
     border-collapse: collapse;
 }
 
-
-
 .calendar-table th {
     color: #444;
     font-size: 14px;
     padding-bottom: 6px;
 }
-
-
 
 .calendar-table td {
     text-align: center;
@@ -361,8 +467,6 @@ main {
     color: #111;
 }
 
-
-
 .calendar-date.today {
     background-color: #ffecec;
     border-radius: 50%;
@@ -370,19 +474,15 @@ main {
     color: #d60000;
 }
 
-
-
 .calendar-date .dot {
     width: 6px;
     height: 6px;
     background-color: #b48ced;
     border-radius: 50%;
-    margin: 2px auto 0 auto;
-
+    margin: 2px auto 0;
 }
 
-/* 오늘 날짜 표시 */
-
+/* 오늘 텍스트 */
 #todayText p {
     margin-bottom: 10px;
 }
