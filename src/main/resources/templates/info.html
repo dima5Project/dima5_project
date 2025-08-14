@@ -74,11 +74,43 @@
 
             <div class="info-card tall-weather" id="weatherCard">
                 <h3>🌤️ 날씨</h3>
-                <p>🌡️ 온도: <span id="temperature">로딩 중...</span></p>
-                <p>🌦️ 날씨: <span id="mainWeather">로딩 중...</span></p>
-                <p>🌪️ 풍속: <span id="windSpeed">로딩 중...</span></p>
-                <p>🌀 풍향: <span id="windDirLabel">로딩 중...</span></p>
-                <p>💧 강수량: <span id="rainVolume">로딩 중...</span></p>
+
+                <!-- 큰 온도 카드 -->
+                <div class="wx-main">
+                    <div class="wx-main-label">🌡 온도</div>
+                    <div class="wx-main-value" id="temperature">로딩 중...</div>
+                </div>
+
+                <!-- 2×2 정보 카드 -->
+                <div class="wx-grid">
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">날씨</span>
+                        </div>
+                        <div class="wx-value" id="mainWeather">로딩 중...</div>
+                    </div>
+
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">풍속</span>
+                        </div>
+                        <div class="wx-value" id="windSpeed">로딩 중...</div>
+                    </div>
+
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">강수량</span>
+                        </div>
+                        <div class="wx-value" id="rainVolume">로딩 중...</div>
+                    </div>
+
+                    <div class="wx-tile">
+                        <div class="wx-tile-head">
+                            <span class="wx-label">풍향</span>
+                        </div>
+                        <div class="wx-value" id="windDirLabel">로딩 중...</div>
+                    </div>
+                </div>
             </div>
 
 
@@ -92,7 +124,7 @@
 
                 <!-- 한국 -->
                 <div class="tz-block">
-                    <span class="tz-badge">KR 한국</span><br />
+                    <span class="tz-badge">한국</span><br />
                     <div id="koreaTime" class="tz-time">로딩 중</div>
                     <div class="tz-date">
                         <span class="utc">UTC+09:00</span>
