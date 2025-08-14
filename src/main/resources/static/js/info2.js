@@ -239,10 +239,31 @@ function loadTimezone(countryNameKr) {
             hour: '2-digit', minute: '2-digit', hour12: true
         });
 
+        // UTC 오프셋 값을 가져와서 Etc/GMT 형식에 맞게 변환
+        let foreignTime;
+        let foreignUtc = `UTC${data.utcOffset}`; // API 응답 그대로 사용
+
+        // API에서 받은 data.utcOffset이 숫자인 경우를 처리
+        const offsetNumber = parseFloat(data.utcOffset);
+        if (!isNaN(offsetNumber)) {
+            // Etc/GMT는 UTC와 부호가 반대이므로 -1을 곱함
+            const gmtOffset = offsetNumber * -1;
+            const timeZoneName = `Etc/GMT${gmtOffset}`;
+
+            foreignTime = new Date().toLocaleString("ko-KR", {
+                timeZone: timeZoneName,
+                weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
+        } else {
+            // API 응답이 숫자가 아닌 다른 형식이면 기본값 설정
+            foreignTime = "로딩 중";
+        }
+
         $("#koreaTime").text(koreaTime);
         $("#countryName").text(data.countryName);
-        $("#foreignTime").text(`${data.dayOfWeek}, ${data.currentTime}`);
-        $("#foreignUtc").text(`UTC${data.utcOffset}`);
+        $("#foreignTime").text(foreignTime);
+        $("#foreignUtc").text(foreignUtc);
     });
 }
 
