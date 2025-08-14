@@ -290,55 +290,50 @@ function loadHoliday(countryNameKr) {
         let calendarEl = document.getElementById('fullCalendar');
         calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-
-            // 테마 시스템을 'sandstone'로 설정
             themeSystem: 'sandstone',
-
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,dayGridWeek,dayGridDay'
             },
-
             locale: 'ko',
             events: events,
-
-            // ... (eventDidMount 및 datesSet 콜백) ...
         });
         calendar.render();
-    }
+    }); // <-- `$.get` 호출을 닫는 올바른 위치
+}
 
 // 달력 아래에 공휴일 목록과 오늘 날짜를 표시하는 함수
 function updateHolidayListAndToday(startDate, endDate, allHolidays) {
-            let listContainer = $('#holidayListContainer');
-            listContainer.empty();
+    let listContainer = $('#holidayListContainer');
+    listContainer.empty();
 
-            // 1. 오늘 날짜 정보 추가
-            let today = new Date();
-            let days = ["일", "월", "화", "수", "목", "금", "토"];
-            let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 (${days[today.getDay()]})`;
-            listContainer.append(`<p>${todayText}</p>`);
+    // 1. 오늘 날짜 정보 추가
+    let today = new Date();
+    let days = ["일", "월", "화", "수", "목", "금", "토"];
+    let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 (${days[today.getDay()]})`;
+    listContainer.append(`<p>${todayText}</p>`);
 
-            // 2. 공휴일 목록 추가 (기존 코드와 동일)
-            let currentMonthHolidays = allHolidays.filter(h => {
-                const holidayDate = new Date(h.holidayDate);
-                return holidayDate >= startDate && holidayDate < endDate;
-            });
+    // 2. 공휴일 목록 추가 (기존 코드와 동일)
+    let currentMonthHolidays = allHolidays.filter(h => {
+        const holidayDate = new Date(h.holidayDate);
+        return holidayDate >= startDate && holidayDate < endDate;
+    });
 
-            if (currentMonthHolidays.length > 0) {
-                let listHTML = '<h4>이번 달 공휴일</h4><ul>';
-                currentMonthHolidays.forEach(holiday => {
-                    const date = new Date(holiday.holidayDate);
-                    const day = date.getDate();
-                    const dayOfWeek = days[date.getDay()];
-                    listHTML += `<li>${day}일(${dayOfWeek}) : ${holiday.holidayName}</li>`;
-                });
-                listHTML += '</ul>';
-                listContainer.append(listHTML);
-            } else {
-                listContainer.append('<p>이번 달에는 공휴일이 없습니다.</p>');
-            }
-        }
+    if (currentMonthHolidays.length > 0) {
+        let listHTML = '<h4>이번 달 공휴일</h4><ul>';
+        currentMonthHolidays.forEach(holiday => {
+            const date = new Date(holiday.holidayDate);
+            const day = date.getDate();
+            const dayOfWeek = days[date.getDay()];
+            listHTML += `<li>${day}일(${dayOfWeek}) : ${holiday.holidayName}</li>`;
+        });
+        listHTML += '</ul>';
+        listContainer.append(listHTML);
+    } else {
+        listContainer.append('<p>이번 달에는 공휴일이 없습니다.</p>');
+    }
+}
 
 // function drawHolidayCalendar(holidays) {
 //     let today = new Date();
@@ -417,97 +412,97 @@ function updateHolidayListAndToday(startDate, endDate, allHolidays) {
 
 // 날씨 카드
 function loadWeather(lat, lon) {
-            $.get("/api/info/weather/direct", { lat, lon }, function (data) {
-                let rainVolume = data.rainVolume !== null ? parseFloat(data.rainVolume) : 0;
-                if (isNaN(rainVolume)) rainVolume = 0;
+    $.get("/api/info/weather/direct", { lat, lon }, function (data) {
+        let rainVolume = data.rainVolume !== null ? parseFloat(data.rainVolume) : 0;
+        if (isNaN(rainVolume)) rainVolume = 0;
 
-                $("#temperature").text(data.temperature + "°C");
-                $("#mainWeather").text(data.mainWeather + " " + data.weatherEmoji);
-                $("#windSpeed").text(data.windSpeed + " m/s");
-                $("#windDirLabel").text(data.windDirLabel + " (" + data.windDeg + "°)");
-                $("#rainVolume").text(rainVolume + " mm");
-            });
-        }
+        $("#temperature").text(data.temperature + "°C");
+        $("#mainWeather").text(data.mainWeather + " " + data.weatherEmoji);
+        $("#windSpeed").text(data.windSpeed + " m/s");
+        $("#windDirLabel").text(data.windDirLabel + " (" + data.windDeg + "°)");
+        $("#rainVolume").text(rainVolume + " mm");
+    });
+}
 
 // 혼잡도 카드
 function loadDocking(portId) {
-            $.get(`/api/info/docking/${portId}`, function (data) {
-                let congestionText = data.congestionLevel === "혼잡" ? "혼잡"
-                    : data.congestionLevel === "매우 혼잡" ? "매우 혼잡"
-                        : "원활";
+    $.get(`/api/info/docking/${portId}`, function (data) {
+        let congestionText = data.congestionLevel === "혼잡" ? "혼잡"
+            : data.congestionLevel === "매우 혼잡" ? "매우 혼잡"
+                : "원활";
 
-                $("#currentShips").text(data.currentShips);
-                $("#expectedShips").text(data.expectedShips);
-                $("#congestionLevel").text(congestionText);
-            });
-        }
+        $("#currentShips").text(data.currentShips);
+        $("#expectedShips").text(data.expectedShips);
+        $("#congestionLevel").text(congestionText);
+    });
+}
 
 // 혼잡도 그래프
 function loadDockingGraph(portId) {
-            $.get(`/api/info/dock-graph/${portId}`, function (data) {
-                drawChart(data);
-            });
-        }
+    $.get(`/api/info/dock-graph/${portId}`, function (data) {
+        drawChart(data);
+    });
+}
 
 function drawChart(data) {
-            let ctx = document.getElementById("graphCanvas").getContext("2d");
-            let labels = data.map(d => d.date);
-            let actualData = data.map(d => d.actual);
-            let expectedData = data.map(d => d.expected);
+    let ctx = document.getElementById("graphCanvas").getContext("2d");
+    let labels = data.map(d => d.date);
+    let actualData = data.map(d => d.actual);
+    let expectedData = data.map(d => d.expected);
 
-            if (congestionChart) congestionChart.destroy();
+    if (congestionChart) congestionChart.destroy();
 
-            congestionChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: '정박 선박 수',
-                            data: actualData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1,
-                            order: 1,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: '정박 추이 (선)',
-                            data: actualData,
-                            type: 'line',
-                            borderColor: 'blue',
-                            borderWidth: 2,
-                            pointBackgroundColor: 'blue',
-                            tension: 0.3,
-                            fill: false,
-                            order: 0,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: '입항 예정 수',
-                            data: expectedData,
-                            backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                            borderColor: 'rgba(255, 159, 64, 1)',
-                            borderWidth: 1,
-                            order: 2,
-                            yAxisID: 'y'
-                        }
-                    ]
+    congestionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '정박 선박 수',
+                    data: actualData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    order: 1,
+                    yAxisID: 'y'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '최근 항만 혼잡도 추이'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
+                {
+                    label: '정박 추이 (선)',
+                    data: actualData,
+                    type: 'line',
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'blue',
+                    tension: 0.3,
+                    fill: false,
+                    order: 0,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '입항 예정 수',
+                    data: expectedData,
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1,
+                    order: 2,
+                    yAxisID: 'y'
                 }
-            });
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '최근 항만 혼잡도 추이'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
+    });
+}
