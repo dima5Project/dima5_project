@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS predict_user
 );
 ALTER TABLE predict_user
     MODIFY user_pwd varchar(100) NOT NULL;  -- 최소 60 필요(보통 100 권장)
+ALTER TABLE predict_user 
+	ADD COLUMN join_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- (ROLE_ADMIN) 관리자는 INSERT 구문으로 수동 입력해야 할 듯!
 
