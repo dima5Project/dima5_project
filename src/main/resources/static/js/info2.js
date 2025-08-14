@@ -42,111 +42,175 @@ const portCoordinates = {
     "하이퐁": { lat: 20.86, lon: 106.68 }
 };
 
-let congestionChart; // 그래프 표시 위한 선언
+const portIdToName = {
+    "CNDAG": "다강", "CNHUA": "황화", "CNLYG": "롄윈강", "CNNGB": "닝보", "CNNJI": "난징", "CNQDG": "칭다오", "CNRZH": "르자오", "CNSHA": "상하이", "CNTAC": "톈진", "CNTXG": "탕구싱강",
+    "HKHKG": "홍콩", "JPHIJ": "히로시마", "JPHKT": "하카타", "JPIMB": "이마바리", "JPIMI": "이미즈", "JPKIJ": "가고시마", "JPMKX": "마쓰야마", "JPMOJ": "모지", "JPNGO": "나고야", "JPNGS": "나가사키",
+    "JPOSA": "오사카", "JPSMZ": "시미즈", "JPTYO": "도쿄", "JPUKB": "고베", "JPWAK": "와카야마", "JPYKK": "욧카이치", "JPYOK": "요코하마",
+    "KRINC": "인천", "KRKAN": "군산", "KRKPO": "포항", "KRPTK": "평택", "KRYOS": "여수",
+    "PHMNL": "마닐라", "RUNJK": "나홋카", "RUVVO": "보스토치니",
+    "TWKEL": "기륭", "TWKHH": "가오슝", "VNHPH": "하이퐁"
+};
+
+const portNameToCountry = {
+    "다강": "중국", "황화": "중국", "롄윈강": "중국", "닝보": "중국", "난징": "중국", "칭다오": "중국", "르자오": "중국", "상하이": "중국", "톈진": "중국", "탕구싱강": "중국",
+    "홍콩": "홍콩",
+    "히로시마": "일본", "하카타": "일본", "이마바리": "일본", "이미즈": "일본", "가고시마": "일본", "마쓰야마": "일본", "모지": "일본", "나고야": "일본", "나가사키": "일본", "오사카": "일본", "시미즈": "일본", "도쿄": "일본", "고베": "일본", "와카야마": "일본", "욧카이치": "일본", "요코하마": "일본",
+    "인천": "한국", "군산": "한국", "포항": "한국", "평택": "한국", "여수": "한국",
+    "마닐라": "필리핀",
+    "나홋카": "러시아", "보스토치니": "러시아",
+    "기륭": "대만", "가오슝": "대만",
+    "하이퐁": "베트남"
+};
+
+let congestionChart;
+let autoUpdateInterval;
+let isUserInteracting = false;
+let currentPortId = 'CNDAG';
+let currentPortNameKr = '다강';
+let currentCountryNameKr = '중국';
 
 // ==========================
 // 전역 상태 변수 (달력 관련)
 // ==========================
 let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth(); // 0부터 시작 (0 = 1월)
-let currentHolidayData = []; // 현재 달 공휴일 목록 캐시
+let currentMonth = new Date().getMonth();
+let currentHolidayData = [];
+
+// ==========================
+// 자동 업데이트용 항구 목록
+// ==========================
+const allPortIds = Object.keys(portIdToName);
 
 
 // ==========================
 // 페이지 로딩 시 동작
 // ==========================
 $(document).ready(function () {
-    initEventBindings(); // 전체 이벤트 바인딩
-
-    loadCountries(); // 처음 국가 목록 불러오기
-    drawHolidayCalendar([]);
-
-    initPortFromQuery();
+    initEventBindings();
+    loadInitialData();
 });
+
 
 // ==========================
 // 2. 이벤트 바인딩
 // ==========================
 function initEventBindings() {
     $("#countrySelect").on("change", function () {
-        let country = $(this).val();
-        console.log('country changed:', this.value);
-        loadPorts(country);
-        loadTimezone(country);
-        loadHoliday(country);
+        isUserInteracting = true;
+        stopAutoUpdate();
+
+        let countryNameKr = $(this).val();
+        loadPorts(countryNameKr);
+        loadTimezone(countryNameKr);
+        loadHoliday(countryNameKr);
     });
 
     $("#searchBtn").on("click", function () {
+        isUserInteracting = true;
+        stopAutoUpdate();
+
         let portId = $("#portSelect").val();
         let portNameKr = $("#portSelect option:selected").text();
-        let coords = portCoordinates[portNameKr];
 
-        if (!portId || !coords) {
-            alert("국가와 항구를 모두 선택해주세요.");
+        if (!portId || portId === "항구 선택") {
+            alert("항구를 선택해주세요.");
             return;
         }
 
-        // 날씨
-        loadWeather(coords.lat, coords.lon);
+        let coords = portCoordinates[portNameKr];
+        if (!coords) {
+            alert("선택한 항구의 좌표 정보가 없습니다.");
+            return;
+        }
 
-        // 혼잡도 카드 + 그래프
-        loadDocking(portId);
-        loadDockingGraph(portId);
+        // 검색 시 전역 변수 업데이트
+        currentPortId = portId;
+        currentPortNameKr = portNameKr;
+        currentCountryNameKr = $("#countrySelect").val();
+
+        // 선택된 항구로 데이터 로드
+        updateInfoCardsAndGraphs();
     });
 }
+
 
 // ==========================
 // 3. 기능 함수들
 // ==========================
 
-// [ADDED] ✅ 딥링크 초기화: /port/info?port={portId}로 진입했을 때 자동 세팅
-function initPortFromQuery() {
-    let params = new URLSearchParams(location.search);
-    let portId = params.get('port');
+// 페이지 로딩 시 초기 데이터 로드 및 자동 업데이트 시작
+function loadInitialData() {
+    $.get(`/api/info/port/${encodeURIComponent(currentPortId)}`, function (p) {
+        currentCountryNameKr = p.countryNameKr;
+        currentPortNameKr = p.portNameKr;
 
-    if (!portId) {
-        portId = 'CNDAG';
+        loadCountries().done(() => {
+            $("#countrySelect").val(currentCountryNameKr);
+            // loadPorts()의 완료를 기다린 후 항구 설정
+            loadPorts(currentCountryNameKr).done(() => {
+                $("#portSelect").val(currentPortId);
+                updateInfoCardsAndGraphs();
+            });
+        });
+
+        startAutoUpdate();
+    });
+}
+
+// 모든 정보 카드를 업데이트하는 공통 함수
+function updateInfoCardsAndGraphs() {
+    let coords = portCoordinates[currentPortNameKr];
+
+    if (coords) {
+        // 날씨
+        loadWeather(coords.lat, coords.lon);
     }
 
-    // 1) 포트 기본 정보 조회 (한글 국가/항구명 + 좌표 확보)
-    $.get(`/api/info/port/${encodeURIComponent(portId)}`, function (p) {
-        // p: { portId, countryNameKr, portNameKr, locLat, locLon, ... }
+    // 혼잡도 카드 + 그래프
+    loadDocking(currentPortId);
+    loadDockingGraph(currentPortId);
+    // 시차 + 공휴일
+    loadTimezone(currentCountryNameKr);
+    loadHoliday(currentCountryNameKr);
+}
 
-        // 2) 국가 목록 로딩이 끝나면 해당 국가 선택
-        let waitCountries = setInterval(() => {
-            let $country = $("#countrySelect");
-            if ($country.children('option').length > 0) {
-                clearInterval(waitCountries);
-                $country.val(p.countryNameKr).trigger('change');
+// 자동 업데이트 중지
+function stopAutoUpdate() {
+    if (autoUpdateInterval) {
+        clearInterval(autoUpdateInterval);
+        console.log("자동 업데이트가 중지되었습니다.");
+    }
+}
 
-                // 3) 항구 목록 로딩이 끝나면 해당 항구 선택
-                let waitPorts = setInterval(() => {
-                    let $opt = $(`#portSelect option[value='${portId}']`);
-                    if ($opt.length) {
-                        clearInterval(waitPorts);
-                        $("#portSelect").val(portId);
+// 자동 업데이트 시작 (10초 간격)
+function startAutoUpdate() {
+    if (!isUserInteracting) {
+        stopAutoUpdate();
 
-                        // 4) 카드/그래프 로딩
-                        let coords = portCoordinates[p.portNameKr]; // 좌표 직접 관리 중이면 이렇게
-                        if (coords) {
-                            loadWeather(coords.lat, coords.lon);
-                        } else if (p.locLat && p.locLon) {
-                            loadWeather(p.locLat, p.locLon);
-                        }
-                        loadDocking(portId);
-                        loadDockingGraph(portId);
-                        loadTimezone(p.countryNameKr);
-                        loadHoliday(p.countryNameKr);
-                    }
-                }, 50);
-            }
-        }, 50);
-    });
+        autoUpdateInterval = setInterval(() => {
+            console.log("자동 업데이트 중...");
+
+            const randomIndex = Math.floor(Math.random() * allPortIds.length);
+            const randomPortId = allPortIds[randomIndex];
+
+            currentPortId = randomPortId;
+            currentPortNameKr = portIdToName[randomPortId];
+            currentCountryNameKr = portNameToCountry[currentPortNameKr];
+
+            updateInfoCardsAndGraphs();
+
+            $("#countrySelect").val(currentCountryNameKr);
+            // loadPorts()의 완료를 기다린 후 항구 설정
+            loadPorts(currentCountryNameKr).done(() => {
+                $("#portSelect").val(currentPortId);
+            });
+        }, 10000);
+    }
 }
 
 // 국가 목록
 function loadCountries() {
-    $.get("/api/info/countries", function (data) {
+    return $.get("/api/info/countries", function (data) {
         let $countrySelect = $("#countrySelect");
         $countrySelect.empty().append(`<option disabled selected>국가 선택</option>`);
         data.forEach(country => {
@@ -156,8 +220,8 @@ function loadCountries() {
 }
 
 // 항구 목록
-function loadPorts(country) {
-    $.get(`/api/info/ports/${country}`, function (data) {
+function loadPorts(countryNameKr) {
+    return $.get(`/api/info/ports/${countryNameKr}`, function (data) {
         let $portSelect = $("#portSelect");
         $portSelect.empty().append(`<option disabled selected>항구 선택</option>`);
         data.forEach(port => {
@@ -167,8 +231,8 @@ function loadPorts(country) {
 }
 
 // 시차 카드
-function loadTimezone(country) {
-    $.get(`/api/info/timezone/${country}`, function (data) {
+function loadTimezone(countryNameKr) {
+    $.get(`/api/info/timezone/${countryNameKr}`, function (data) {
         let koreaTime = new Date().toLocaleString("ko-KR", {
             timeZone: "Asia/Seoul",
             weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit',
@@ -183,8 +247,8 @@ function loadTimezone(country) {
 }
 
 // 공휴일 + 달력
-function loadHoliday(country) {
-    $.get(`/api/info/holiday/${country}`, function (data) {
+function loadHoliday(countryNameKr) {
+    $.get(`/api/info/holiday/${countryNameKr}`, function (data) {
         if (Array.isArray(data) && data.length > 0) {
             currentHolidayData = data;
             drawHolidayCalendar(data);
@@ -197,18 +261,20 @@ function loadHoliday(country) {
 function drawHolidayCalendar(holidays) {
     let today = new Date();
     let year = today.getFullYear();
-    let month = today.getMonth(); // 0-indexed
+    let month = today.getMonth();
     let todayDate = today.getDate();
-    let firstDay = new Date(year, month, 1).getDay();
-    let lastDate = new Date(year, month + 1, 0).getDate();
-    let holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
+    let firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    let lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let holidayDates = holidays.filter(h => {
+        let hDate = new Date(h.holidayDate);
+        return hDate.getFullYear() === currentYear && hDate.getMonth() === currentMonth;
+    }).map(h => new Date(h.holidayDate).getDate());
 
-    // 월 이동 UI (HTML 템플릿)
     let monthTitle = `<div class="calendar-header">
- <button onclick="prevMonth()"> ◀ </button>
- <strong>${currentYear}년 ${currentMonth + 1}월</strong>
- <button onclick="nextMonth()"> ▶ </button>
-    </div>`;
+ <button onclick="prevMonth()"> ◀ </button>
+ <strong>${currentYear}년 ${currentMonth + 1}월</strong>
+ <button onclick="nextMonth()"> ▶ </button>
+    </div>`;
 
     let calendarHTML = `<table class="calendar-table"><thead><tr>`;
     let days = ["일", "월", "화", "수", "목", "금", "토"];
@@ -220,16 +286,19 @@ function drawHolidayCalendar(holidays) {
     }
 
     for (let d = 1; d <= lastDate; d++) {
-        let isToday = d === todayDate;
+        let isToday = (d === todayDate && currentYear === today.getFullYear() && currentMonth === today.getMonth());
         let isHoliday = holidayDates.includes(d);
 
         let classes = "calendar-date";
         if (isToday) classes += " today";
         if (isHoliday) classes += " holiday";
 
-        calendarHTML += `<td class="${classes}">${d}`;
+        calendarHTML += `<td class="${classes}">
+            <div class="date-number">${d}</div>`;
         if (isHoliday) {
-            calendarHTML += `<div class="dot"></div>`;
+            let holiday = holidays.find(h => new Date(h.holidayDate).getDate() === d);
+            let holidayName = holiday ? holiday.holidayName : '';
+            calendarHTML += `<div class="dot" title="${holidayName}"></div>`;
         }
         calendarHTML += `</td>`;
 
@@ -241,7 +310,7 @@ function drawHolidayCalendar(holidays) {
     calendarHTML += `</tr></tbody></table>`;
     $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
 
-    let todayText = `<strong>오늘 날짜:</strong> ${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
+    let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
     $("#todayText").html(`<p>${todayText}</p>`);
 }
 
@@ -267,7 +336,7 @@ function nextMonth() {
 // 날씨 카드
 function loadWeather(lat, lon) {
     $.get("/api/info/weather/direct", { lat, lon }, function (data) {
-        let rainVolume = parseFloat(data.rainVolume);
+        let rainVolume = data.rainVolume !== null ? parseFloat(data.rainVolume) : 0;
         if (isNaN(rainVolume)) rainVolume = 0;
 
         $("#temperature").text(data.temperature + "°C");
