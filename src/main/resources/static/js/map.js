@@ -1,12 +1,12 @@
-// map.js
+
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
-        center: [129.05, 35.13],
-        zoom: 6,
+        center: [127.05, 33.13],
+        zoom: 5.2,
         scrollZoom: true,
         attributionControl: false
     });
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'line-cap': 'round'
             },
             paint: {
-                'line-color': '#007cbf',
+                'line-color': ['get', 'color'], // GeoJSON feature의 'color' 속성 값을 사용하도록 변경
                 'line-width': 4
             }
         });
@@ -355,7 +355,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 coordinates: route.coordinates
             },
             properties: {
-                name: route.route_name
+                name: route.route_name,
+                color: route.color // portpredict.js에서 넘어온 color 속성을 GeoJSON에 추가
             }
         }));
         map.getSource(routeSourceId).setData({
@@ -406,4 +407,4 @@ document.addEventListener("DOMContentLoaded", () => {
         map.getSource(markerSourceId).setData(emptyGeojson);
         map.getSource(lastMarkerSourceId).setData(emptyGeojson);
     };
-});
+});       
