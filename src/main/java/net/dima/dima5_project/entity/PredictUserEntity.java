@@ -1,5 +1,9 @@
 package net.dima.dima5_project.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +48,11 @@ public class PredictUserEntity {
 
     @Column(name = "user_role")
     private String userRole;
+
+    // 가입일
+    @CreationTimestamp
+    @Column(name = "join_date")
+    private LocalDateTime joinDate;
 
     public static PredictUserEntity toEntity(PredictUserDTO predictUserDTO) {
         return PredictUserEntity.builder()
