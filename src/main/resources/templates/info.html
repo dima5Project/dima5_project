@@ -42,83 +42,83 @@
         </div>
 
         <div class="extra-info-container">
-            <div class="row">
-                <div class="map-box">
-                    <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
-                </div>
-                <div class="info-card" id="dockingCard">
-                    <h3>⚓ 혼잡도</h3>
-                    <div class="docking-grid">
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="currentShips">로딩 중</span>
-                            </div>
-                            <span>정박 선박 수</span>
+
+            <div class="map-box">
+                <img src="/img/port_map.jpg" alt="항구 지도" class="map-img" />
+            </div>
+            <div class="info-card" id="dockingCard">
+                <h3>⚓ 혼잡도</h3>
+                <div class="docking-grid">
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="currentShips">로딩 중</span>
                         </div>
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="expectedShips">로딩 중</span>
-                            </div>
-                            <span>입항 예정 수</span>
+                        <span>정박 선박 수</span>
+                    </div>
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="expectedShips">로딩 중</span>
                         </div>
-                        <div class="docking-info">
-                            <div class="status-circle">
-                                <span id="congestionLevel">로딩 중</span>
-                            </div>
-                            <span>상태</span>
+                        <span>입항 예정 수</span>
+                    </div>
+                    <div class="docking-info">
+                        <div class="status-circle">
+                            <span id="congestionLevel">로딩 중</span>
                         </div>
+                        <span>상태</span>
                     </div>
                 </div>
             </div>
 
-            <div class="row content-row">
-                <div class="info-card tall-weather" id="weatherCard">
-                    <h3>🌤 날씨</h3>
-                    <p>온도: <span id="temperature">로딩 중...</span></p>
-                    <p>날씨: <span id="mainWeather">로딩 중...</span></p>
-                    <p>풍속: <span id="windSpeed">로딩 중...</span></p>
-                    <p>풍향: <span id="windDirLabel">로딩 중...</span></p>
-                    <p>강수량: <span id="rainVolume">로딩 중...</span></p>
+
+
+            <div class="info-card tall-weather" id="weatherCard">
+                <h3>🌤️ 날씨</h3>
+                <p>🌡️ 온도: <span id="temperature">로딩 중...</span></p>
+                <p>🌦️ 날씨: <span id="mainWeather">로딩 중...</span></p>
+                <p>🌪️ 풍속: <span id="windSpeed">로딩 중...</span></p>
+                <p>🌀 풍향: <span id="windDirLabel">로딩 중...</span></p>
+                <p>💧 강수량: <span id="rainVolume">로딩 중...</span></p>
+            </div>
+
+
+            <div class="info-card" id="chartCard">
+                <canvas id="graphCanvas"></canvas>
+            </div>
+
+
+            <div class="info-card" id="timezoneCard">
+                <h3>🕜 시차 정보</h3>
+
+                <!-- 한국 -->
+                <div class="tz-block">
+                    <span class="tz-badge">KR 한국</span><br />
+                    <div id="koreaTime" class="tz-time">로딩 중</div>
+                    <div class="tz-date">
+                        <span class="utc">UTC+09:00</span>
+                    </div>
                 </div>
 
-                <div class="col-2">
-                    <div class="info-card" id="chartCard">
-                        <canvas id="graphCanvas" height="180"></canvas>
-                    </div>
+                <div class="tz-sep"></div>
 
-                    <div class="row inner-row">
-                        <div class="info-card" id="timezoneCard">
-                            <h3>시차 정보</h3>
-
-                            <!-- 한국 -->
-                            <div class="tz-block">
-                                <span class="tz-badge">KR 한국</span><br />
-                                <div id="koreaTime" class="tz-time">로딩 중</div>
-                                <div class="tz-date">
-                                    <span class="utc">UTC+09:00</span>
-                                </div>
-                            </div>
-
-                            <div class="tz-sep"></div>
-
-                            <!-- 해외 -->
-                            <div class="tz-block">
-                                <span class="tz-badge" id="countryName">로딩중</span><br />
-                                <div id="foreignTime" class="tz-time">로딩중</div>
-                                <div class="tz-date">
-                                    <span class="utc" id="foreignUtc">로딩중</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="info-card" id="holidayCard">
-                            <h3>공휴일 달력</h3>
-                            <div id="todayText"></div>
-                            <div id="holidayCalendarContainer"></div>
-                        </div>
+                <!-- 해외 -->
+                <div class="tz-block">
+                    <span class="tz-badge" id="countryName">로딩중</span><br />
+                    <div id="foreignTime" class="tz-time">로딩중</div>
+                    <div class="tz-date">
+                        <span class="utc" id="foreignUtc">로딩중</span>
                     </div>
                 </div>
             </div>
+
+            <div class="info-card" id="holidayCard">
+                <h3>📆 공휴일 달력</h3>
+                <div id="todayText"></div>
+                <div id="holidayCalendarContainer"></div>
+            </div>
+
+
+
         </div>
     </main>
 
