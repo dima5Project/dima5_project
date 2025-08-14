@@ -16,6 +16,9 @@
     <link rel="stylesheet" href="/css/mypage.css" th:href="@{/css/mypage.css}">
     <script defer th:src="@{/js/mypage.js}"></script>
 
+    <link rel="stylesheet" th:href="@{/css/faq.css}">
+    <script defer th:src="@{/js/faq.js}"></script>
+
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 
@@ -204,6 +207,8 @@
 
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+    <div th:replace="~{fragment/faq :: widget}"></div>
+
 
 </body>
 
