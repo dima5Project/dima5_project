@@ -1,0 +1,366 @@
+/* 전체 FAQ 위젯 영역*/
+#faq-widget {
+    position: fixed;
+    /* 화면에 고정되도록 설정 */
+    bottom: 30px;
+    /* 아래쪽에서 30px 떨어짐 */
+    right: 30px;
+    /* 오른쪽에서 30px 떨어짐 */
+    z-index: 1000;
+    /* 다른 요소보다 위에 표시 */
+    font-family: 'Noto Sans KR', sans-serif;
+    /* 폰트 설정 */
+}
+
+/* ? 아이콘 버튼 */
+#faq-toggle {
+    width: 50px;
+    /* 버튼 너비 */
+    height: 50px;
+    /* 버튼 높이 */
+    border-radius: 50%;
+    /* 동그란 버튼 */
+    border: none;
+    /* 테두리 없음 */
+    background-color: #0f3c9a;
+    /* 배경색 (진한 파랑) */
+    color: white;
+    /* 글자색 흰색 */
+    font-size: 24px;
+    /* 글자 크기 */
+    cursor: pointer;
+    /* 마우스 오버 시 포인터 표시 */
+    transition: transform 0.2s ease;
+    /* 부드럽게 커짐 효과 */
+    position: fixed;
+    /* 위치 고정 */
+    bottom: 30px;
+    /* 하단 여백 */
+    right: 30px;
+    /* 오른쪽 여백 */
+    z-index: 1001;
+    /* 챗봇 박스보다 위에 위치 */
+}
+
+/* hover 시 ? 크기 증가 */
+#faq-toggle:hover {
+    transform: scale(1.1);
+    /* 커지는 효과 */
+}
+
+/* 챗봇 박스 스타일 */
+#faq-box {
+    position: fixed;
+    /* 👈 이거 추가 */
+    right: 30px;
+    /* 버튼과 같은 기준 */
+    bottom: 90px;
+    /* 버튼 위로 띄우기 */
+    z-index: 1002;
+    width: 370px;
+    height: 75vh;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    /* margin-bottom: 70px;  👈 이건 fixed면 필요 없음 */
+}
+
+/* 숨김 클래스 */
+.hidden {
+    display: none;
+    /* 보이지 않도록 설정 */
+}
+
+/* 상단 헤더 영역 */
+.faq-header {
+    background-color: #0f3c9a;
+    /* 배경색 파랑 */
+    color: white;
+    /* 글자색 흰색 */
+    padding: 12px 25px;
+    /* 상하 12px, 좌우 16px 여백 */
+    display: flex;
+    /* 수평 정렬 */
+    justify-content: space-between;
+    /* 양 끝 정렬 */
+    align-items: center;
+    /* 수직 중앙 정렬 */
+    font-weight: bold;
+    /* 글자 굵게 */
+    font-size: 16px;
+    /* 글자 크기 */
+}
+
+/* X 아이콘 버튼 */
+#faq-close {
+    background: transparent;
+    /* 배경 없음 */
+    border: none;
+    /* 테두리 없음 */
+    font-size: 40px;
+    /* 글자 크기 */
+    color: white;
+    /* 글자색 흰색 */
+    cursor: pointer;
+    /* 포인터 커서 */
+    transition: transform 0.2s ease;
+    /* 커짐 애니메이션 */
+}
+
+/* X hover 시 커짐 */
+#faq-close:hover {
+    transform: scale(1.2);
+    /* 커지는 효과 */
+}
+
+/* 챗봇 메시지 영역 */
+.faq-body {
+    padding: 13px;
+    /* 내부 여백 */
+    padding-bottom: 20px;
+    height: calc(75vh - 50px);
+    /* 헤더 제외 높이 */
+    overflow-y: scroll;
+    /* 자동 세로 스크롤 숨김 */
+    background: #f9f9f9;
+    /* 연한 회색 배경 */
+    position: relative;
+}
+
+/* 관리자 로고 */
+.faq-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-top: 6px;
+}
+
+/* 개별 메시지 컨테이너 */
+.faq-message {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    max-width: 100%;
+    flex-shrink: 0;
+    /* 기본 왼쪽 정렬 */
+    gap: 6px;
+}
+
+/* 사용자 메시지일 경우 오른쪽 정렬로 전환 */
+.faq-message.user {
+    justify-content: flex-end;
+}
+
+/* 말풍선 + 시간을 감싸는 div로 구성 */
+.faq-bubble-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 220px;
+    /* 말풍선 너비 제한 */
+    word-wrap: break-word;
+    top: -12px;
+    white-space: normal;
+    /* 줄바꿈 허용 */
+}
+
+/* 말풍선 스타일 */
+.faq-bubble {
+    display: inline-block;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    word-wrap: break-word;
+    /* 단어 단위 줄바꿈 */
+    overflow-wrap: break-word;
+    /* 긴 단어 줄바꿈 */
+    white-space: normal;
+    /* 줄바꿈 허용 */
+    max-width: 100%;
+    /* wrapper 기준 100% */
+    margin: 20px 0 5px 0;
+    transform: none;
+}
+
+/* 말풍선 내부 기본 타이포 */
+.faq-bubble {
+    line-height: 1.55;
+}
+
+/* 문단·리스트·hr 등 서로 연달아 올 때 윗여백 주기 */
+.faq-bubble>*+* {
+    margin-top: 8px;
+}
+
+/* 필요하면 12px로 키워도 됨 */
+
+/* 리스트 들여쓰기/표식 */
+.faq-bubble .faq-list {
+    margin: 6px 0 10px 18px;
+    padding: 0;
+    list-style: disc;
+}
+
+/* 텍스트 메시지와 버튼 간격 */
+.faq-text {
+    margin-bottom: 16px;
+    /* 버튼과의 간격 */
+    text-align: left;
+    /* 왼쪽 정렬 */
+}
+
+/* 버튼 묶음 */
+.faq-buttons {
+    width: 100%;
+    /* 부모(.faq-bubble)에 맞춤 */
+    display: flex;
+    /* 플렉스 레이아웃 */
+    flex-direction: column;
+    /* 세로 정렬 */
+    gap: 8px;
+    /* 버튼 간격 */
+    align-items: flex-start;
+    /* 왼쪽 정렬 */
+}
+
+/* 버튼 */
+.faq-buttons button {
+    width: 100%;
+    /* 부모(.faq-buttons)에 맞춤 */
+    padding: 8px 12px;
+    /* 안쪽 여백 */
+    font-size: 13px;
+    /* 글자 크기 */
+    border-radius: 10px;
+    /* 둥근 버튼 */
+    border: none;
+    /* 테두리 없음 */
+    background-color: #f1f5f9;
+    /* 연한 파란 배경 */
+    cursor: pointer;
+    /* 포인터 커서 */
+    font-weight: bold;
+    /* 굵은 글씨 */
+    transition: background 0.2s, font-size 0.2s;
+    /* 효과 */
+    white-space: normal;
+    /* 줄바꿈 허용 */
+    word-break: break-word;
+    /* 단어 단위 줄바꿈 */
+    text-align: center;
+    /* 텍스트 중앙 정렬 */
+}
+
+.faq-buttons button:hover {
+    background-color: #e2ecf8;
+    /* hover 시 배경색 변경 */
+}
+
+/* 시간 기본 스타일 */
+.faq-time {
+    position: absolute;
+    bottom: 10px;
+    font-size: 11px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* 어시스턴트 메시지: 말풍선 오른쪽 외부에 시간 표시 */
+.faq-message.assistant .faq-time {
+    left: 100%;
+    margin-left: 8px;
+}
+
+/* 사용자 메시지: 말풍선 왼쪽 외부에 시간 표시 */
+.faq-message.user .faq-time {
+    right: 100%;
+    margin-right: 8px;
+}
+
+/* 사용자 질문 목록 말풍선에 적용되는 스타일 */
+.faq-user-question {
+    background-color: #e5f0ff;
+    /* 연한 파랑 배경 */
+    color: #0f3c9a;
+    /* 글자색 진파랑 */
+    font-weight: bold;
+    /* 굵은 글씨 */
+    align-self: flex-end;
+    /* 오른쪽 정렬 (flex item 기준) */
+}
+
+/* 하위 질문 버튼 전용 스타일 */
+.faq-subquestion-button {
+    background-color: #f1f5f9;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.faq-subquestion-button:hover {
+    background-color: #e2ecf8;
+}
+
+.faq-scroll-bottom-indicator {
+    flex-shrink: 0;
+    /* 줄어들지 않게 */
+}
+
+/* 이전 질문, 처음으로 버튼 */
+.faq-nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    max-width: 210px;
+    width: 100%;
+    align-self: center;
+}
+
+.faq-nav-buttons button {
+    flex: 1;
+    background-color: #e1e7f5;
+    color: #0f1035;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    font-size: 13px;
+}
+
+.faq-nav-buttons button:hover {
+    background-color: #cbd9f0;
+}
+
+/* 스크롤 하단 여백용 패딩 요소 */
+.faq-scroll-padding {
+    height: 10px;
+    flex-shrink: 0;
+}
+
+/* 네비게이션 버튼이 있는 assistant 말풍선만 시간 위치 조정 */
+.faq-message.assistant.nav-type .faq-time {
+    bottom: 40px;
+    /* 원하는 높이로 조정 */
+}
+
+#faq-widget,
+#faq-toggle,
+#faq-box {
+    z-index: 2147483647;
+}
