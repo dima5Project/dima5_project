@@ -434,6 +434,18 @@ function loadDocking(portId) {
         $("#currentShips").text(data.currentShips);
         $("#expectedShips").text(data.expectedShips);
         $("#congestionLevel").text(congestionText);
+
+        // 여기에 클래스를 추가하는 코드
+        const congestionCircle = $("#congestionLevel").closest(".status-circle");
+        congestionCircle.removeClass("is-congested is-very-congested is-clear");
+
+        if (data.congestionLevel === "매우 혼잡") {
+            congestionCircle.addClass("is-very-congested");
+        } else if (data.congestionLevel === "혼잡") {
+            congestionCircle.addClass("is-congested");
+        } else {
+            congestionCircle.addClass("is-clear");
+        }
     });
 }
 

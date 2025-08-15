@@ -17,5 +17,5 @@ public class AskBriefDTO {
     private Long askSeq; // 클릭 시 해당 문의 상세 페이지 이동하려고 필요
     private String title; // 리스트 / 알림에 제목 표시
     private String writer; // 작성자 표시
-    private LocalDateTime joinDate; // 작성 날짜, 시간 표시
+    private LocalDateTime createDate; // 작성 날짜, 시간 표시
 }
