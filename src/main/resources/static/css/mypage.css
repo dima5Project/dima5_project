@@ -1,5 +1,6 @@
 @charset "UTF-8";
 
+/* ===== 기본 ===== */
 body {
     font-family: 'Noto Sans KR', sans-serif;
     margin: 0;
@@ -7,12 +8,14 @@ body {
     color: #000;
 }
 
+/* (다른 페이지 영향 막기 위해 mypage 쪽에서 다시 오버라이드함) */
 main {
-    max-width: 1040px;
+    max-width: 1150px;
     margin: 60px auto;
     padding: 0 20px;
 }
 
+/* ===== 상단 히어로 ===== */
 .qna-header-bg {
     background-color: #0f1035;
     height: 435px;
@@ -20,21 +23,24 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    /* 연결감 보정용 */
 }
 
 .qna-header {
-    padding-top: 20vh;
+    padding-top: 120px;
+    /* 연결감 보정 */
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
-    color: white;
+    color: #fff;
 }
 
 .qna-header h2 {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 30px;
-    color: white;
+    color: #fff;
 }
 
 .qna-header p {
@@ -45,22 +51,41 @@ main {
 
 /* ===== 공통 레이아웃 ===== */
 .mypage {
-    max-width: 1040px;
-    margin: 60px auto 80px;
-    /* 위쪽 40px, 아래쪽 80px */
+    width: 100%;
+    max-width: none;
+    /* main 기본값 무력화 */
+    margin: 60px auto;
     padding: 0 20px;
-    position: relative;
-    z-index: 1;
 }
 
+/* 중앙 콘텐츠를 뷰포트 기준으로 정확히 중앙, 사이드는 그 왼쪽에 고정 */
 .mp-container {
-    display: grid;
-    grid-template-columns: 150px 1fr;
-    gap: 24px;
+    position: relative;
+    display: block;
+    /* grid 사용 안 함 */
+    /* 조절 포인트 */
+    --content-width: 980px;
+    /* 중앙(콘텐츠) 너비 */
+    --rail: 170px;
+    /* 사이드바 너비 */
+    --gap: 24px;
+    /* 사이드-콘텐츠 간격 */
 }
 
-/* ===== 좌측 사이드 ===== */
+/* 중앙 콘텐츠(빨간 영역) */
+.mp-content {
+    width: var(--content-width);
+    margin: 0 auto;
+    /* 항상 화면 정중앙 */
+    min-width: 0;
+}
+
+/* 좌측 사이드바: 중앙 콘텐츠의 왼쪽 바깥에 절대배치 */
 .mp-side {
+    position: absolute;
+    top: 0;
+    left: calc(50% - (var(--content-width) / 2) - var(--gap) - var(--rail));
+    width: var(--rail);
     background: #fff;
     border: 1px solid #e5e8eb;
     border-radius: 8px;
@@ -68,6 +93,7 @@ main {
     height: fit-content;
 }
 
+/* ===== 사이드 내부 ===== */
 .mp-side__title {
     font-size: 16px;
     font-weight: 700;
@@ -81,11 +107,9 @@ main {
 
 .mp-side__nav a {
     display: flex;
-    /* flexbox로 변경 */
     justify-content: space-between;
-    /* 텍스트와 화살표를 양 끝으로 정렬 */
+    /* 텍스트-화살표 양끝 */
     align-items: center;
-    /* 세로 가운데 정렬 */
     padding: 10px 5px;
     border-radius: 6px;
     text-decoration: none;
@@ -98,11 +122,7 @@ main {
     background: #f2f5f9;
 }
 
-/* ===== 우측: 요약 카드 ===== */
-.mp-content {
-    min-width: 0;
-}
-
+/* ===== 요약 카드 ===== */
 .mp-summary {
     display: flex;
     justify-content: space-between;
@@ -115,7 +135,6 @@ main {
     margin-bottom: 20px;
 }
 
-/* 왼쪽: 인사 + 메타정보 (2줄) */
 .mp-summary__hello {
     display: flex;
     flex-direction: column;
@@ -125,7 +144,7 @@ main {
 }
 
 .mp-summary__hello .hello {
-    margin: 0;
+    margin: 0 0 10px 0;
     font-size: 18px;
     font-weight: 700;
     color: #111;
@@ -147,7 +166,6 @@ main {
     color: #c9cdd2;
 }
 
-/* 오른쪽: 통계 */
 .mp-summary__stats {
     display: flex;
     gap: 40px;
@@ -156,7 +174,7 @@ main {
 .mp-summary__stats li {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     font-size: 13px;
     color: #333;
     text-align: center;
@@ -183,7 +201,6 @@ main {
     display: flex;
     justify-content: flex-start;
     column-gap: 15px;
-    /* 제목과 버튼 사이 거리 */
     align-items: center;
     padding: 14px 16px;
     border-bottom: 1px solid #eef1f4;
@@ -205,7 +222,6 @@ main {
 
 .btn-more:hover {
     background-color: #f2f5f9;
-    /* 연한 배경 */
     border-color: #ccc;
 }
 
@@ -228,10 +244,8 @@ main {
     color: #222;
     font-weight: 600;
     padding: 10px 8px;
-    text-align: left;
     text-align: center;
     vertical-align: middle;
-    /* 세로 가운데 */
 }
 
 .tbl tbody td {
@@ -243,36 +257,19 @@ main {
     white-space: nowrap;
     text-align: center;
     vertical-align: middle;
-    /* 세로 가운데 */
 }
 
 .tbl tbody tr:hover td {
     background: #fbfdff;
 }
 
-/* 강조 텍스트 (확률) */
 .tbl b {
     color: #013895;
     font-weight: 700;
 }
 
-/* 삭제 버튼 */
-.btn-delete {
-    padding: 6px 14px;
-    font-size: 11px;
-    color: #000;
-    background-color: #fff;
-    border: 1px solid #bbb;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-delete:hover {
-    background-color: #f5f5f5;
-}
-
-/* 재검색 버튼 */
+/* 버튼 */
+.btn-delete,
 .btn-search-again {
     padding: 6px 14px;
     font-size: 11px;
@@ -281,14 +278,15 @@ main {
     border: 1px solid #bbb;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all .2s ease;
 }
 
+.btn-delete:hover,
 .btn-search-again:hover {
     background-color: #f5f5f5;
 }
 
-/* 재검색 열 가운데 정렬 */
+/* 테이블 마지막 열 중앙 */
 .tbl thead th:last-child,
 .tbl tbody td:last-child {
     text-align: center;
@@ -306,13 +304,4 @@ main {
 .tag-done {
     background: #eef5ff;
     color: #013895;
-}
-
-/* ===== 히어로(상단 남색)와의 연결감 보정 ===== */
-.qna-header-bg {
-    position: relative;
-}
-
-.qna-header {
-    padding-top: 120px;
 }
