@@ -21,10 +21,10 @@
             </div>
 
             <div class="navbar_menu">
-                <div class="nav_item has_submenu" data-submenu-id="submenu_intro_wrapper">
+                <div class="nav_item has_submenu" data-active-path-prefix="/intro"
+                    data-submenu-id="submenu_intro_wrapper">
                     <a th:href="@{/intro/service}" class="nav_link">소개</a>
                     <div id="submenu_intro_wrapper" class="submenu_wrapper">
-                        <div class="circle" aria-hidden="true"></div>
                         <div id="submenu_intro" class="submenu">
                             <a th:href="@{/intro/service}" class="submenu_item">서비스 소개</a>
                             <a th:href="@{/intro/team}" class="submenu_item">팀 소개</a>
@@ -32,26 +32,26 @@
                     </div>
                 </div>
 
-                <div class="nav_item">
+                <div class="nav_item" data-active-path-prefix="/predict">
                     <a th:href="@{/predict/init}" class="nav_link">예측 서비스</a>
                 </div>
 
-                <div class="nav_item has_submenu" data-submenu-id="submenu_info_wrapper">
+                <div class="nav_item has_submenu" data-active-path-prefix="/port"
+                    data-submenu-id="submenu_info_wrapper">
                     <a th:href="@{/port/info}" class="nav_link">부가정보</a>
                     <div id="submenu_info_wrapper" class="submenu_wrapper">
-                        <div class="circle" aria-hidden="true"></div>
                         <div id="submenu_info" class="submenu">
                             <a th:href="@{/port/info}" class="submenu_item">날씨</a>
-                            <a th:href="@{/port/info}" class="submenu_item">환율</a>
-                            <a th:href="@{/port/info}" class="submenu_item">기타 정보</a>
+                            <a th:href="@{/port/info}" class="submenu_item">혼잡도</a>
+                            <a th:href="@{/port/info}" class="submenu_item">운영 정보</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="nav_item">
+                <div class="nav_item" data-active-path-prefix="/news">
                     <a th:href="@{/news/main}" class="nav_link">뉴스룸</a>
                 </div>
-                <div class="nav_item">
+                <div class="nav_item" data-active-path-prefix="/ask">
                     <a th:href="@{/ask}" class="nav_link">문의</a>
                 </div>
             </div>

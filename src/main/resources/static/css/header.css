@@ -68,6 +68,39 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+}
+
+/* 밑줄 효과를 위한 가상 요소 (::after) */
+.nav_item::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    /* `.nav_item`의 아래쪽으로 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    /* 초기 너비를 0으로 설정하여 숨김 */
+    height: 7px;
+    /* 원하는 밑줄 두께 */
+    background-color: #013895;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+/* 호버 시 밑줄 효과 */
+.nav_item:hover::after {
+    width: var(--underline-width, 0);
+    /* 너비를 100%로 늘려 밑줄이 나타나게 함 */
+    left: 0;
+    transform: translateX(0);
+}
+
+/* 해당 페이지에 있을 때 밑줄이 유지되도록 할 클래스 */
+.nav_item.active::after {
+    width: 100%;
+    left: 0;
+    transform: translateX(0);
 }
 
 /* 각 메뉴 항목 (예: 소개, 예측 서비스 등) */
@@ -78,11 +111,25 @@ body {
     text-decoration: none;
     padding: 10px;
     transition: color 0.2s ease-in-out;
+    display: inline-block;
+    line-height: 1.2;
+    transition: color 0.3s ease, border-bottom-color 0.3s ease, border-bottom-width 0.3s ease;
+    border-bottom: 3px solid transparent;
 }
 
 /* hover 시 파란색으로 변경 */
 .nav_link:hover {
-    color: #337ed9;
+    color: #013895;
+}
+
+/* 현재 페이지일 때 색상 유지 */
+.nav_link.active {
+    color: #013895;
+}
+
+/* 서브메뉴가 있는 항목의 링크도 동일하게 처리 */
+.nav_item.has_submenu .nav_link.active {
+    color: #013895;
 }
 
 /* 서브메뉴 (기본적으로 숨김) */
@@ -139,19 +186,6 @@ body {
 /* hover 시 서브메뉴 보여줌 */
 .nav_item.has_submenu:hover>.submenu_wrapper {
     display: block;
-}
-
-/* 파란 점 */
-.submenu_wrapper .circle {
-    width: 12px;
-    height: 12px;
-    background-color: #013895;
-    border-radius: 50%;
-    position: absolute;
-    top: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1003;
 }
 
 /* 오른쪽 영역 (로그인 + 언어 선택) */
