@@ -14,9 +14,12 @@ $(function () {
 // 조회 버튼: 클릭 이벤트
 
 // 조회 버튼: 클릭 이벤트 (임시 테스트 모드 - API 대신 샘플 데이터 사용)
+let globalRoutesData = [];
+let globalPredictions = [];
+
 $(document).on('click', '.sidebar__btn.primary', function () {
-    const selectValue = $('.cselect__value').attr('data-value'); // 드롭다운 선택 값
-    const inputValue = $('.sidebar__input').val().trim(); // 입력 값
+    const selectValue = $('.cselect__value').attr('data-value');
+    const inputValue = $('.sidebar__input').val().trim();
 
     if (!selectValue || !inputValue) {
         alert('옵션과 값을 모두 입력하세요.');
@@ -29,80 +32,86 @@ $(document).on('click', '.sidebar__btn.primary', function () {
         "latest": {
             "time_point": 11,
             "actual_time_point": 10.83,
-            "time_stamp": "2025-08-14 11:57:57",
-            "lat": 37.187775,
-            "lon": 130.1177583,
-            "cog": 13.1,
-            "heading": 18.5,
-            "departure_time": "2025-08-14 01:08:09",
+            "time_stamp": "2025-08-16 14:15:49",
+            "departure_time": "2025-08-16 03:26:01",
+            "lat": 37.16046667,
+            "lon": 130.1098833,
+            "cog": 10.8,
+            "heading": 17,
             "predictions": [
                 {
                     "rank": 1,
                     "port_id": "RUVVO",
-                    "prob": 0.454553
+                    "prob": 0.456952,
+                    "eta_hours_left": 41.503333,
+                    "eta": "2025-08-18 07:46:01"
                 },
                 {
                     "rank": 2,
                     "port_id": "RUNJK",
-                    "prob": 0.326398
+                    "prob": 0.323999,
+                    "eta_hours_left": 104.836667,
+                    "eta": "2025-08-20 23:06:01"
                 },
                 {
                     "rank": 3,
                     "port_id": "KRKPO",
-                    "prob": 0.030311
+                    "prob": 0.040649,
+                    "eta_hours_left": 0,
+                    "eta": "2025-08-16 14:15:49"
                 }
             ]
         },
         "timeline": [
             {
                 "time_point": 5,
-                "time_stamp": "2024-08-10 11:40:00",
+                "time_stamp": "2024-08-10 11:30:00",
                 "actual_time_point": 5,
-                "lat": 35.93396667,
-                "lon": 129.7898167,
-                "cog": 11.4,
+                "lat": 35.87731667,
+                "lon": 129.7767167,
+                "cog": 10.9,
                 "heading": 9,
                 "predictions": [
                     {
                         "rank": 1,
                         "port_id": "RUVVO",
-                        "prob": 0.729818
+                        "prob": 0.730071
                     },
                     {
                         "rank": 2,
                         "port_id": "RUNJK",
-                        "prob": 0.16137
+                        "prob": 0.160444
                     },
                     {
                         "rank": 3,
                         "port_id": "KRKPO",
-                        "prob": 0.073335
+                        "prob": 0.072784
                     }
                 ]
             },
             {
                 "time_point": 8,
-                "time_stamp": "2024-08-10 14:40:00",
+                "time_stamp": "2024-08-10 14:30:00",
                 "actual_time_point": 8,
-                "lat": 36.59317222,
-                "lon": 129.9615556,
-                "cog": 11.46666667,
-                "heading": 11.33333333,
+                "lat": 36.56428333,
+                "lon": 129.9543167,
+                "cog": 11.3,
+                "heading": 11,
                 "predictions": [
                     {
                         "rank": 1,
                         "port_id": "RUVVO",
-                        "prob": 0.822177
+                        "prob": 0.601176
                     },
                     {
                         "rank": 2,
                         "port_id": "RUNJK",
-                        "prob": 0.062672
+                        "prob": 0.279946
                     },
                     {
                         "rank": 3,
                         "port_id": "KRKPO",
-                        "prob": 0.018907
+                        "prob": 0.019712
                     }
                 ]
             }
@@ -1936,6 +1945,19 @@ $(document).on('click', '.sidebar__btn.primary', function () {
     displayPredictionResults(resp.latest.predictions, departurePort);
     displayTimelineResults(resp.timeline, resp.latest, departurePort);
 
+    // ETA 정보 업데이트 로직 추가
+    if (resp.latest && resp.latest.predictions) {
+        const predictions = resp.latest.predictions;
+
+        const rank1Eta = predictions.find(p => p.rank === 1)?.eta || '정보 없음';
+        const rank2Eta = predictions.find(p => p.rank === 2)?.eta || '정보 없음';
+        const rank3Eta = predictions.find(p => p.rank === 3)?.eta || '정보 없음';
+
+        $('.box.one .eta__time').html('<span class="pill">ETA</span> ' + rank1Eta);
+        $('.box.two .eta__time').html('<span class="pill">ETA</span> ' + rank2Eta);
+        $('.box.three .eta__time').html('<span class="pill">ETA</span> ' + rank3Eta);
+    }
+
     // 결과 영역 보이기 및 폼 입력 비활성화
     $('.sidebar__content').removeClass('is-hidden');
     $('.sidebar__input')
@@ -1955,6 +1977,8 @@ $(document).on('click', '.sidebar__btn.primary', function () {
     const routesData = resp.tracks_topk.filter(trackObj => trackObj.rank >= 1 && trackObj.rank <= 3);
 
     const routes = [];
+    let top1RouteData = null;
+
     routesData.forEach(topRouteData => {
         const trackPoints = topRouteData.track || [];
         if (trackPoints.length > 0) {
@@ -1967,9 +1991,9 @@ $(document).on('click', '.sidebar__btn.primary', function () {
 
             let color = '#007cbf'; // rank 1: 기존 파란색
             if (topRouteData.rank === 2) {
-                color = '#555555'; // rank 2: 초록색 008000
+                color = '#A9A9A9'; // rank 2: 초록색 008000
             } else if (topRouteData.rank === 3) {
-                color = '#555555'; // rank 3: 진한 회색
+                color = '#A9A9A9'; // rank 3: 진한 회색
             }
 
             const name = `예상 항로 (Top ${topRouteData.rank})`;
@@ -1977,47 +2001,113 @@ $(document).on('click', '.sidebar__btn.primary', function () {
             routes.push({
                 route_name: name,
                 coordinates: coordinates,
-                color: color
+                color: color,
+                rank: topRouteData.rank
             });
+
+            if (topRouteData.rank === 1) {
+                top1RouteData = topRouteData; // rank 1 데이터 저장
+            }
         }
     });
+    // ─────────── 항로 데이터를 전역 변수에 저장 ───────────
+    globalRoutesData = routes;
+    globalPredictions = resp.latest.predictions;
 
-    // rank 1 항로의 마커만 표시
-    const top1RouteData = routesData.find(trackObj => trackObj.rank === 1);
-    const trackPoints = top1RouteData ? top1RouteData.track : [];
+    // 모든 예측 박스 활성화 (기본값) 및 모든 항로 표시
+    $('.box').addClass('is-active');
 
-    if (trackPoints.length > 0) {
-        // 2. time_point에 해당하는 마커 지점 추출
-        const markerTimePoints = [5, 8, 11, 14, 17, 20, 23, 26, 29];
-        const validMarkers = [];
+    // 2. 새로운 마커 로직 (timeline + latest + 출발항)
+    const validMarkers = [];
 
-        markerTimePoints.forEach(timePoint => {
-            const point = trackPoints.find(p => p.time_point === timePoint);
-            if (point) {
+    // rank 1 항로의 첫 번째 마커
+    if (top1RouteData && top1RouteData.track && top1RouteData.track.length > 0) {
+        const firstPoint = top1RouteData.track[0];
+        validMarkers.push({
+            coordinates: [firstPoint.lon, firstPoint.lat],
+            description: `예상 항로 시작점 (Time 0)`
+        });
+    }
+
+    // timeline의 time_point 마커 추가
+    if (resp.timeline && resp.timeline.length > 0) {
+        resp.timeline.forEach(timeData => {
+            if (timeData.lat && timeData.lon) {
                 validMarkers.push({
-                    coordinates: [point.lon, point.lat],
-                    description: `예측 시점: ${point.time_point}h`
+                    coordinates: [timeData.lon, timeData.lat],
+                    description: `예측 시점: ${timeData.time_point}h`
                 });
             }
         });
+    }
 
-        // 3. 마지막 마커 분리
-        if (validMarkers.length > 0) {
-            lastMarker = validMarkers.pop();
-            const arrivalPortId = resp.latest.predictions[0].port_id;
-            lastMarker.description = `예상 도착항: ${arrivalPortId}`;
-        }
+    // latest의 최종 마커 추가
+    if (resp.latest && resp.latest.lat && resp.latest.lon) {
+        lastMarker = {
+            coordinates: [resp.latest.lon, resp.latest.lat],
+            description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`
+        };
+    }
 
-        // 4. 지도 함수 호출
-        if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
-            window.drawRoutes(routes); // 수정된 항로 배열 전달
-            window.drawMarkers(validMarkers, lastMarker);
-        } else {
-            console.error("Map functions are not available.");
-        }
+    // 4. 지도 함수 호출
+    if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
+        window.drawRoutes(routes);
+        window.drawMarkers(validMarkers, lastMarker);
+        // 조회 시 3개 항구 마커도 보이도록 변경
+        window.togglePortMarkersByRank([1, 2, 3]);
+        window.toggleMarkersVisibility(true);
+    } else {
+        console.error("Map functions are not available.");
     }
 });
 
+// 예측 결과 박스 클릭 이벤트 (개별 토글 로직)
+$(document).on('click', '.box.one, .box.two, .box.three', function () {
+    // 조회 결과가 없으면 함수를 실행하지 않음
+    if (!globalRoutesData || globalRoutesData.length === 0) {
+        console.warn('globalRoutesData is empty. Cannot draw routes.');
+        return;
+    }
+
+    const $box = $(this);
+
+    // 1. 클릭된 박스의 활성/비활성 상태를 토글
+    $box.toggleClass('is-active');
+
+    // 2. 현재 활성화 상태인 모든 박스를 찾아서 rank를 추출
+    const activeRanks = [];
+    $('.box.is-active').each(function () {
+        // .one, .two, .three 클래스를 사용하여 rank를 안전하게 추출
+        const rank = $(this).hasClass('one') ? 1 : ($(this).hasClass('two') ? 2 : 3);
+        activeRanks.push(rank);
+    });
+
+    // 3. 활성화된 rank에 해당하는 항로만 필터링
+    const routesToDraw = globalRoutesData.filter(route => activeRanks.includes(route.rank));
+
+    // 4. 필터링된 항로 배열로 지도 다시 그리기
+    window.drawRoutes(routesToDraw);
+
+    // 5. 예측 항구 마커 토글
+    // 활성화된 rank에 해당하는 항구 마커만 표시
+    if (typeof window.togglePortMarkersByRank === 'function') {
+        window.togglePortMarkersByRank(activeRanks);
+    }
+
+    const isRank1Active = $('.box.one').hasClass('is-active');
+    if (typeof window.toggleMarkersVisibility === 'function') {
+        window.toggleMarkersVisibility(isRank1Active);
+    }
+});
+
+// Rank 1에 해당하는 마커들을 토글합니다.
+function toggleMarkersForRank1(isVisible) {
+    if (typeof window.toggleMarkersVisibility === 'function') {
+        window.toggleMarkersVisibility(isVisible);
+    } else {
+        console.warn("toggleMarkersVisibility 함수가 map.js에 존재하지 않습니다.");
+    }
+}
 
 // 초기화 버튼 : 페이지 최초 상태로 되돌리기
 $(document).on('click', '.sidebar__row .sidebar__btn:not(.primary)', function () {
@@ -2029,52 +2119,81 @@ $(document).on('click', '.sidebar__row .sidebar__btn:not(.primary)', function ()
     $wrap.find('.cselect__option').attr('aria-selected', 'false');
     $wrap.find('.cselect__option[data-value="MMSI"]').attr('aria-selected', 'true');
     $wrap.find('.cselect__value').text('MMSI').attr('data-value', 'MMSI');
-
-    // hidden input 값도 복구
-    const name = $wrap.data('name'); // 예: idType
+    const name = $wrap.data('name');
     let $hidden = $wrap.find(`input[type="hidden"][name="${name}"]`);
     if (!$hidden.length) {
         $hidden = $('<input>', { type: 'hidden', name });
         $wrap.append($hidden);
     }
     $hidden.val('MMSI');
-
-    // 드롭다운 닫기
     $wrap.removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
 
-    // 3) 결과 영역 숨기고 스크롤 상단으로
-    const $content = $('.sidebar__content');
-    $content.scrollTop(0).addClass('is-hidden');
+    // 3) 결과 영역 숨기기 및 스크롤 상단으로
+    // 첫 번째 슬라이드(선박 정보, 예측 결과)의 내용만 숨김
+    $('#sidebar-content').addClass('is-hidden');
 
+    // 예측 박스 활성 상태 초기화 및 전역 데이터 비우기
+    $('.box').removeClass('is-active');
+    globalRoutesData = [];
+    globalPredictions = [];
+
+    // 지도에서 항로와 마커 지우기
+    window.clearRoutesAndMarkers();
+    // 모든 항구 마커 다시 표시
+    window.showAllPortMarkers();
+
+    // 두 번째 슬라이드(타임라인)의 내용만 비움
+    // 제목과 밑줄은 그대로 유지됩니다.
+    clearTimeline();
+
+    // 입력 필드 활성화
     $('.sidebar__input')
         .prop('disabled', false)
         .removeAttr('aria-disabled')
         .removeClass('is-locked');
-    $('.cselect__control').prop('disabled', false);     // 셀렉트 해제
-    // 지도에서 항로와 마커 지우기
-    window.clearRoutesAndMarkers();
+    $('.cselect__control').prop('disabled', false);
 });
 
-// ───────── 추가된 기능: JSON 데이터를 화면에 표시 ─────────
-function displayPredictionResults(predictions) {
-    if (!predictions || predictions.length === 0) return;
+/**
+ * 타임라인 내용을 지우고 제목은 유지하는 함수
+ */
+function clearTimeline() {
+    $('.voy-timeline').empty();
+}
 
-    // 예측 결과 박스 업데이트
-    const boxSelectors = ['.box.one', '.box.two', '.box.three'];
-    predictions.forEach((prediction, index) => {
-        if (boxSelectors[index]) {
-            const $box = $(boxSelectors[index]);
-            // box__head 안에 head__label을 rank로 대체
-            $box.find('.head__label.num').text(`${prediction.rank}`);
-            // box__head 안에 strong을 prob로 대체 (소수점 4자리까지 표시)
+// ───────── JSON 데이터를 화면에 표시 ─────────
+function displayPredictionResults(predictions) {
+    if (!predictions || predictions.length === 0) {
+        console.warn('예측 데이터가 없습니다.');
+        return;
+    }
+
+    // 각 박스를 업데이트
+    predictions.forEach(prediction => {
+        let boxSelector;
+        if (prediction.rank === 1) {
+            boxSelector = '.box.one';
+        } else if (prediction.rank === 2) {
+            boxSelector = '.box.two';
+        } else if (prediction.rank === 3) {
+            boxSelector = '.box.three';
+        }
+
+        if (boxSelector) {
+            const $box = $(boxSelector);
+            // rank 1은 .num을, 나머지는 .head__label을 직접 찾습니다.
+            if (prediction.rank === 1) {
+                $box.find('.head__label.num').text(`${prediction.rank}`);
+            } else {
+                // 'Top - 2'에서 'Top - '를 제거하고 숫자만 업데이트
+                const $label = $box.find('.head__label');
+                $label.text(`Top - ${prediction.rank}`);
+            }
             $box.find('.box__head strong').text(`${(prediction.prob * 100).toFixed(2)}%`);
-            // last를 port_id로 대체
             $box.find('.last').text(prediction.port_id);
         }
     });
 }
-
-// ───────── 추가된 기능 끝 ─────────
 
 
 // 간단 토글 + 선택 저장
@@ -2348,4 +2467,6 @@ $(document).on('click', '#saveModal [data-action="yes"]', function () {
         alert('저장되었습니다. "마이페이지 > 내 선박 정보" 에서 확인하세요.');
     }, 50);
 });
+
+
 
