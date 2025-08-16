@@ -14,14 +14,36 @@
     }
 
     // ===== 유틸 =====
-    function formatDate(iso) {
-        return iso ? String(iso).replace("T", " ").split(".")[0] : "";
+    function toIso(any) {
+        // 백엔드가 여러 키/형식으로 줄 수 있으니 통합
+        const v =
+            (any && (any.createDate ?? any.createdAt ?? any.create_at ?? any.replyDate ?? any.date)) ??
+            any;
+
+        // 1) 문자열 ISO "2025-08-16T17:39:05.123" or "2025-08-16 17:39:05"
+        if (typeof v === "string") return v.replace(" ", "T");
+        // 2) LocalDateTime 배열 [yyyy,mm,dd,HH,MM,SS(,nano)]
+        if (Array.isArray(v) && v.length >= 6) {
+            const [Y, M, D, h, m, s] = v;
+            const pad = (n) => String(n).padStart(2, "0");
+            return `${Y}-${pad(M)}-${pad(D)}T${pad(h)}:${pad(m)}:${pad(s)}`;
+        }
+        // 3) Date 객체
+        if (v instanceof Date && !isNaN(v)) return v.toISOString();
+        return null;
     }
+
+    function formatDate(input) {
+        const iso = toIso(input);
+        return iso ? String(iso).replace("T", " ").split(".")[0] : "-";
+    }
+
     function escapeHtml(s) {
         return String(s || "").replace(/[&<>"']/g, (m) =>
             ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])
         );
     }
+
     function showToast(msg, duration = 4500) {
         const t = document.getElementById("toast");
         if (!t) return;
@@ -29,6 +51,14 @@
         t.classList.add("show");
         clearTimeout(t._hideTimer);
         t._hideTimer = setTimeout(() => t.classList.remove("show"), duration);
+    }
+
+    // 🔴 공용: 빨간 점 토글 (class와 display 둘 다 지원)
+    function setNoticeDot(on) {
+        const dot = document.getElementById("noticeDot");
+        if (!dot) return;
+        dot.classList.toggle("show", !!on);
+        dot.style.display = on ? "inline-block" : "none";
     }
 
     // ===== 1) 사용자 유형 도넛 =====
@@ -90,7 +120,7 @@
         if (empty) empty.hidden = true;
 
         items.forEach((it) => {
-            const time = formatDate(it.createDate);
+            const time = formatDate(it);
             tbody.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -112,7 +142,7 @@
         if (!tbody) return;
         if (empty) empty.hidden = true;
 
-        const time = formatDate(it.createDate);
+        const time = formatDate(it);
         tbody.insertAdjacentHTML(
             "afterbegin",
             `
@@ -146,11 +176,11 @@
                 `
         <li class="adm-logitem ${answered ? "answered" : "unread"}" data-ask="${it.askSeq}">
           <span class="badge ${answered ? "badge-done" : "badge-new"}">
-            ${answered ? "답변" : "신규"}
+            ${answered ? "답변 완료" : "신규"}
           </span>
           <div>
             <div class="title ellipsis">${escapeHtml(it.title)}</div>
-            <div class="meta">${escapeHtml(it.writer)} · ${formatDate(it.createDate)}</div>
+            <div class="meta">${escapeHtml(it.writer)} · ${formatDate(it)}</div>
           </div>
         </li>
       `
@@ -161,8 +191,7 @@
     async function refreshUnansweredDot() {
         try {
             const { count } = await getJson("/api/admin/asks/unanswered-count");
-            const dot = document.getElementById("noticeDot");
-            if (dot) dot.style.display = count > 0 ? "inline-block" : "none";
+            setNoticeDot(count > 0);
         } catch (e) {
             /* ignore */
         }
@@ -176,7 +205,7 @@
         li.classList.add("answered");
         const badge = li.querySelector(".badge");
         if (badge) {
-            badge.textContent = "답변";
+            badge.textContent = "답변 완료";
             badge.classList.remove("badge-new");
             badge.classList.add("badge-done");
         }
@@ -193,9 +222,8 @@
             const payload = JSON.parse(ev.data);
             showToast(`새 문의: ${payload.title}`, 8000);
             prependRow(payload);
-            const dot = document.getElementById("noticeDot");
-            if (dot) dot.style.display = "inline-block"; // 즉시 켜기
-            await refreshUnansweredDot(); // 서버 집계 반영
+            setNoticeDot(true);              // 즉시 켜기
+            await refreshUnansweredDot();    // 서버 집계로 보정
             if (document.getElementById("askLogPanel")?.classList.contains("open")) {
                 loadLog().catch(console.error);
             }
@@ -216,6 +244,7 @@
             console.warn("[SSE] 오류, 3초 후 재연결");
             es.close();
             setTimeout(connectSSE, 3000);
+            refreshUnansweredDot().catch(() => { });
         };
     }
 
@@ -275,5 +304,10 @@
         loadRecentAsks().catch(console.error);
         refreshUnansweredDot().catch(console.error);
         connectSSE();
+    });
+
+    // 포커스 복귀 시 점 상태 보정
+    window.addEventListener("focus", () => {
+        refreshUnansweredDot().catch(() => { });
     });
 })();

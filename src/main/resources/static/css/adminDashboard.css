@@ -71,6 +71,10 @@ body {
     z-index: 2;
 }
 
+.adm-dot.show {
+    display: inline-block;
+}
+
 /* Layout */
 .adm-wrap {
     max-width: 1200px;
