@@ -13,9 +13,8 @@
     <!-- 대시보드 전용 CSS -->
     <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
 
-    <!-- Chart.js & jQuery -->
+    <!-- Chart.js (필수) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body>
@@ -25,7 +24,7 @@
             <h1 class="adm-title">관리자 대시보드</h1>
         </div>
         <div class="adm-header__right">
-            <button id="askBtn" class="adm-btn">
+            <button id="askBtn" class="adm-btn" type="button" aria-haspopup="dialog" aria-controls="askLogPanel">
                 문의관리
                 <span id="noticeDot" class="adm-dot" aria-hidden="true"></span>
             </button>
@@ -41,7 +40,7 @@
                     <h3>사용자 유형 분포</h3>
                 </div>
                 <div class="adm-card__bd">
-                    <canvas id="userTypeChart" height="220"></canvas>
+                    <canvas id="userTypeChart" height="220" aria-label="사용자 유형 도넛 차트"></canvas>
                 </div>
             </article>
 
@@ -52,7 +51,7 @@
                     <div class="adm-card__tools">
                         <label class="adm-inline">
                             최근
-                            <select id="weeksSelect" class="adm-select">
+                            <select id="weeksSelect" class="adm-select" aria-label="조회 주차 선택">
                                 <option value="8">8주</option>
                                 <option value="12" selected>12주</option>
                                 <option value="16">16주</option>
@@ -62,7 +61,7 @@
                     </div>
                 </div>
                 <div class="adm-card__bd">
-                    <canvas id="weeklySignupChart" height="220"></canvas>
+                    <canvas id="weeklySignupChart" height="220" aria-label="주차별 가입자 수 막대 차트"></canvas>
                 </div>
             </article>
 
@@ -71,30 +70,51 @@
                 <div class="adm-card__hd">
                     <h3>최근 문의</h3>
                     <div>
-                        <button id="refreshAsk" class="adm-btn adm-btn--ghost">새로고침</button>
+                        <button id="refreshAsk" class="adm-btn adm-btn--ghost" type="button">새로고침</button>
                     </div>
                 </div>
-                <div id="askList" class="adm-list" aria-live="polite" aria-busy="false">
-                    <!-- JS가 채움 -->
+
+                <div class="adm-card__bd">
+                    <div class="adm-table-wrap">
+                        <table class="adm-table" id="askTable" aria-label="최근 문의 표">
+                            <thead>
+                                <tr>
+                                    <th style="width:80px">번호</th>
+                                    <th>문의 제목</th>
+                                    <th style="width:160px">글쓴이</th>
+                                    <th style="width:180px">시간</th>
+                                </tr>
+                            </thead>
+                            <tbody id="askTableBody">
+                                <!-- JS가 채움 -->
+                            </tbody>
+                        </table>
+                        <div id="askEmpty" class="adm-empty" hidden>문의가 없습니다.</div>
+                    </div>
                 </div>
             </article>
         </section>
     </main>
 
+    <!-- 오버레이 & 사이드 드로어(문의 로그) -->
+    <div id="drawerOverlay" class="adm-overlay" aria-hidden="true"></div>
+
+    <aside id="askLogPanel" class="adm-drawer" aria-hidden="true" aria-label="문의 로그 패널" role="dialog">
+        <header class="adm-drawer__hd">
+            <strong>문의 로그</strong>
+            <button id="closeLog" class="adm-btn adm-btn--ghost" type="button" aria-label="닫기">닫기</button>
+        </header>
+        <div class="adm-drawer__bd">
+            <ul id="logList" class="adm-loglist"></ul>
+            <div id="logEmpty" class="adm-empty" hidden>로그가 없습니다.</div>
+        </div>
+    </aside>
+
     <!-- 토스트 -->
     <div id="toast" class="adm-toast" role="status" aria-live="polite"></div>
 
-    <!-- 대시보드 JS (내가 준 JS 넣어주면 됨) -->
+    <!-- 대시보드 로직 (이 파일 하나에 전체 이벤트/차트/SSE/드로어 바인딩 포함) -->
     <script src="/js/adminDashboard.js" th:src="@{/js/adminDashboard.js}"></script>
-    <script>
-        // 선택 주차 변경 핸들링 (선택)
-        document.addEventListener('DOMContentLoaded', () => {
-            const select = document.getElementById('weeksSelect');
-            if (select && typeof loadWeeklySignups === 'function') {
-                select.addEventListener('change', () => loadWeeklySignups(Number(select.value)));
-            }
-        });
-    </script>
 </body>
 
 </html>

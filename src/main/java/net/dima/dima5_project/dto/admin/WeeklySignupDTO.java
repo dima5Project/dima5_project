@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WeeklySignupDTO {
-    private String monthWeek;
+    private int week;
     private long count;
 }

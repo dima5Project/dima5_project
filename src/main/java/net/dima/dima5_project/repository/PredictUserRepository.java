@@ -18,17 +18,12 @@ public interface PredictUserRepository extends JpaRepository<PredictUserEntity, 
   // 월별 주차 가입자 수 (월요일 시작 기준)
   @Query(value = """
           SELECT
-            DATE_FORMAT(join_date, '%Y-%m') AS ym,
-            CONCAT(
-              DATE_FORMAT(join_date, '%m월 '),
-              CEIL( (DAY(join_date) + WEEKDAY(DATE_FORMAT(join_date, '%Y-%m-01'))) / 7 ),
-              '주'
-            ) AS month_week,
-            COUNT(*) AS cnt
+              YEARWEEK(join_date, 1) AS week,   -- ISO 주차
+              COUNT(*) AS cnt
           FROM predict_user
           WHERE join_date >= :fromDate
-          GROUP BY ym, month_week
-          ORDER BY MIN(join_date)
+          GROUP BY YEARWEEK(join_date, 1)
+          ORDER BY week
       """, nativeQuery = true)
-  List<Object[]> monthlyWeekSignupCounts(@Param("fromDate") LocalDateTime fromDate);
+  List<Object[]> countWeeklySignups(@Param("fromDate") LocalDateTime fromDate);
 }
