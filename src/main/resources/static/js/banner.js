@@ -1,30 +1,20 @@
-// // 1. 시작하기 버튼 클릭 시 페이지 이동
-// const startBtn = document.querySelector('.start-btn');
-// if (startBtn) {
-//     startBtn.addEventListener('click', () => {
-//         window.location.href = '/portpredict';
-//     });
-// }
+// 화살표 누르면 아래로 이동 
 
-// // 2. 카드 클릭 시 페이지 이동 (card1 → 팀 페이지)
-// const teamCard = document.getElementById('team-card');
-// if (teamCard) {
-//     teamCard.addEventListener('click', () => {
-//         window.location.href = '/introduce';
-//     });
-// }
+document.addEventListener('DOMContentLoaded', function () {
+    // scroll-indicator-link 클래스를 가진 <a> 태그를 선택자로 지정
+    const scrollTrigger = document.querySelector('.scroll-indicator-link');
+    const serviceSection = document.querySelector('.service');
 
-// const serviceCard = document.getElementById('service-card');
-// if (serviceCard) {
-//     serviceCard.addEventListener('click', () => {
-//         window.location.href = '/introduce';
-//     });
-// }
+    if (scrollTrigger && serviceSection) {
+        scrollTrigger.addEventListener('click', function (e) {
+            // <a> 태그의 기본 동작(점프)을 막습니다.
+            e.preventDefault();
 
-// const newsCard = document.getElementById('news-card');
-// if (newsCard) {
-//     newsCard.addEventListener('click', () => {
-//         window.location.href = '/news';
-//     });
-// }
-
+            // scrollTo() 메서드로 부드러운 스크롤 효과를 줍니다.
+            serviceSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    }
+});
