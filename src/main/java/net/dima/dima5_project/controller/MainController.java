@@ -14,7 +14,7 @@ public class MainController {
      * 첫 화면 요청 (로그인 성공하면 Controller에서 정보를 얻어오도록)
      * @return
      */
-    @GetMapping({"/", ""}) // localhost:8080/ localhost:8080 -> 두 개를 하나의 요청으로 처리하겠다
+    @GetMapping({"/", ""})
     public String index(
         @AuthenticationPrincipal LoginUserDetailsDTO loginUser, // 서버쪽에서 사용자 정보를 가져옴
         Model model
