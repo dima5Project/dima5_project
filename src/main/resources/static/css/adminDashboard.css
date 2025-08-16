@@ -68,6 +68,7 @@ body {
     position: absolute;
     right: -4px;
     top: -4px;
+    z-index: 2;
 }
 
 /* Layout */
@@ -163,22 +164,237 @@ body {
     font-size: 12px;
 }
 
-/* Toast */
 .adm-toast {
     position: fixed;
-    right: 16px;
-    bottom: 16px;
+    right: 20px;
+    bottom: 20px;
     background: #111;
     color: #fff;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .25);
     opacity: 0;
-    transform: translateY(12px);
-    transition: all .25s ease;
+    transform: translateY(14px);
+    transition: opacity .25s ease, transform .25s ease;
+    max-width: 360px;
+    line-height: 1.4;
 }
 
 .adm-toast.show {
     opacity: 1;
     transform: translateY(0);
+}
+
+.adm-table-wrap {
+    width: 100%;
+    overflow: auto;
+}
+
+.adm-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.adm-table th,
+.adm-table td {
+    border-bottom: 1px solid var(--adm-border);
+    padding: 10px 12px;
+    text-align: left;
+}
+
+.adm-table thead th {
+    background: #fafafa;
+    font-weight: 700;
+}
+
+.adm-empty {
+    color: var(--adm-muted);
+    padding: 16px;
+}
+
+.adm-table td.ellipsis {
+    max-width: 480px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 카드 본문은 고정 높이 확보 */
+.adm-card__bd {
+    height: 320px;
+    /* 원하는 높이로 */
+    position: relative;
+    /* 캔버스 absolute가 이 기준을 씀 */
+}
+
+/* 캔버스가 카드 본문을 꽉 채우도록 */
+#userTypeChart,
+#weeklySignupChart {
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* 패널: 화면 고정 + 슬라이드 인 */
+.adm-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: min(420px, 92vw);
+    /* 데스크톱 420px, 모바일은 화면폭의 92% */
+    background: #fff;
+    box-shadow: -18px 0 28px rgba(0, 0, 0, .08);
+    transform: translateX(100%);
+    /* 처음엔 화면 밖 */
+    transition: transform .28s ease;
+    z-index: 1100;
+    /* 헤더/차트보다 위로 */
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(0, 0, 0, .06);
+}
+
+/* 열렸을 때 */
+.adm-drawer.open {
+    transform: translateX(0);
+}
+
+/* 내부 레이아웃 */
+.adm-drawer__hd {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+.adm-drawer__bd {
+    padding: 12px 16px 20px;
+    overflow-y: auto;
+    /* 패널 안에서만 세로 스크롤 */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 오버레이 */
+.adm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    z-index: 1090;
+}
+
+.adm-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 본문 스크롤 잠금 */
+body.no-scroll {
+    overflow: hidden;
+    overscroll-behavior: contain;
+}
+
+/* 안전: 전체 페이지 가로 스크롤 방지 */
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* ===== 문의 로그 (드로어) ===== */
+.adm-loglist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.adm-logitem {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+    align-items: start;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--adm-border);
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.adm-logitem:hover {
+    background: #fafbff;
+}
+
+/* 왼쪽 빨간 인디케이터 (미답변) */
+.adm-logitem.unread {
+    box-shadow: inset 3px 0 0 red;
+}
+
+/* 뱃지 */
+.adm-logitem .badge {
+    grid-row: 1 / span 2;
+    align-self: start;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3b5bfd;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.adm-logitem.unread .badge {
+    background: #ffe9ea;
+    color: red;
+}
+
+/* 제목/메타 */
+.adm-logitem .title {
+    font-weight: 700;
+    margin-top: 2px;
+    margin-right: 4px;
+}
+
+.adm-logitem .title.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adm-logitem .meta {
+    color: var(--adm-muted);
+    font-size: 12px;
+}
+
+/* 드로어 헤더 살짝 강조 */
+.adm-drawer__hd {
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.badge-new {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-done {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.adm-logitem.unread::before {
+    background: #ef4444;
+}
+
+.adm-logitem.answered::before {
+    background: #9ca3af;
 }

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>문의 답변</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 관리자 공통 CSS -->
+    <link th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" rel="stylesheet" />
+
+    <style>
+        .ask-wrap {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .ask-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--adm-shadow);
+            overflow: hidden;
+        }
+
+        .ask-hd {
+            padding: 16px;
+            border-bottom: 1px solid var(--adm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ask-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .ask-meta {
+            color: var(--adm-muted);
+            font-size: 13px;
+        }
+
+        .ask-bd {
+            padding: 16px;
+        }
+
+        .ask-content {
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .reply-area {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .reply-area textarea {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            padding: 12px;
+            border: 1px solid var(--adm-border);
+            border-radius: 12px;
+        }
+
+        .btns {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .muted {
+            color: var(--adm-muted);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #334155;
+        }
+
+        .danger {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 상단 헤더 -->
+    <header class="adm-header">
+        <div class="adm-header__left">
+            <a href="/admin" class="adm-btn adm-btn--ghost">← 대시보드</a>
+            <span class="adm-title" style="margin-left:8px;">문의 답변</span>
+        </div>
+        <div class="adm-header__right">
+            <a href="/admin" class="adm-btn">목록</a>
+        </div>
+    </header>
+
+    <!-- 본문 -->
+    <main class="ask-wrap">
+        <article class="ask-card">
+            <div class="ask-hd">
+                <div>
+                    <div id="askTitle" class="ask-title">제목</div>
+                    <div class="ask-meta" id="askMeta">글쓴이 · 시간</div>
+                </div>
+                <div id="replyBadge" class="badge" style="display:none;">답변완료</div>
+            </div>
+            <div class="ask-bd">
+                <div id="askContent" class="ask-content muted">내용을 불러오는 중…</div>
+
+                <section class="reply-area">
+                    <label for="replyContent"><strong>답변</strong></label>
+                    <textarea id="replyContent" placeholder="여기에 답변을 입력하세요."></textarea>
+                    <div class="btns">
+                        <button id="deleteReply" class="adm-btn danger" style="display:none;">답변 삭제</button>
+                        <button id="saveReply" class="adm-btn">저장</button>
+                    </div>
+                    <div id="replyInfo" class="muted"></div>
+                </section>
+            </div>
+        </article>
+    </main>
+
+    <!-- 서버에서 받은 askSeq -->
+    <script th:inline="javascript">
+        window.__ASK_SEQ__ = "[[${askSeq}]]";
+    </script>
+
+    <script src="/js/askreply.js" th:src="@{/js/askreply.js}" defer></script>
+</body>
+
+</html>

@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,8 +62,14 @@ public class AskBoardEntity {
     @Column(name = "ask_pwd")
     private String askPwd;
 
-    @Column(name = "reply_status")
-    private Boolean replyStatus;
+    @Column(name = "reply_status", nullable = false)
+    private Boolean replyStatus = false;
+
+    @PrePersist
+    void prePersist() {
+        if (replyStatus == null)
+            replyStatus = false;
+    }
 
     // AskReply 1:1 역방향
     @OneToOne(mappedBy = "askBoard", cascade = CascadeType.ALL)

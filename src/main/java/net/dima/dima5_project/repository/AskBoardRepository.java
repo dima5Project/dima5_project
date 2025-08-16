@@ -40,4 +40,5 @@ public interface AskBoardRepository extends JpaRepository<AskBoardEntity, Long> 
         @Query("select a from AskBoardEntity a order by a.createDate desc")
         Page<AskBoardEntity> findRecent(Pageable pageable);
 
+        long countByReplyStatusFalse(); // 미답변 수
 }
