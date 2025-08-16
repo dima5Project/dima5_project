@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
@@ -17,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const markerLayerId = 'marker-layer';
     const lastMarkerSourceId = 'last-marker-source';
     const lastMarkerLayerId = 'last-marker-layer';
+    let allPortMarkers = []; // 모든 항구 마커를 저장할 배열
 
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -184,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!f.geometry || f.geometry.type !== 'Point') return;
             const [lng, lat] = f.geometry.coordinates || [];
             if (typeof lng !== 'number' || typeof lat !== 'number') return;
+            const portId = f.properties?.port_id || ''; // port_id 추출
 
             const color = f.properties?.color || '#013895';
             const size = f.properties?.size || 28;
@@ -193,11 +194,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 size
             });
 
+            // DOM 엘리먼트에 port_id 저장
+            el.dataset.portId = portId;
+
             el.addEventListener('click', () => {
                 el.classList.add('bump');
                 setTimeout(() => el.classList.remove('bump'), 180);
 
-                const portId = f.properties?.port_id || '';
                 if (!portId) return;
 
                 new mapboxgl.Popup()
@@ -210,12 +213,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 1000);
             });
 
-            new mapboxgl.Marker({
+            const marker = new mapboxgl.Marker({ // 마커 인스턴스 저장
                 element: el,
                 anchor: 'bottom'
             })
                 .setLngLat([lng, lat])
                 .addTo(map);
+
+            allPortMarkers.push(marker); // 마커를 배열에 저장
 
             el.addEventListener('mouseenter', async () => {
                 const pid = f.properties?.port_id || 'Unknown';
@@ -248,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 el.classList.add('bump');
                 setTimeout(() => el.classList.remove('bump'), 180);
 
-                const portId = f.properties?.port_id || '';
                 if (!portId) return;
 
                 window.location.assign(`/port/info?port=${encodeURIComponent(portId)}`);
@@ -295,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
             source: markerSourceId,
             paint: {
                 'circle-radius': 6,
-                'circle-color': '#ff0000',
+                'circle-color': '#34495e', // timeline 마커 색상 (짙은 청회색)
                 'circle-stroke-width': 1,
                 'circle-stroke-color': '#fff'
             }
@@ -314,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
             source: lastMarkerSourceId,
             paint: {
                 'circle-radius': 8,
-                'circle-color': '#0000ff',
+                'circle-color': '#00bfff', // latest 마커 색상 (짙은 빨간색)
                 'circle-stroke-width': 2,
                 'circle-stroke-color': '#fff'
             }
@@ -328,6 +332,7 @@ document.addEventListener("DOMContentLoaded", () => {
             color: '#013895',
             size: 28
         });
+        busanEl.dataset.portId = 'KRBUS'; // 부산 마커에도 ID 부여
 
         busanEl.addEventListener('mouseenter', () => {
             const html = buildBusanHoverCardHTML();
@@ -338,12 +343,14 @@ document.addEventListener("DOMContentLoaded", () => {
             busanHoverPopup.remove();
         });
 
-        new mapboxgl.Marker({
+        const busanMarker = new mapboxgl.Marker({ // 부산 마커를 배열에 저장
             element: busanEl,
             anchor: 'bottom'
         })
             .setLngLat([129.040, 35.106])
             .addTo(map);
+
+        allPortMarkers.push(busanMarker); // 부산 마커를 배열에 저장
     });
 
     window.drawRoutes = function (routes) {
@@ -397,6 +404,46 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // 마커 레이어의 가시성을 제어합니다.
+    window.toggleMarkersVisibility = function (isVisible) {
+        if (!map || !map.getLayer(markerLayerId) || !map.getLayer(lastMarkerLayerId)) return;
+        const visibility = isVisible ? 'visible' : 'none';
+        map.setLayoutProperty(markerLayerId, 'visibility', visibility);
+        map.setLayoutProperty(lastMarkerLayerId, 'visibility', visibility);
+    };
+
+    // 활성화된 랭크에 해당하는 항구 마커만 표시
+    window.togglePortMarkersByRank = function (ranksToKeep) {
+        const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
+        portIdsToKeep.add('KRBUS'); // 부산항은 항상 유지
+
+        allPortMarkers.forEach(marker => {
+            const portId = marker.getElement().dataset.portId;
+            if (portIdsToKeep.has(portId)) {
+                marker.getElement().style.display = '';
+            } else {
+                marker.getElement().style.display = 'none';
+            }
+        });
+    };
+
+    // 모든 항구 마커 숨기기 (부산항 제외)
+    window.hideAllPortMarkers = function () {
+        allPortMarkers.forEach(marker => {
+            const portId = marker.getElement().dataset.portId;
+            if (portId !== 'KRBUS') {
+                marker.getElement().style.display = 'none';
+            }
+        });
+    };
+
+    // 모든 항구 마커 다시 표시
+    window.showAllPortMarkers = function () {
+        allPortMarkers.forEach(marker => {
+            marker.getElement().style.display = '';
+        });
+    };
+
     window.clearRoutesAndMarkers = function () {
         if (!map || !map.getSource(routeSourceId)) return;
         const emptyGeojson = {
@@ -406,5 +453,6 @@ document.addEventListener("DOMContentLoaded", () => {
         map.getSource(routeSourceId).setData(emptyGeojson);
         map.getSource(markerSourceId).setData(emptyGeojson);
         map.getSource(lastMarkerSourceId).setData(emptyGeojson);
+        window.toggleMarkersVisibility(false);
     };
-});       
+});
