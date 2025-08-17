@@ -12,19 +12,21 @@
     <script defer th:src="@{/js/header.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script defer th:src="@{/js/info2.js}"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@350;400;500;700&display=swap"
         rel="stylesheet">
+    <!-- 
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.calendar/latest/tui-calendar.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.1.8/chance.min.js"></script>
+    <script src="https://uicdn.toast.com/tui-code-snippet/v2.3.0/tui-code-snippet.min.js"></script>
+    <script src="https://uicdn.toast.com/tui.calendar/latest/tui-calendar.js"></script> -->
 
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ko.js'></script>
-
+    <script defer th:src="@{/js/info2.js}"></script>
 </head>
 
 <body>
@@ -126,7 +128,6 @@
                 <canvas id="graphCanvas"></canvas>
             </div>
 
-
             <div class="info-card" id="timezoneCard">
                 <h3>🕜 시차 정보</h3>
 
@@ -151,10 +152,11 @@
                 </div>
             </div>
 
+            <!-- 달력 -->
             <div class="info-card" id="holidayCard">
-                <h3>🗓️ 공휴일 달력</h3>
-                <div id="fullCalendar"></div>
-                <div id="holidayListContainer"></div>
+                <h3>📆 공휴일 달력</h3>
+                <div id="todayText"></div>
+                <div id="holidayCalendarContainer"></div>
             </div>
 
 
@@ -163,6 +165,7 @@
     </main>
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+
 </body>
 
 </html>

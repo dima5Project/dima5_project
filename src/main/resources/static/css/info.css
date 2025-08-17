@@ -270,11 +270,13 @@ main {
 /* 그래프 */
 #chartCard {
     grid-area: chart;
+    /* css grid 레이아웃에서 이 요소가 차지할 영역의 이름을 chart로 지정함. 부모 컨테이너에서 위치 쉽게 제어 가능 */
     min-height: 300px;
 }
 
 #chartCard canvas {
     width: 100% !important;
+    /* 부모 요소(chartCard)의 100%로 설정 */
     height: 100% !important;
     display: block;
 }

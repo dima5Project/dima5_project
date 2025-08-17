@@ -68,6 +68,7 @@ let isUserInteracting = false;
 let currentPortId = 'CNDAG';
 let currentPortNameKr = '다강';
 let currentCountryNameKr = '중국';
+let calendar;
 
 // ==========================
 // 전역 상태 변수 (달력 관련)
@@ -109,17 +110,15 @@ function initEventBindings() {
         isUserInteracting = true;
         stopAutoUpdate();
 
+        // 사용자가 선택한 항구 정보를 가져옴
         let portId = $("#portSelect").val();
-        let portNameKr = $("#portSelect option:selected").text();
+        let portNameKr = portIdToName[portId];
 
-        if (!portId || portId === "항구 선택") {
-            alert("항구를 선택해주세요.");
-            return;
-        }
+        let coords = portCoordinates[portId];
 
-        let coords = portCoordinates[portNameKr];
-        if (!coords) {
-            alert("선택한 항구의 좌표 정보가 없습니다.");
+        // portId, coords 중 선택을 안 한 것이 있으면 경고창을 띄움
+        if (!portId || !coords) {
+            alert("국가와 항구를 모두 선택해주세요.");
             return;
         }
 
@@ -149,12 +148,133 @@ function loadInitialData() {
             // loadPorts()의 완료를 기다린 후 항구 설정
             loadPorts(currentCountryNameKr).done(() => {
                 $("#portSelect").val(currentPortId);
+
+                initCalendar();
+
                 updateInfoCardsAndGraphs();
             });
         });
 
         startAutoUpdate();
     });
+}
+
+// 달력 초기화
+function initCalendar() {
+    const container = document.getElementById('calendar');
+    if (!container) {
+        console.error('Calendar container not found!');
+        return;
+    }
+
+    calendar = new tui.Calendar(container, {
+        defaultView: 'month', // 월간 뷰로 설정
+        taskView: false,
+        template: {
+            monthDayname: function (dayname) {
+                return '<span class="tui-full-calendar-dayname-name">' + dayname.label + '</span>';
+            },
+            monthGridHeader: function (model) {
+                return '<div><span class="tui-full-calendar-month-grid-cell-date">' + model.date + '</span></div>';
+            },
+            // 공휴일을 강조하는 템플릿
+            milestone: function (milestone) {
+                return '<span style="color:#d60000; font-weight:bold;">' + milestone.title + '</span>';
+            }
+        },
+        calendars: [{
+            id: '1',
+            name: 'Holiday',
+            color: '#d60000',
+            bgColor: '#FEE2E2',
+            dragBgColor: '#FEE2E2',
+            borderColor: '#FCA5A5'
+        }]
+    });
+
+    console.log("tui.calendar 인스턴스가 초기화되었습니다.");
+}
+
+// 공휴일 + 달력
+function loadHoliday(country) {
+    $.get(`/api/info/holiday/${country}`, function (data) {
+        if (Array.isArray(data) && data.length > 0) {
+            currentHolidayData = data;
+            drawHolidayCalendar(data);
+        } else {
+            currentHolidayData = [];
+            drawHolidayCalendar([]);
+        }
+    });
+}
+function drawHolidayCalendar(holidays) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0-indexed
+    const todayDate = today.getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    const holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
+
+    // 월 이동 UI (HTML 템플릿)
+    const monthTitle = `<div class="calendar-header">
+ <button onclick="prevMonth()"> ◀ </button>
+ <strong>${currentYear}년 ${currentMonth + 1}월</strong>
+ <button onclick="nextMonth()"> ▶ </button>
+    </div>`;
+
+    let calendarHTML = `<table class="calendar-table"><thead><tr>`;
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    days.forEach(d => calendarHTML += `<th>${d}</th>`);
+    calendarHTML += `</tr></thead><tbody><tr>`;
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarHTML += `<td></td>`;
+    }
+
+    for (let d = 1; d <= lastDate; d++) {
+        const isToday = d === todayDate;
+        const isHoliday = holidayDates.includes(d);
+
+        let classes = "calendar-date";
+        if (isToday) classes += " today";
+        if (isHoliday) classes += " holiday";
+
+        calendarHTML += `<td class="${classes}">${d}`;
+        if (isHoliday) {
+            calendarHTML += `<div class="dot"></div>`;
+        }
+        calendarHTML += `</td>`;
+
+        if ((firstDay + d) % 7 === 0) {
+            calendarHTML += `</tr><tr>`;
+        }
+    }
+
+    calendarHTML += `</tr></tbody></table>`;
+    $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
+
+    const todayText = `<strong>오늘 날짜:</strong> ${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
+    $("#todayText").html(`<p>${todayText}</p>`);
+}
+
+// 이전 / 다음 달 이동 함수
+function prevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    drawHolidayCalendar(currentHolidayData);
+}
+
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    drawHolidayCalendar(currentHolidayData);
 }
 
 // 모든 정보 카드를 업데이트하는 공통 함수
@@ -268,10 +388,6 @@ function loadTimezone(countryNameKr) {
 }
 
 // 공휴일 + 달력
-// 전역 변수: FullCalendar 인스턴스를 저장
-let calendar;
-
-// 공휴일 + 달력 (FullCalendar 사용)
 function loadHoliday(countryNameKr) {
     $.get(`/api/info/holiday/${countryNameKr}`, function (data) {
         if (calendar) {
@@ -286,20 +402,52 @@ function loadHoliday(countryNameKr) {
             };
         });
 
-        // FullCalendar 초기화
-        let calendarEl = document.getElementById('fullCalendar');
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            themeSystem: 'sandstone',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,dayGridWeek,dayGridDay'
+        // 캘린더 컨테이너 요소 가져오기
+        const container = document.getElementById('calendar');
+
+        // 캘린더 인스턴스 생성
+        calendar = new tui.Calendar(container, {
+            defaultView: 'week', // 'month', 'week', 'day' 중 선택 가능
+            taskView: false,     // 일정(task) 뷰 비활성화
+            template: {
+                // 주간/일간 뷰에서 시간 헤더에 표시할 템플릿
+                timegridDisplayPrimaryTime: function (time) {
+                    const hour = time.hour;
+                    return hour + ':00';
+                },
+                // 주간/일간 뷰에서 주 헤더에 표시할 템플릿
+                milestone: function (milestone) {
+                    return '<span class="tui-full-calendar-milestone">' + milestone.title + '</span>';
+                }
             },
-            locale: 'ko',
-            events: events,
+            calendars: [
+                {
+                    id: '1',
+                    name: 'My Calendar',
+                    color: '#ffffff',
+                    bgColor: '#9e5fff',
+                    dragBgColor: '#9e5fff',
+                    borderColor: '#9e5fff'
+                }
+            ]
         });
+
+        // 샘플 일정 추가 (선택 사항)
+        calendar.createSchedules([
+            {
+                id: '1',
+                calendarId: '1',
+                title: '홈페이지 개발 회의',
+                category: 'time',
+                dueDateClass: '',
+                start: '2025-08-16T10:00:00',
+                end: '2025-08-16T12:00:00'
+            }
+        ]);
+
+        // 초기화된 캘린더 렌더링
         calendar.render();
+
     }); // <-- `$.get` 호출을 닫는 올바른 위치
 }
 
@@ -334,81 +482,6 @@ function updateHolidayListAndToday(startDate, endDate, allHolidays) {
         listContainer.append('<p>이번 달에는 공휴일이 없습니다.</p>');
     }
 }
-
-// function drawHolidayCalendar(holidays) {
-//     let today = new Date();
-//     let year = today.getFullYear();
-//     let month = today.getMonth();
-//     let todayDate = today.getDate();
-//     let firstDay = new Date(currentYear, currentMonth, 1).getDay();
-//     let lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
-//     let holidayDates = holidays.filter(h => {
-//         let hDate = new Date(h.holidayDate);
-//         return hDate.getFullYear() === currentYear && hDate.getMonth() === currentMonth;
-//     }).map(h => new Date(h.holidayDate).getDate());
-
-//     let monthTitle = `<div class="calendar-header">
-// <button onclick="prevMonth()"> ◀ </button>
-// <strong>${currentYear}년 ${currentMonth + 1}월</strong>
-// <button onclick="nextMonth()"> ▶ </button>
-// </div>`;
-
-//     let calendarHTML = `<table class="calendar-table"><thead><tr>`;
-//     let days = ["일", "월", "화", "수", "목", "금", "토"];
-//     days.forEach(d => calendarHTML += `<th>${d}</th>`);
-//     calendarHTML += `</tr></thead><tbody><tr>`;
-
-//     for (let i = 0; i < firstDay; i++) {
-//         calendarHTML += `<td></td>`;
-//     }
-
-//     for (let d = 1; d <= lastDate; d++) {
-//         let isToday = (d === todayDate && currentYear === today.getFullYear() && currentMonth === today.getMonth());
-//         let isHoliday = holidayDates.includes(d);
-
-//         let classes = "calendar-date";
-//         if (isToday) classes += " today";
-//         if (isHoliday) classes += " holiday";
-
-//         calendarHTML += `<td class="${classes}">
-//                         <div class="date-number">${d}</div>`;
-//         if (isHoliday) {
-//             let holiday = holidays.find(h => new Date(h.holidayDate).getDate() === d);
-//             let holidayName = holiday ? holiday.holidayName : '';
-//             calendarHTML += `<div class="dot" title="${holidayName}"></div>`;
-//         }
-//         calendarHTML += `</td>`;
-
-//         if ((firstDay + d) % 7 === 0) {
-//             calendarHTML += `</tr><tr>`;
-//         }
-//     }
-
-//     calendarHTML += `</tr></tbody></table>`;
-//     $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
-
-//     let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
-//     $("#todayText").html(`<p>${todayText}</p>`);
-// }
-
-// // 이전 / 다음 달 이동 함수
-// function prevMonth() {
-//     currentMonth--;
-//     if (currentMonth < 0) {
-//         currentMonth = 11;
-//         currentYear--;
-//     }
-//     drawHolidayCalendar(currentHolidayData);
-// }
-
-// function nextMonth() {
-//     currentMonth++;
-//     if (currentMonth > 11) {
-//         currentMonth = 0;
-//         currentYear++;
-//     }
-//     drawHolidayCalendar(currentHolidayData);
-// }
 
 // 날씨 카드
 function loadWeather(lat, lon) {
@@ -456,63 +529,164 @@ function loadDockingGraph(portId) {
     });
 }
 
-function drawChart(data) {
-    let ctx = document.getElementById("graphCanvas").getContext("2d");
-    let labels = data.map(d => d.date);
-    let actualData = data.map(d => d.actual);
-    let expectedData = data.map(d => d.expected);
+Chart.register(ChartDataLabels);
 
-    if (congestionChart) congestionChart.destroy();
+function drawChart(data) { // 외부에서 전달받은 data를 이용해 차트를 그리는 함수
+    let ctx = document.getElementById("graphCanvas").getContext("2d"); // id가 graphCanvas인 canvas 요소를 찾고, 그 위에 2d 그래픽을 그릴 수 있는 렌더링 컨텍스트(ctx)를 가져옴. 차트를 그리기 위한 도화지 역할
+    let labels = data.map(d => d.date); // data 배열의 각 객체에서 date 속성만 추출하여 labels 배열을 만듦. 차트의 x축(날짜)에 사용됨.
+    let actualData = data.map(d => d.actual); // data 배열에서 actual 속성(실제 정박 선박 수)을 추출하여 actualData 배열을 만듦. 정박 선박 수 데이터셋에 사용함
+    let expectedData = data.map(d => d.expected); // data 배열에서 expected 속성(입항 예정 수)을 추출하여 expectedData 배열을 만듦. 입항 예정 수 데이터셋에 사용함.
 
-    congestionChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
+    if (congestionChart) congestionChart.destroy(); // 기존에 그려진 차트 인스턴스가 있다면 파괴하여 메모리 누수 방지, 새로운 차트 그릴 준비
+
+    congestionChart = new Chart(ctx, { // ctx(캔버스)에 새로운 차트 인스턴스를 생성하여 congestionChart 변수에 할당함.
+        type: 'bar', // 차트의 기본 타입을 막대 차트로 지정
+        data: { // 차트에 표시할 데이터 정의
+            labels: labels, // x축에 표시될 레이블(날짜)을 위에서 준비한 labels 배열로 지정.
+            datasets: [ // 차트에 들어갈 여러 데이터셋을 배열 형태로 정의.
+
+                // 정박 선박 수 데이터 셋
                 {
-                    label: '정박 선박 수',
-                    data: actualData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1,
-                    order: 1,
-                    yAxisID: 'y'
+                    label: '정박 선박 수', // 범례와 튤팁에 표시될 데이터셋의 이름
+                    data: actualData, // 해당 데이터셋이 사용할 데이터 배열
+                    backgroundColor: 'rgba(149, 203, 240, 0.6)', // 막대나 선의 색상. rgba는 투명도 포함
+                    borderColor: 'rgba(149, 203, 240, 1)',
+                    borderWidth: 1, // 선의 두께나 막대의 두께 설정
+                    hoverBorderWidth: 4, // 호버 시 외곽선 두께
+                    hoverBorderColor: 'rgba(150, 150, 234, 1)',
+                    order: 1, // 차트의 레이어 순서 지정. order:0은 가장 아래에 그려져 막대 뒤로 가려짐
+                    pointStyle: 'circle', // 범례 아이콘을 둥근 사각형으로 설정
+                    borderRadius: 20, // 막대 모서리를 5px 둥글게 함
+                    yAxisID: 'y' // 이 데이터셋이 사용할 Y축의 ID 지정. 
                 },
+
+                // 정박 추이 (선) 데이터셋
                 {
                     label: '정박 추이 (선)',
                     data: actualData,
-                    type: 'line',
-                    borderColor: 'blue',
+                    type: 'line', // 선 차트
+                    borderColor: '#47b5b5',
                     borderWidth: 2,
-                    pointBackgroundColor: 'blue',
-                    tension: 0.3,
+                    pointBackgroundColor: '#47b5b5',
+                    tension: 0.3, // 선의 곡률 설정. 0.3은 약간 부드러운 곡선임.
                     fill: false,
                     order: 0,
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    pointStyle: 'circle', // 범례 아이콘을 선으로 설정
+                    datalabels: {
+                        display: false
+                    },
+                    tooltip: { // 이 데이터셋의 툴팁을 완전히 비활성화
+                        enabled: false
+                    }
                 },
+
+                // 입항 예정 수 데이터 셋
                 {
                     label: '입항 예정 수',
                     data: expectedData,
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255,177,193, 0.6)',
+                    borderColor: 'rgba(255, 177, 193, 1)',
                     borderWidth: 1,
+                    hoverBorderWidth: 4, // 호버 시 외곽선 두께
+                    hoverBorderColor: 'rgba(150, 150, 234, 1)',
                     order: 2,
-                    yAxisID: 'y'
+                    pointStyle: 'circle', // 범례 아이콘을 둥근 사각형으로 설정
+                    borderRadius: 20, // 막대 모서리를 5px 둥글게 함
+                    yAxisID: 'y1'
                 }
             ]
         },
+
+        // 차트의 모양, 동작 등을 설정하는 객체
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: '최근 항만 혼잡도 추이'
+            responsive: true, // 캔버스 크기에 따라 차트 크기를 자동으로 조절
+            maintainAspectRatio: false, // 캔버스의 가로-세로 비율을 유지하지 않도록 하여 원하는 크기로 자유롭게 조절할 수 있음
+
+            layout: {
+                padding: {
+                    top: 0 // 상단 패딩 0으로 설정하여 전체 차트를 위로 올림
                 }
             },
+
+            // Chart.js 플러그인에 대한 설정
+            plugins: {
+                // 차트 제목 설정
+                title: {
+                    display: true, // 제목 보이게
+                    text: '최근 항만 혼잡도 추이', // 제목 내용
+                    color: '#000', // 제목 글자 색상
+                    font: {
+                        size: 20, // 제목 글자 크기
+                        weight: 'bold'
+                    },
+                    padding: {
+                        bottom: 5 // 제목 아래쪽 패딩을 줄여서 범례에 더 가깝게 만듦
+                    }
+                },
+
+                datalabels: {
+                    anchor: 'end', // 숫자를 막대의 끝 부분에 표시
+                    align: 'top', // 숫자를 막대 위쪽에 정렬
+                    formatter: function (value, context) {
+                        // 데이터 값만 표시하도록 포맷팅
+                        return value;
+                    },
+                    font: {
+                        size: 12,
+                    },
+                    color: '#333', // 숫자 색상
+                    offset: -7, // 숫자를 막대 안쪽으로 -10px 이동하여 더 가깝게 함
+                    padding: {
+                        top: 5 // 상단 패딩을 줄여 간격 좁힘
+                    }
+                },
+
+                tooltip: {
+                    mode: 'nearest', // 마우스에 가장 가까운 단일 데이터셋만 툴팁에 표시
+                    intersect: false // 가까우면 툴팁 표시
+                },
+
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        padding: 10 // 범례 항목 간의 간격 조정
+                    },
+                    position: 'top', // 범례 위치
+                }
+            },
+
+            // 차트의 축에 대한 설정
             scales: {
+                // x축에 대한 설정
+                x: {
+                    barPercentage: 0.3, // 막대 너비를 60%로 줄여서 얇게 함
+                    categoryPercentage: 0.5 // 카테고리 내에서 막대가 차지하는 비율을 70%로 줄여 막대 간 간격을 넓힘
+                },
+
+                // y축에 대한 설정
                 y: {
-                    beginAtZero: true
+                    type: 'linear', // y축의 스케일 타입을 linear로 지정
+                    display: true,
+                    position: 'left', // 왼쪽 y축
+                    beginAtZero: true, // y축이 0부터 시작하도록 설정하여 데이터가 왜곡되어 보이지 않게 함
+                    title: {
+                        display: true,
+                        text: '정박 선박 수' // 왼쪽 y축 제목
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right', // 오른쪽 y축
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false // 오른쪽 y축의 그리드 라인 비활성화
+                    },
+                    title: {
+                        display: true,
+                        text: '입항 예정 수' // 오른쪽 y축 제목
+                    }
                 }
             }
         }
