@@ -57,7 +57,7 @@ public class AdminApiController {
     }
 
     // 미답변 수
-    @GetMapping("/api/admin/asks/unanswered-count")
+    @GetMapping("asks/unanswered-count")
     public Map<String, Object> unansweredCount() {
         long count = askBoardRepository.countByReplyStatusFalse();
         return Map.of("count", count);

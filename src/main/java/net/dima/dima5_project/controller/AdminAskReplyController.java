@@ -133,7 +133,7 @@ public class AdminAskReplyController {
     }
 
     /** 미답변 수 (헤더 빨간 점) */
-    @GetMapping("/unanswered-count")
+    @GetMapping("/unanswered-counts")
     public Map<String, Long> unansweredCount() {
         long count = askBoardRepository.countByReplyStatusFalse();
         return Map.of("count", count);

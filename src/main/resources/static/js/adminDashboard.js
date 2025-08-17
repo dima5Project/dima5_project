@@ -3,6 +3,34 @@
     let weeklySignupChart;
     let es; // SSE 인스턴스(단일)
 
+    // 막대에만 값 라벨을 표시하는 플러그인
+    const valueLabelPlugin = {
+        id: "valueLabel",
+        afterDatasetsDraw(chart, _args, opts) {
+            // 차트 옵션에서 plugins.valueLabel.show 가 true일 때만 그림
+            if (!opts?.show) return;
+
+            const { ctx } = chart;
+            chart.data.datasets.forEach((ds, di) => {
+                const meta = chart.getDatasetMeta(di);
+                meta.data?.forEach((el, i) => {
+                    const val = ds.data?.[i];
+                    if (val == null) return;
+                    const { x, y } = el.tooltipPosition();
+                    ctx.save();
+                    ctx.font = "12px Noto Sans KR, sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "bottom";
+                    ctx.fillStyle = "#333";
+                    ctx.fillText(String(val), x, y - 4); // 막대 위 숫자
+                    ctx.restore();
+                });
+            });
+        }
+    };
+    Chart.register(valueLabelPlugin);
+
+
     // ===== 공통 fetch =====
     async function getJson(url) {
         const res = await fetch(url, { headers: { Accept: "application/json" } });
@@ -81,26 +109,61 @@
         });
     }
 
-    // ===== 2) 월별 주차 가입자 막대 =====
-    async function loadWeeklySignups(weeks = 12) {
-        const data = await getJson(`/api/admin/weekly?weeks=${weeks}`); // [{monthWeek,count}]
-        const labels = data.map((d) => d.monthWeek);
-        const values = data.map((d) => d.count);
+    // ===== 2) 월별 주차 가입자 막대 =====  ⬅️ 이 함수만 바꾸세요
+    async function loadWeeklySignups(weeks = 4) {
+        const raw = await getJson(`/api/admin/weekly?weeks=${weeks}`);
+        console.log("[/api/admin/weekly] 응답:", raw);
+
+        // 백엔드 키가 monthWeek 또는 monthweek 일 수도 있으니 통합
+        const items = (Array.isArray(raw) ? raw : []).slice(-weeks);
+        const labels = items.map(d => d.monthWeek ?? d.monthweek ?? "");
+        const values = items.map(d => Number(d.count) || 0);
+
+        console.log("파싱된 labels:", labels);
+        console.log("파싱된 values:", values);
 
         if (weeklySignupChart) weeklySignupChart.destroy();
         weeklySignupChart = new Chart(document.getElementById("weeklySignupChart"), {
             type: "bar",
-            data: { labels, datasets: [{ label: "가입 수", data: values }] },
+            data: {
+                labels,
+                datasets: [{
+                    label: "가입 수",
+                    data: values,
+                    // 막대 두께/여백
+                    barThickness: 22,
+                    maxBarThickness: 26,
+                    categoryPercentage: 0.8,
+                    barPercentage: 0.75
+                }]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 resizeDelay: 150,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } },
-            },
+                layout: { padding: { top: 12, right: 16, bottom: 8, left: 8 } }, // 카드 안 여백
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true },
+                    valueLabel: { show: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 20,                  // ⬅️ Y축 20으로 고정
+                        ticks: { stepSize: 5 }    // 0,5,10,15,20
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 0,
+                            minRotation: 0
+                        }
+                    }
+                }
+            }
         });
     }
-
     // ===== 3) 최근 문의 표 =====
     async function loadRecentAsks(limit = 20) {
         const data = await getJson(`/api/admin/asks/recent?limit=${limit}`);
@@ -190,7 +253,7 @@
 
     async function refreshUnansweredDot() {
         try {
-            const { count } = await getJson("/api/admin/asks/unanswered-count");
+            const { count } = await getJson("/api/admin/asks/unanswered-counts");
             setNoticeDot(count > 0);
         } catch (e) {
             /* ignore */
