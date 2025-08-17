@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="/css/askList.css" th:href="@{/css/askList.css}">
     <script defer src="/js/askList.js?v=1"></script>
 
+    <link rel="stylesheet" th:href="@{/css/faq.css}">
+    <script defer th:src="@{/js/faq.js}"></script>
+
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 
@@ -90,8 +93,9 @@
                             <td th:text="${q.askType}">서비스 이용</td>
                             <td class="toggle-password">
                                 <span th:text="${q.askTitle}">제목</span>
-                                <span class="secret"
-                                    th:if="${q.askPwd != null and !#strings.isEmpty(q.askPwd)}">[비밀글]</span>
+                                <span class="secret" th:if="${q.askPwd != null and !#strings.isEmpty(q.askPwd)}">
+                                    <img class="icon-lock-img" th:src="@{/images/askImages/lock.svg}" alt="비밀글">
+                                </span>
                                 <span class="answered" th:if="${q.replyStatus == true}">[답변 완료]</span>
                             </td>
                             <td th:text="${q.writer != null ? q.writer.userId : '익명'}">writer</td>
@@ -125,11 +129,6 @@
                                         th:text="${q.originalFilename != null ? q.originalFilename : '다운로드'}">
                                         다운로드
                                     </a>
-                                </div>
-                                <div class="detail-actions" style="margin-top:10px; text-align:right;">
-                                    <button type="button" class="btn-delete" th:attr="data-id=${q.askSeq}">
-                                        삭제
-                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -175,6 +174,8 @@
     </main>
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+    <div th:replace="~{fragment/faq :: widget}"></div>
+
 </body>
 
 </html>
