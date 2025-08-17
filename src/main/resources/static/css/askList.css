@@ -149,28 +149,28 @@ main {
 
 /* ===== 제목칸 잠금 아이콘 크기/정렬 ===== */
 
-/* 제목 칸은 왼쪽 정렬로(아이콘+제목 자연스럽게) */
+/* 제목 셀을 플렉스 컨테이너로 */
 .qna-table td.toggle-password {
-    text-align: left;
-}
-
-/* 아이콘과 텍스트 간격/정렬 */
-.qna-table .secret {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    margin-left: 6px;
-    /* 제목 뒤 간격 */
+    gap: 6px;
+    /* 제목과 아이콘 간격 */
+    text-align: left;
+    /* 기존 정렬 유지 */
 }
 
-/* 아이콘 크기 */
-.qna-table .icon-lock-img {
-    width: 25px;
-    height: 25px;
-    display: inline-block;
-    vertical-align: middle;
-    /* 필요 시 미세 높이 보정 */
-    /* transform: translateY(-1px); */
+/* 보조 스타일 */
+.qna-table .secret {
+    margin-left: 0;
+    line-height: 1;
 }
+
+.qna-table .icon-lock-img {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+}
+
 
 .toggle-password {
     cursor: pointer;
