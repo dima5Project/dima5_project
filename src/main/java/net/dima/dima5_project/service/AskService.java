@@ -1,16 +1,9 @@
 package net.dima.dima5_project.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Authentication;
 import org.springframework.data.domain.Page;
 
 import org.springframework.data.domain.Pageable;
@@ -24,10 +17,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.dto.AskBoardDTO;
 import net.dima.dima5_project.dto.LoginUserDetailsDTO;
+import net.dima.dima5_project.dto.admin.AskBriefDTO;
+import net.dima.dima5_project.entity.AdminNoticeEntity;
 import net.dima.dima5_project.entity.AskBoardEntity;
 import net.dima.dima5_project.entity.PredictUserEntity;
+import net.dima.dima5_project.repository.AdminNoticeRepository;
 import net.dima.dima5_project.repository.AskBoardRepository;
 import net.dima.dima5_project.repository.UserRepository;
+import net.dima.dima5_project.sse.SseEmitters;
 import net.dima.dima5_project.util.FileService;
 
 @Service
@@ -37,6 +34,8 @@ public class AskService {
 
     private final AskBoardRepository askBoardRepository;
     private final UserRepository UserRepository;
+    private final AdminNoticeRepository adminNoticeRepository;
+    private final SseEmitters sseEmitters;
 
     // 글개수
     @Value("${ask.board.pageLimit}")
@@ -193,7 +192,43 @@ public class AskService {
             dto.setAskPwd(null);
         }
 
-        askBoardRepository.save(AskBoardEntity.toEntity(dto));
+        // 4) DB 저장
+        AskBoardEntity saved = askBoardRepository.save(AskBoardEntity.toEntity(dto));
+
+        // 혹시 모를 null 대비
+        if (saved.getReplyStatus() == null) {
+            saved.setReplyStatus(false);
+            askBoardRepository.save(saved);
+        }
+        // ★ 글쓴이 라벨(표시용) 공통 생성 (NPE 방어 포함)
+        String writerLabel = "";
+        if (saved.getWriter() != null) {
+            String nm = saved.getWriter().getUserName();
+            String id = saved.getWriter().getUserId();
+            writerLabel = (nm != null && !nm.isBlank()) ? nm : (id != null ? id : "");
+        }
+
+        // 5) SSE 이벤트 전송 ★ 여기 추가
+        AskBriefDTO payload = AskBriefDTO.builder()
+                .askSeq(saved.getAskSeq())
+                .title(saved.getAskTitle())
+                .writer(
+                        saved.getWriter().getUserName() != null && !saved.getWriter().getUserName().isBlank()
+                                ? saved.getWriter().getUserName()
+                                : saved.getWriter().getUserId())
+                .createDate(saved.getCreateDate()) // 필드명 맞추기
+                .build();
+
+        adminNoticeRepository.save(AdminNoticeEntity.builder()
+                .eventType("ASK_NEW")
+                .askSeq(saved.getAskSeq())
+                .title(saved.getAskTitle())
+                .writer(writerLabel)
+                .isRead(Boolean.FALSE)
+                .createdAt(LocalDateTime.now())
+                .build());
+
+        sseEmitters.send(payload);
     }
 
     /**

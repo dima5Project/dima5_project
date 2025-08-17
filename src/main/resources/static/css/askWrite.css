@@ -28,7 +28,7 @@ main {
 }
 
 .qna-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
@@ -56,15 +56,24 @@ main {
 .form-row {
     display: grid;
     grid-template-columns: 140px 1fr;
+    /* 12px 간격 추가 */
     align-items: center;
-    gap: 16px;
     margin-bottom: 18px;
+    padding-bottom: 17px;
+    /* 선 아래로 내려오게 위치 조정 */
+    border-bottom: 1px solid #bdbdbd;
 }
+
+/* 비밀번호 필드 .form-row에만 적용 */
+/*.qna-form .form-row:nth-child(7) {
+    border-bottom: none;
+}*/
 
 .form-row label,
 .form-label {
     font-size: 14px;
     color: #222;
+    font-weight: 500;
 }
 
 input[type="text"],

@@ -518,3 +518,50 @@ function drawChart(data) {
         }
     });
 }
+
+// 선택 항구의 맵박스
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. URL에서 portId 가져오기
+    const params = new URLSearchParams(window.location.search);
+    const portId = params.get('port');
+
+    if (!portId) {
+        console.error("URL에 portId가 없습니다.");
+        return;
+    }
+
+    try {
+        // 2. portId로 항구 정보 가져오기 (메인 페이지에서 사용했던 API 재활용)
+        const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`);
+        if (!res.ok) throw new Error('hover API 실패');
+        const portInfo = await res.json();
+
+        // 3. 위도, 경도 정보 추출
+        const lat = portInfo.latitude;
+        const lng = portInfo.longitude;
+
+        if (!lat || !lng) {
+            console.error("API 응답에 유효한 위도/경도 정보가 없습니다.");
+            return;
+        }
+
+        // 4. Mapbox 지도 초기화
+        mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
+
+        const map = new mapboxgl.Map({
+            container: 'alt-map-container',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [lng, lat], // 해당 항구 중심으로 설정
+            zoom: 12, // 항구 하나만 보이도록 줌 레벨 조정
+            attributionControl: false
+        });
+
+        // 5. 지도에 마커 추가
+        new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(map);
+
+    } catch (e) {
+        console.error("데이터 로딩 또는 지도 초기화 실패:", e);
+    }
+});

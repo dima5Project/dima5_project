@@ -1,5 +1,7 @@
 package net.dima.dima5_project.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +20,7 @@ public class PredictUserDTO {
     private String userEmail;
     private String userType;
     private String userRole;
+    private LocalDateTime joinDate;
 
     public static PredictUserDTO toDTO(PredictUserEntity predictUserEntity) {
         return PredictUserDTO.builder()
@@ -28,6 +31,7 @@ public class PredictUserDTO {
                 .userEmail(predictUserEntity.getUserEmail())
                 .userType(predictUserEntity.getUserType())
                 .userRole(predictUserEntity.getUserRole())
+                .joinDate(predictUserEntity.getJoinDate())
                 .build();
     }
 }

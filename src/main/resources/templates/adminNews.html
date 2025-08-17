@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>뉴스 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Reset & Font -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- 공용 대시보드 CSS (사이드바 포함) -->
+    <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
+
+    <style>
+        /* 모달 크기/레이아웃 */
+        .adm-modal__panel {
+            width: 860px;
+            max-width: 92vw;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
+        }
+
+        .modal-grid .adm-field>span {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .modal-grid .adm-input {
+            width: 100%;
+        }
+
+        .modal-grid .span-2 {
+            grid-column: 1 / span 2;
+        }
+
+        /* 테이블 셀 줄바꿈 보조 */
+        .adm-table .ellipsis {
+            max-width: 520px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body class="has-sidebar page-news">
+    <!-- 사이드바 -->
+    <aside class="adm-sidebar">
+        <div class="adm-sidebar__brand">관리</div>
+        <nav class="adm-nav">
+            <a href="/admin" class="adm-nav__link" data-match="^/admin$"><span>대시보드</span></a>
+            <a href="/admin/news" class="adm-nav__link" data-match="^/admin/news$"><span>뉴스 관리</span></a>
+        </nav>
+    </aside>
+
+    <!-- 컨텐츠 -->
+    <div class="adm-content">
+        <!-- 헤더 -->
+        <header class="adm-header">
+            <div class="adm-header__left">
+                <button id="sbToggle" class="adm-btn adm-btn--ghost" type="button" aria-label="메뉴">☰</button>
+                <h1 class="adm-title">뉴스 관리</h1>
+            </div>
+            <div class="adm-header__right">
+                <button id="btnOpenCreate" class="adm-btn" type="button">뉴스 등록</button>
+            </div>
+        </header>
+
+        <!-- 본문 -->
+        <main class="adm-wrap">
+            <section class="adm-card adm-card--full">
+                <div class="adm-card__hd">
+                    <h3>뉴스 목록</h3>
+                    <div class="adm-card__tools">
+                        <input id="q" class="adm-input" type="search" placeholder="제목/매체 검색…" />
+                        <button id="btnSearch" class="adm-btn adm-btn--ghost" type="button">검색</button>
+                    </div>
+                </div>
+
+                <div class="adm-card__bd">
+                    <div class="adm-table-wrap">
+                        <table class="adm-table" aria-label="뉴스 목록 표">
+                            <thead>
+                                <tr>
+                                    <th style="width:90px">번호</th>
+                                    <th>제목</th>
+                                    <th style="width:160px">매체</th>
+                                    <th style="width:180px">등록일</th>
+                                    <th style="width:120px">이미지</th>
+                                    <th style="width:160px">링크</th>
+                                    <th style="width:160px">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="newsTbody"></tbody>
+                        </table>
+                        <div id="newsEmpty" class="adm-empty" hidden>등록된 뉴스가 없습니다.</div>
+                    </div>
+
+                    <!-- 페이지네이션 -->
+                    <div class="adm-pagination" id="pager" hidden>
+                        <button id="prevPage" class="adm-btn adm-btn--ghost" type="button">이전</button>
+                        <span id="pageInfo" class="adm-muted"></span>
+                        <button id="nextPage" class="adm-btn adm-btn--ghost" type="button">다음</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 모달: 등록/수정 -->
+        <dialog id="newsModal" class="adm-modal">
+            <form method="dialog" class="adm-modal__panel" id="newsForm">
+                <header class="adm-modal__hd">
+                    <h4 id="modalTitle">뉴스 등록</h4>
+                </header>
+
+                <div class="adm-modal__bd modal-grid">
+                    <input type="hidden" id="newsSeq" />
+
+                    <label class="adm-field span-2">
+                        <span>제목</span>
+                        <input id="newsTitle" class="adm-input" type="text" required maxlength="200" />
+                    </label>
+
+                    <label class="adm-field">
+                        <span>매체</span>
+                        <input id="publisher" class="adm-input" type="text" required maxlength="100" />
+                    </label>
+
+                    <label class="adm-field">
+                        <span>등록일</span>
+                        <input id="registerDate" class="adm-input" type="datetime-local" step="1" />
+                    </label>
+
+                    <label class="adm-field">
+                        <span>이미지 URL</span>
+                        <input id="imgUrl" class="adm-input" type="url" placeholder="https://…" />
+                    </label>
+
+                    <label class="adm-field">
+                        <span>기사 URL</span>
+                        <input id="newsUrl" class="adm-input" type="url" placeholder="https://…" />
+                    </label>
+                </div>
+
+                <footer class="adm-modal__ft">
+                    <button value="cancel" class="adm-btn adm-btn--ghost" type="reset">취소</button>
+                    <button id="btnSave" class="adm-btn" type="submit">저장</button>
+                </footer>
+            </form>
+        </dialog>
+
+        <!-- 토스트 -->
+        <div id="toast" class="adm-toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- 스크립트 -->
+    <script src="/js/adminNews.js" th:src="@{/js/adminNews.js}"></script>
+    <script>
+        (function () {
+            const cur = location.pathname + location.search;
+            let best = null, bestLen = -1;
+
+            document.querySelectorAll('.adm-nav__link').forEach(a => {
+                const pat = a.getAttribute('data-match');
+                try {
+                    const re = new RegExp(pat);
+                    if (re.test(cur) && pat.length > bestLen) {
+                        best = a; bestLen = pat.length;
+                    }
+                } catch (_) { }
+            });
+            best?.classList.add('is-active');
+
+            // 사이드바 접기
+            document.getElementById('sbToggle')?.addEventListener('click', () => {
+                document.body.classList.toggle('sb-collapsed');
+            });
+        })();
+    </script>
+</body>
+
+</html>

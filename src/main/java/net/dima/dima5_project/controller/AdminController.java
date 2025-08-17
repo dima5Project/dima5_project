@@ -12,4 +12,9 @@ public class AdminController {
         return "adminDashboard";
     }
 
+    // 뉴스 관리 화면
+    @GetMapping("/admin/news")
+    public String adminNews() {
+        return "adminNews"; // templates/admin/news.html
+    }
 }

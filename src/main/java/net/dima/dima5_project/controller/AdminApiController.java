@@ -1,6 +1,7 @@
 package net.dima.dima5_project.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import net.dima.dima5_project.dto.admin.AskBriefDTO;
 import net.dima.dima5_project.dto.admin.UserTypeCountDTO;
 import net.dima.dima5_project.dto.admin.WeeklySignupDTO;
+import net.dima.dima5_project.repository.AskBoardRepository;
 import net.dima.dima5_project.service.AdminStatService;
 import net.dima.dima5_project.sse.SseEmitters;
 
@@ -22,6 +24,7 @@ import net.dima.dima5_project.sse.SseEmitters;
 public class AdminApiController {
 
     private final AdminStatService adminStatService;
+    private final AskBoardRepository askBoardRepository;
     private final SseEmitters sseEmitters;
 
     // 도넛 차트 - 유형 관련
@@ -53,4 +56,16 @@ public class AdminApiController {
         return emitter;
     }
 
+    // 미답변 수
+    @GetMapping("asks/unanswered-count")
+    public Map<String, Object> unansweredCount() {
+        long count = askBoardRepository.countByReplyStatusFalse();
+        return Map.of("count", count);
+    }
+
+    /** 관리자 알림 SSE 스트림 */
+    @GetMapping("/asks/stream")
+    public SseEmitter stream() {
+        return sseEmitters.addAndInit();
+    }
 }
