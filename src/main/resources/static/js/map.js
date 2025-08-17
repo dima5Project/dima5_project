@@ -37,6 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
         className: 'busan-popup-container'
     });
 
+    // 최신 위치 마커에 대한 팝업 변수 추가
+    const marineHoverPopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        anchor: 'bottom',
+        offset: 16
+    });
+
     const hoverCache = new Map();
     const HOVER_TTL_MS = 60000;
 
@@ -82,6 +90,126 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
         const i = Math.round(((deg % 360) / 22.5)) % 16;
         return dirs[i];
+    }
+
+    // 보조: 각도→방위(예: N, E, S, W)
+    function bearingToText(deg) {
+        const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
+        return dirs[Math.round((((deg % 360) + 360) % 360) / 45)];
+    }
+
+    // 최신 위치 마커 팝업을 위한 HTML 생성 함수
+    function buildMarinePopupHTML(d) {
+        const waveDirectionText = bearingToText(d.waveDirection);
+        const currentDirectionText = bearingToText(d.currentDirection);
+        return `
+            <div class="marine-popup">
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">파고</span>
+                    <span class="marine-popup__value">${d.waveHeight}m</span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">파향</span>
+                    <span class="marine-popup__value">${d.waveDirection}° <span class="subtle">(${waveDirectionText})</span></span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">표층 수온</span>
+                    <span class="marine-popup__value">${d.seaSurfaceTemp}°C</span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">유속</span>
+                    <span class="marine-popup__value">${d.currentVelocity}m/s</span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">유향</span>
+                    <span class="marine-popup__value">${d.currentDirection}° <span class="subtle">(${currentDirectionText})</span></span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">시정</span>
+                    <span class="marine-popup__value">${d.visibilityKm}km</span>
+                </div>
+                <div class="marine-popup__item">
+                    <span class="marine-popup__label">날씨</span>
+                    <span class="marine-popup__value">${d.weatherText}</span>
+                </div>
+            </div>`;
+    }
+
+    // 사용자가 제공한 새로운 팝업 디자인으로 교체
+    function buildPopupHTML(d) {
+        return `
+    <div class="marine-popup">
+      <div class="header">
+        <svg class="icon" viewBox="0 0 24 24" fill="none">
+          <path d="M12 22s7-6.28 7-12a7 7 0 1 0-14 0c0 5.72 7 12 7 12z" stroke="#fff" stroke-width="2" fill="none"/>
+          <circle cx="12" cy="10" r="3" fill="#fff"/>
+        </svg>
+        <span>사용자 현위치</span>
+      </div>
+    
+      <div class="body">
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 16c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2" stroke="#1d4ed8" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="label">파고</div>
+          <div class="value">${d.waveHeight.toFixed(1)} m</div>
+        </div>
+    
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M5 12h10" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 7l5 5-5 5" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="label">파도방향</div>
+          <div class="value">
+            ${Math.round(d.waveDirection)}°
+            <span class="sub">(${bearingToText(d.waveDirection)})</span>
+          </div>
+        </div>
+    
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M4 12c2 0 3-2 5-2s3 2 5 2 3-2 5-2" stroke="#0ea5e9" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M13 7l5 5-5 5" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="label">해류</div>
+          <div class="value">
+            ${d.currentVelocity.toFixed(1)} m/s
+            <span class="sub">(${bearingToText(d.currentDirection)}쪽)</span>
+          </div>
+        </div>
+    
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 3v10a4 4 0 1 0 4 4" stroke="#ef4444" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="12" cy="18" r="2" fill="#ef4444"/>
+          </svg>
+          <div class="label">해수온도</div>
+          <div class="value">${d.seaSurfaceTemp.toFixed(1)} °C</div>
+        </div>
+    
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z" fill="none" stroke="#2563eb" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" fill="#2563eb"/>
+          </svg>
+          <div class="label">가시거리</div>
+          <div class="value">${d.visibilityKm.toFixed(1)} km</div>
+        </div>
+    
+        <div class="row">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4" fill="#fbbf24"/>
+            <g stroke="#fbbf24" stroke-width="2">
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.2 4.2l2.2 2.2M17.6 17.6l2.2 2.2M17.6 6.4l2.2-2.2M4.2 19.8l2.2-2.2"/>
+            </g>
+          </svg>
+          <div class="label">날씨</div>
+          <div class="value">${d.weatherText}</div>
+        </div>
+      </div>
+    </div>`;
     }
 
     function buildPortHoverCardHTML({ portId, windSpdMS, windDirDeg, tempC, congestion, tzText }) {
@@ -351,6 +479,30 @@ document.addEventListener("DOMContentLoaded", () => {
             .addTo(map);
 
         allPortMarkers.push(busanMarker); // 부산 마커를 배열에 저장
+
+        // 마지막 마커에 대한 hover 기능 추가
+        let hoverTimeout;
+        const marineData = {
+            waveHeight: 1.2,
+            waveDirection: 210,
+            seaSurfaceTemp: 27.5,
+            currentVelocity: 0.4,
+            currentDirection: 90,
+            visibilityKm: 10.0,
+            weatherText: "맑음"
+        };
+        map.on('mouseenter', lastMarkerLayerId, (e) => {
+            clearTimeout(hoverTimeout);
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            // buildMarinePopupHTML 대신 새로운 buildPopupHTML 함수 사용
+            const html = buildPopupHTML(marineData);
+            marineHoverPopup.setLngLat(coordinates).setHTML(html).addTo(map);
+        });
+        map.on('mouseleave', lastMarkerLayerId, () => {
+            hoverTimeout = setTimeout(() => {
+                marineHoverPopup.remove();
+            }, 100);
+        });
     });
 
     window.drawRoutes = function (routes) {

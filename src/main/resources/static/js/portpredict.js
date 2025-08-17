@@ -1,2472 +1,606 @@
+// 선박정보, 항구정보 전역변수 선언
+let vesselData = [];
+let portData = [];
+
+// 페이지 로드 시 CSV 데이터를 불러오는 함수
+async function loadVesselData() {
+    try {
+        const response = await fetch('/data/vessel_master.csv');
+        const csvText = await response.text();
+        vesselData = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true
+        }).data;
+        console.log("Vessel data loaded successfully:", vesselData.length, "records.");
+    } catch (error) {
+        console.error("Failed to load vessel data:", error);
+    }
+}
+
+// 항구 데이터 CSV를 불러오는 함수
+async function loadPortData() {
+    try {
+        const response = await fetch('/data/port_name.csv');
+        const csvText = await response.text();
+        portData = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true
+        }).data;
+        console.log("Port data loaded successfully:", portData.length, "records.");
+    } catch (error) {
+        console.error("Failed to load port data:", error);
+    }
+}
+
+// --- 항구 ID로 항구 정보를 찾는 함수 ---
+function getPortInfo(portId) {
+    if (!portData || portData.length === 0) {
+        console.warn("Port data is not loaded.");
+        return { country_name_kr: '정보 없음', port_name_kr: '정보 없음' };
+    }
+    const foundPort = portData.find(port => port.port_id && port.port_id.toUpperCase() === portId.toUpperCase());
+    if (foundPort) {
+        return foundPort;
+    } else {
+        console.warn(`Port ID not found: ${portId}`);
+        return { country_name_kr: '정보 없음', port_name_kr: '정보 없음' };
+    }
+}
+
+// ───────── 선박 ID 타입 상태를 관리하는 전용 함수 ─────────
+function updateIdType(type) {
+    const $wrap = $('.cselect');
+
+    // UI 업데이트
+    $wrap.find('.cselect__value').text(type).attr('data-value', type);
+    $wrap.find('.cselect__option').attr('aria-selected', 'false');
+    $wrap.find(`.cselect__option[data-value="${type}"]`).attr('aria-selected', 'true');
+
+    // 숨겨진 input 값 업데이트
+    let $hidden = $wrap.find('input[type="hidden"][name="idType"]');
+    if (!$hidden.length) {
+        $hidden = $('<input>', { type: 'hidden', name: 'idType' });
+        $wrap.append($hidden);
+    }
+    $hidden.val(type);
+
+    // 드롭다운 닫기
+    $wrap.removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
+}
 
 $(function () {
+    // 페이지 로드 시 선박 데이터 로드 및 초기 ID 타입 설정
+    loadVesselData();
+    loadPortData();
+    updateIdType('MMSI'); // 페이지 로드 시 MMSI로 초기 상태 설정
+
     // 사이드바 토글
     $(document).on('click', '.sidebar__handle', function () {
         const $sidebar = $('.sidebar');
         const isCollapsed = $sidebar.toggleClass('is-collapsed').hasClass('is-collapsed');
         $(this).attr('aria-expanded', !isCollapsed);
     });
-});
 
+    // 조회 버튼: 클릭 이벤트
+    $(document).on('click', '.sidebar__btn.primary', async function () {
+        const idType = $('input[name="idType"]').val(); // 숨겨진 input에서 정확한 값 가져오기
+        const idValue = $('.sidebar__input').val().trim();
 
-// resp를 추가하는 코드 작성할 것@@@@ -> 진짜 입력되는지 다 확인 할 것 + 항로 데이터는 시원이한테 다시 받기
+        if (!idValue) {
+            alert('선박 고유 번호를 입력해주세요.');
+            return;
+        }
 
-// 조회 버튼: 클릭 이벤트
+        // 기존 경고 메시지 및 도착 메시지 삭제
+        $('.sidebar__divider').next('.sidebar__arrived-message').remove();
 
-// 조회 버튼: 클릭 이벤트 (임시 테스트 모드 - API 대신 샘플 데이터 사용)
-let globalRoutesData = [];
-let globalPredictions = [];
+        // 선박 정보 조회 및 업데이트
+        updateVesselInfo(idType, idValue);
 
-$(document).on('click', '.sidebar__btn.primary', function () {
-    const selectValue = $('.cselect__value').attr('data-value');
-    const inputValue = $('.sidebar__input').val().trim();
+        // --- 실제 백엔드 API 호출 로직 ---
+        const BASE_URL = 'http://127.0.0.1:8000/api'; // 수정: API 경로에 /api 추가
+        let resp;
 
-    if (!selectValue || !inputValue) {
-        alert('옵션과 값을 모두 입력하세요.');
-        return;
-    }
+        try {
+            const url = new URL(`${BASE_URL}/predict`);
+            if (idType.toLowerCase() === 'imo') {
+                url.searchParams.append('imo', idValue);
+            } else { // 기본 MMSI
+                url.searchParams.append('mmsi', idValue);
+            }
 
-    // API 호출 대신 사용할 샘플 JSON 데이터
-    const resp = {
-        "vsl_id": "f643855a-6409-3bea-aaf0-64b66def60ad",
-        "latest": {
-            "time_point": 11,
-            "actual_time_point": 10.83,
-            "time_stamp": "2025-08-16 14:15:49",
-            "departure_time": "2025-08-16 03:26:01",
-            "lat": 37.16046667,
-            "lon": 130.1098833,
-            "cog": 10.8,
-            "heading": 17,
-            "predictions": [
-                {
-                    "rank": 1,
-                    "port_id": "RUVVO",
-                    "prob": 0.456952,
-                    "eta_hours_left": 41.503333,
-                    "eta": "2025-08-18 07:46:01"
-                },
-                {
-                    "rank": 2,
-                    "port_id": "RUNJK",
-                    "prob": 0.323999,
-                    "eta_hours_left": 104.836667,
-                    "eta": "2025-08-20 23:06:01"
-                },
-                {
-                    "rank": 3,
-                    "port_id": "KRKPO",
-                    "prob": 0.040649,
-                    "eta_hours_left": 0,
-                    "eta": "2025-08-16 14:15:49"
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            resp = await response.json();
+            console.log("API 응답:", resp);
+
+        } catch (error) {
+            console.error("API 호출 실패:", error);
+            alert('서버 오류 또는 선박 정보를 찾을 수 없습니다. 다시 시도해 주세요.');
+            // 오류 발생 시 UI 초기화
+            $('.sidebar__input').val('');
+            $('.sidebar__vesselinfo .kv strong').text('정보 없음');
+            updateIdType('MMSI');
+            $('#predict-content').addClass('is-hidden');
+            $('.box').removeClass('is-active').show();
+            globalRoutesData = [];
+            globalPredictions = [];
+            window.clearRoutesAndMarkers();
+            window.showAllPortMarkers();
+            clearTimeline();
+            $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
+            $('.cselect__control').prop('disabled', false);
+            return;
+        }
+
+        // --- 추가된 도착 선박 로직 시작 ---
+        if (resp.detail && resp.detail.code === 'arrived_ship') {
+            const portInfo = getPortInfo(resp.detail.port_id);
+            const portNameKr = portInfo.port_name_kr || resp.detail.port_id;
+
+            // 1. 도착 메시지 표시
+            const arrivedMessage = `<p class="sidebar__arrived-message" style="color: #28a745; font-weight: bold; margin-top: 10px;">해당 선박은 ${portNameKr}에 이미 도착했습니다.</p>`;
+            $('.sidebar__divider').after(arrivedMessage);
+
+            // 2. 예측 정보 박스 숨기기
+            $('.sidebar__content').removeClass('is-hidden');
+            $('.box').removeClass('is-active').hide();
+
+            // 3. 지도에 과거 운항 경로 표시
+            const pastRoute = {
+                route_name: '과거 운항 경로',
+                coordinates: resp.detail.track.map(point => [point.lon, point.lat]),
+                color: '#555555', // 회색
+                rank: 0 // 특별한 랭크
+            };
+            window.drawRoutes([pastRoute]);
+
+            // 4. 도착 항구 마커만 남기기
+            if (typeof window.showOnlyPortMarker === 'function') {
+                window.showOnlyPortMarker(resp.detail.port_id);
+            } else {
+                // showOnlyPortMarker 함수가 없으면 모든 마커를 숨기고 도착 항구 마커만 표시
+                window.hideAllPortMarkers();
+                window.showPortMarker(resp.detail.port_id);
+            }
+
+            // 5. 기타 UI 초기화 및 비활성화
+            $('.sidebar__input').blur().prop('disabled', true).attr('aria-disabled', 'true').addClass('is-locked');
+            $('.cselect__control').prop('disabled', true);
+
+            return; // 도착 선박이므로 추가 예측 로직을 실행하지 않고 종료
+        }
+
+        // -- 3시간 미만 경고창 처리 ---
+        if (resp.latest.actual_time_point < 3) {
+            alert('출항 후 3시간 미만인 선박은 항로 변화가 크지 않아 정확한 예측이 어렵습니다. 잠시 후 다시 조회 해 주세요.');
+            // UI 초기화
+            $('.sidebar__input').val('');
+            $('.sidebar__vesselinfo .kv strong').text('정보 없음');
+            updateIdType('MMSI');
+            $('#predict-content').addClass('is-hidden');
+            $('.box').removeClass('is-active');
+            globalRoutesData = [];
+            globalPredictions = [];
+            window.clearRoutesAndMarkers();
+            window.showAllPortMarkers();
+            clearTimeline();
+            $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
+            $('.cselect__control').prop('disabled', false);
+            return; // 경고 후 함수 종료
+        }
+
+        const departurePort = { "id": "KRBUS", "country": "한국", "city": "부산", "lat": 35.0999, "lon": 129.111 };
+
+        // 화면 UI 업데이트 (슬라이드에 데이터 반영)
+        displayPredictionResults(resp.latest.predictions, departurePort);
+        displayTimelineResults(resp.timeline, resp.latest, departurePort);
+
+        // 나머지 기존 조회 로직은 여기에 그대로 두시면 됩니다.
+        if (resp.latest && resp.latest.predictions) {
+            const predictions = resp.latest.predictions;
+
+            const rank1Eta = predictions.find(p => p.rank === 1)?.eta || '정보 없음';
+            const rank2Eta = predictions.find(p => p.rank === 2)?.eta || '정보 없음';
+            const rank3Eta = predictions.find(p => p.rank === 3)?.eta || '정보 없음';
+
+            $('.box.one .eta__time').html('<span class="pill">ETA</span> ' + rank1Eta);
+            $('.box.two .eta__time').html('<span class="pill">ETA</span> ' + rank2Eta);
+            $('.box.three .eta__time').html('<span class="pill">ETA</span> ' + rank3Eta);
+        }
+
+        $('.sidebar__content').removeClass('is-hidden');
+        $('.sidebar__input').blur().prop('disabled', true).attr('aria-disabled', 'true').addClass('is-locked');
+        $('.cselect__control').prop('disabled', true);
+
+        const markers = [];
+        let lastMarker = null;
+
+        const routesData = resp.tracks_topk.filter(trackObj => trackObj.rank >= 1 && trackObj.rank <= 3);
+
+        const routes = [];
+        let top1RouteData = null;
+
+        routesData.forEach(topRouteData => {
+            const trackPoints = topRouteData.track || [];
+            if (trackPoints.length > 0) {
+                const coordinates = trackPoints.map(point => [point.lon, point.lat]);
+                if (departurePort) {
+                    coordinates.unshift([departurePort.lon, departurePort.lat]);
                 }
-            ]
-        },
-        "timeline": [
-            {
-                "time_point": 5,
-                "time_stamp": "2024-08-10 11:30:00",
-                "actual_time_point": 5,
-                "lat": 35.87731667,
-                "lon": 129.7767167,
-                "cog": 10.9,
-                "heading": 9,
-                "predictions": [
-                    {
-                        "rank": 1,
-                        "port_id": "RUVVO",
-                        "prob": 0.730071
-                    },
-                    {
-                        "rank": 2,
-                        "port_id": "RUNJK",
-                        "prob": 0.160444
-                    },
-                    {
-                        "rank": 3,
-                        "port_id": "KRKPO",
-                        "prob": 0.072784
-                    }
-                ]
-            },
-            {
-                "time_point": 8,
-                "time_stamp": "2024-08-10 14:30:00",
-                "actual_time_point": 8,
-                "lat": 36.56428333,
-                "lon": 129.9543167,
-                "cog": 11.3,
-                "heading": 11,
-                "predictions": [
-                    {
-                        "rank": 1,
-                        "port_id": "RUVVO",
-                        "prob": 0.601176
-                    },
-                    {
-                        "rank": 2,
-                        "port_id": "RUNJK",
-                        "prob": 0.279946
-                    },
-                    {
-                        "rank": 3,
-                        "port_id": "KRKPO",
-                        "prob": 0.019712
-                    }
-                ]
+                let color = '#007cbf';
+                if (topRouteData.rank === 2) {
+                    color = '#A9A9A9';
+                } else if (topRouteData.rank === 3) {
+                    color = '#A9A9A9';
+                }
+                const name = `예상 항로 (Top ${topRouteData.rank})`;
+                routes.push({
+                    route_name: name,
+                    coordinates: coordinates,
+                    color: color,
+                    rank: topRouteData.rank
+                });
+
+                if (topRouteData.rank === 1) {
+                    top1RouteData = topRouteData;
+                }
             }
-        ],
-        "tracks_topk": [
-            {
-                "rank": 1,
-                "port_id": "RUVVO",
-                "track": [
-                    {
-                        "lat": 35.07013333,
-                        "lon": 129.11715
-                    },
-                    {
-                        "lat": 35.0627,
-                        "lon": 129.14575
-                    },
-                    {
-                        "lat": 35.07003333,
-                        "lon": 129.1816333
-                    },
-                    {
-                        "lat": 35.0788,
-                        "lon": 129.22165
-                    },
-                    {
-                        "lat": 35.0839,
-                        "lon": 129.2463667
-                    },
-                    {
-                        "lat": 35.09448333,
-                        "lon": 129.2998667
-                    },
-                    {
-                        "lat": 35.10265,
-                        "lon": 129.3509667
-                    },
-                    {
-                        "lat": 35.10506667,
-                        "lon": 129.3838833
-                    },
-                    {
-                        "lat": 35.11913333,
-                        "lon": 129.4404333
-                    },
-                    {
-                        "lat": 35.13715,
-                        "lon": 129.4865833
-                    },
-                    {
-                        "lat": 35.1637,
-                        "lon": 129.51565
-                    },
-                    {
-                        "lat": 35.20048333,
-                        "lon": 129.5428667
-                    },
-                    {
-                        "lat": 35.23965,
-                        "lon": 129.5666333
-                    },
-                    {
-                        "lat": 35.27573333,
-                        "lon": 129.58955
-                    },
-                    {
-                        "lat": 35.31345,
-                        "lon": 129.6124333
-                    },
-                    {
-                        "lat": 35.35295,
-                        "lon": 129.6325167
-                    },
-                    {
-                        "lat": 35.3835,
-                        "lon": 129.6468
-                    },
-                    {
-                        "lat": 35.4316,
-                        "lon": 129.6657333
-                    },
-                    {
-                        "lat": 35.47626667,
-                        "lon": 129.68075
-                    },
-                    {
-                        "lat": 35.52988333,
-                        "lon": 129.6983167
-                    },
-                    {
-                        "lat": 35.55393333,
-                        "lon": 129.705325
-                    },
-                    {
-                        "lat": 35.57798333,
-                        "lon": 129.7123333
-                    },
-                    {
-                        "lat": 35.61650833,
-                        "lon": 129.7212
-                    },
-                    {
-                        "lat": 35.65503333,
-                        "lon": 129.7300667
-                    },
-                    {
-                        "lat": 35.71923333,
-                        "lon": 129.7405833
-                    },
-                    {
-                        "lat": 35.742875,
-                        "lon": 129.7448333
-                    },
-                    {
-                        "lat": 35.76651667,
-                        "lon": 129.7490833
-                    },
-                    {
-                        "lat": 35.81306667,
-                        "lon": 129.7609083
-                    },
-                    {
-                        "lat": 35.85961667,
-                        "lon": 129.7727333
-                    },
-                    {
-                        "lat": 35.87731667,
-                        "lon": 129.7767167
-                    },
-                    {
-                        "lat": 35.93396667,
-                        "lon": 129.7898167
-                    },
-                    {
-                        "lat": 35.96240833,
-                        "lon": 129.7970917
-                    },
-                    {
-                        "lat": 35.99085,
-                        "lon": 129.8043667
-                    },
-                    {
-                        "lat": 36.02996667,
-                        "lon": 129.8135833
-                    },
-                    {
-                        "lat": 36.06908333,
-                        "lon": 129.8228
-                    },
-                    {
-                        "lat": 36.1082,
-                        "lon": 129.8320167
-                    },
-                    {
-                        "lat": 36.1737,
-                        "lon": 129.8464833
-                    },
-                    {
-                        "lat": 36.19886111,
-                        "lon": 129.8549222
-                    },
-                    {
-                        "lat": 36.22402222,
-                        "lon": 129.8633611
-                    },
-                    {
-                        "lat": 36.24918333,
-                        "lon": 129.8718
-                    },
-                    {
-                        "lat": 36.29344167,
-                        "lon": 129.8838917
-                    },
-                    {
-                        "lat": 36.3377,
-                        "lon": 129.8959833
-                    },
-                    {
-                        "lat": 36.36566667,
-                        "lon": 129.9036167
-                    },
-                    {
-                        "lat": 36.40804167,
-                        "lon": 129.9146333
-                    },
-                    {
-                        "lat": 36.45041667,
-                        "lon": 129.92565
-                    },
-                    {
-                        "lat": 36.49051667,
-                        "lon": 129.9356833
-                    },
-                    {
-                        "lat": 36.5274,
-                        "lon": 129.945
-                    },
-                    {
-                        "lat": 36.56428333,
-                        "lon": 129.9543167
-                    },
-                    {
-                        "lat": 36.59317222,
-                        "lon": 129.9615556
-                    },
-                    {
-                        "lat": 36.62206111,
-                        "lon": 129.9687944
-                    },
-                    {
-                        "lat": 36.65095,
-                        "lon": 129.9760333
-                    },
-                    {
-                        "lat": 36.69165,
-                        "lon": 129.9864833
-                    },
-                    {
-                        "lat": 36.73218889,
-                        "lon": 129.9973778
-                    },
-                    {
-                        "lat": 36.77272778,
-                        "lon": 130.0082722
-                    },
-                    {
-                        "lat": 36.81326667,
-                        "lon": 130.0191667
-                    },
-                    {
-                        "lat": 36.840525,
-                        "lon": 130.0267583
-                    },
-                    {
-                        "lat": 36.86778333,
-                        "lon": 130.03435
-                    },
-                    {
-                        "lat": 36.92433333,
-                        "lon": 130.0496833
-                    },
-                    {
-                        "lat": 36.952175,
-                        "lon": 130.05685
-                    },
-                    {
-                        "lat": 36.98001667,
-                        "lon": 130.0640167
-                    },
-                    {
-                        "lat": 37.02085556,
-                        "lon": 130.0745833
-                    },
-                    {
-                        "lat": 37.06169444,
-                        "lon": 130.08515
-                    },
-                    {
-                        "lat": 37.10253333,
-                        "lon": 130.0957167
-                    },
-                    {
-                        "lat": 37.1315,
-                        "lon": 130.1028
-                    },
-                    {
-                        "lat": 37.16046667,
-                        "lon": 130.1098833
-                    },
-                    {
-                        "lat": 37.187775,
-                        "lon": 130.1177583
-                    },
-                    {
-                        "lat": 37.21508333,
-                        "lon": 130.1256333
-                    },
-                    {
-                        "lat": 37.27213333,
-                        "lon": 130.1458833
-                    },
-                    {
-                        "lat": 37.30759166,
-                        "lon": 130.1587833
-                    },
-                    {
-                        "lat": 37.34305,
-                        "lon": 130.1716833
-                    },
-                    {
-                        "lat": 37.3752,
-                        "lon": 130.1820333
-                    },
-                    {
-                        "lat": 37.40537778,
-                        "lon": 130.1906056
-                    },
-                    {
-                        "lat": 37.43555555,
-                        "lon": 130.1991778
-                    },
-                    {
-                        "lat": 37.46573333,
-                        "lon": 130.20775
-                    },
-                    {
-                        "lat": 37.52075,
-                        "lon": 130.2181833
-                    },
-                    {
-                        "lat": 37.54929166,
-                        "lon": 130.2244667
-                    },
-                    {
-                        "lat": 37.57783333,
-                        "lon": 130.23075
-                    },
-                    {
-                        "lat": 37.61466111,
-                        "lon": 130.2422167
-                    },
-                    {
-                        "lat": 37.65148889,
-                        "lon": 130.2536833
-                    },
-                    {
-                        "lat": 37.68831667,
-                        "lon": 130.26515
-                    },
-                    {
-                        "lat": 37.7437,
-                        "lon": 130.2819833
-                    },
-                    {
-                        "lat": 37.77239167,
-                        "lon": 130.2911917
-                    },
-                    {
-                        "lat": 37.80108333,
-                        "lon": 130.3004
-                    },
-                    {
-                        "lat": 37.85641667,
-                        "lon": 130.31835
-                    },
-                    {
-                        "lat": 37.89479445,
-                        "lon": 130.3296444
-                    },
-                    {
-                        "lat": 37.93317222,
-                        "lon": 130.3409389
-                    },
-                    {
-                        "lat": 37.97155,
-                        "lon": 130.3522333
-                    },
-                    {
-                        "lat": 38.00053334,
-                        "lon": 130.3603667
-                    },
-                    {
-                        "lat": 38.02951667,
-                        "lon": 130.3685
-                    },
-                    {
-                        "lat": 38.06965,
-                        "lon": 130.37985
-                    },
-                    {
-                        "lat": 38.10978333,
-                        "lon": 130.3912
-                    },
-                    {
-                        "lat": 38.15205833,
-                        "lon": 130.4025167
-                    },
-                    {
-                        "lat": 38.19433333,
-                        "lon": 130.4138333
-                    },
-                    {
-                        "lat": 38.23091667,
-                        "lon": 130.4235083
-                    },
-                    {
-                        "lat": 38.2675,
-                        "lon": 130.4331833
-                    },
-                    {
-                        "lat": 38.30796667,
-                        "lon": 130.4451667
-                    },
-                    {
-                        "lat": 38.34843333,
-                        "lon": 130.45715
-                    },
-                    {
-                        "lat": 38.376875,
-                        "lon": 130.4660333
-                    },
-                    {
-                        "lat": 38.40531667,
-                        "lon": 130.4749167
-                    },
-                    {
-                        "lat": 38.45938333,
-                        "lon": 130.49205
-                    },
-                    {
-                        "lat": 38.47853333,
-                        "lon": 130.4981167
-                    },
-                    {
-                        "lat": 38.52326667,
-                        "lon": 130.51205
-                    },
-                    {
-                        "lat": 38.56198334,
-                        "lon": 130.5238833
-                    },
-                    {
-                        "lat": 38.6007,
-                        "lon": 130.5357167
-                    },
-                    {
-                        "lat": 38.6370125,
-                        "lon": 130.546725
-                    },
-                    {
-                        "lat": 38.673325,
-                        "lon": 130.5577333
-                    },
-                    {
-                        "lat": 38.7096375,
-                        "lon": 130.5687417
-                    },
-                    {
-                        "lat": 38.74595,
-                        "lon": 130.57975
-                    },
-                    {
-                        "lat": 38.8046,
-                        "lon": 130.5987333
-                    },
-                    {
-                        "lat": 38.83350833,
-                        "lon": 130.608425
-                    },
-                    {
-                        "lat": 38.86241667,
-                        "lon": 130.6181167
-                    },
-                    {
-                        "lat": 38.902175,
-                        "lon": 130.6308667
-                    },
-                    {
-                        "lat": 38.94193334,
-                        "lon": 130.6436167
-                    },
-                    {
-                        "lat": 38.98169167,
-                        "lon": 130.6563667
-                    },
-                    {
-                        "lat": 39.02145,
-                        "lon": 130.6691167
-                    },
-                    {
-                        "lat": 39.06120834,
-                        "lon": 130.6818667
-                    },
-                    {
-                        "lat": 39.10096667,
-                        "lon": 130.6946167
-                    },
-                    {
-                        "lat": 39.13976667,
-                        "lon": 130.706475
-                    },
-                    {
-                        "lat": 39.17856667,
-                        "lon": 130.7183333
-                    },
-                    {
-                        "lat": 39.20488889,
-                        "lon": 130.7264167
-                    },
-                    {
-                        "lat": 39.23121111,
-                        "lon": 130.7345
-                    },
-                    {
-                        "lat": 39.25753333,
-                        "lon": 130.7425833
-                    },
-                    {
-                        "lat": 39.29185238,
-                        "lon": 130.7521464
-                    },
-                    {
-                        "lat": 39.32617143,
-                        "lon": 130.7617095
-                    },
-                    {
-                        "lat": 39.36049047,
-                        "lon": 130.7712726
-                    },
-                    {
-                        "lat": 39.39480952,
-                        "lon": 130.7808357
-                    },
-                    {
-                        "lat": 39.42912857,
-                        "lon": 130.7903988
-                    },
-                    {
-                        "lat": 39.46344762,
-                        "lon": 130.7999619
-                    },
-                    {
-                        "lat": 39.49776667,
-                        "lon": 130.809525
-                    },
-                    {
-                        "lat": 39.53208571,
-                        "lon": 130.8190881
-                    },
-                    {
-                        "lat": 39.56640476,
-                        "lon": 130.8286512
-                    },
-                    {
-                        "lat": 39.60072381,
-                        "lon": 130.8382143
-                    },
-                    {
-                        "lat": 39.63504286,
-                        "lon": 130.8477774
-                    },
-                    {
-                        "lat": 39.6693619,
-                        "lon": 130.8573405
-                    },
-                    {
-                        "lat": 39.70368095,
-                        "lon": 130.8669036
-                    },
-                    {
-                        "lat": 39.738,
-                        "lon": 130.8764667
-                    },
-                    {
-                        "lat": 39.77445909,
-                        "lon": 130.8869303
-                    },
-                    {
-                        "lat": 39.81091818,
-                        "lon": 130.8973939
-                    },
-                    {
-                        "lat": 39.84737727,
-                        "lon": 130.9078576
-                    },
-                    {
-                        "lat": 39.88383636,
-                        "lon": 130.9183212
-                    },
-                    {
-                        "lat": 39.92029545,
-                        "lon": 130.9287849
-                    },
-                    {
-                        "lat": 39.95675455,
-                        "lon": 130.9392485
-                    },
-                    {
-                        "lat": 39.99321364,
-                        "lon": 130.9497121
-                    },
-                    {
-                        "lat": 40.02967273,
-                        "lon": 130.9601758
-                    },
-                    {
-                        "lat": 40.06613182,
-                        "lon": 130.9706394
-                    },
-                    {
-                        "lat": 40.10259091,
-                        "lon": 130.981103
-                    },
-                    {
-                        "lat": 40.13905,
-                        "lon": 130.9915667
-                    },
-                    {
-                        "lat": 40.17224444,
-                        "lon": 131.0011389
-                    },
-                    {
-                        "lat": 40.20543889,
-                        "lon": 131.0107111
-                    },
-                    {
-                        "lat": 40.23863333,
-                        "lon": 131.0202833
-                    },
-                    {
-                        "lat": 40.27084444,
-                        "lon": 131.0298833
-                    },
-                    {
-                        "lat": 40.30305556,
-                        "lon": 131.0394833
-                    },
-                    {
-                        "lat": 40.33526667,
-                        "lon": 131.0490833
-                    },
-                    {
-                        "lat": 40.3734,
-                        "lon": 131.0614809
-                    },
-                    {
-                        "lat": 40.41153334,
-                        "lon": 131.0738786
-                    },
-                    {
-                        "lat": 40.44966667,
-                        "lon": 131.0862762
-                    },
-                    {
-                        "lat": 40.4878,
-                        "lon": 131.0986738
-                    },
-                    {
-                        "lat": 40.52593334,
-                        "lon": 131.1110714
-                    },
-                    {
-                        "lat": 40.56406667,
-                        "lon": 131.123469
-                    },
-                    {
-                        "lat": 40.6022,
-                        "lon": 131.1358667
-                    },
-                    {
-                        "lat": 40.64033334,
-                        "lon": 131.1482643
-                    },
-                    {
-                        "lat": 40.67846667,
-                        "lon": 131.1606619
-                    },
-                    {
-                        "lat": 40.7166,
-                        "lon": 131.1730595
-                    },
-                    {
-                        "lat": 40.75473334,
-                        "lon": 131.1854571
-                    },
-                    {
-                        "lat": 40.79286667,
-                        "lon": 131.1978548
-                    },
-                    {
-                        "lat": 40.831,
-                        "lon": 131.2102524
-                    },
-                    {
-                        "lat": 40.86913334,
-                        "lon": 131.22265
-                    },
-                    {
-                        "lat": 40.90726667,
-                        "lon": 131.2350476
-                    },
-                    {
-                        "lat": 40.9454,
-                        "lon": 131.2474452
-                    },
-                    {
-                        "lat": 40.98353334,
-                        "lon": 131.2598429
-                    },
-                    {
-                        "lat": 41.02166667,
-                        "lon": 131.2722405
-                    },
-                    {
-                        "lat": 41.0598,
-                        "lon": 131.2846381
-                    },
-                    {
-                        "lat": 41.09793334,
-                        "lon": 131.2970357
-                    },
-                    {
-                        "lat": 41.13606667,
-                        "lon": 131.3094333
-                    },
-                    {
-                        "lat": 41.1679,
-                        "lon": 131.3213667
-                    },
-                    {
-                        "lat": 41.19973334,
-                        "lon": 131.3333
-                    },
-                    {
-                        "lat": 41.23156667,
-                        "lon": 131.3452333
-                    },
-                    {
-                        "lat": 41.26688195,
-                        "lon": 131.3569
-                    },
-                    {
-                        "lat": 41.30219723,
-                        "lon": 131.3685667
-                    },
-                    {
-                        "lat": 41.3375125,
-                        "lon": 131.3802333
-                    },
-                    {
-                        "lat": 41.37282778,
-                        "lon": 131.3919
-                    },
-                    {
-                        "lat": 41.40814306,
-                        "lon": 131.4035667
-                    },
-                    {
-                        "lat": 41.44345834,
-                        "lon": 131.4152333
-                    },
-                    {
-                        "lat": 41.47877361,
-                        "lon": 131.4269
-                    },
-                    {
-                        "lat": 41.51408889,
-                        "lon": 131.4385667
-                    },
-                    {
-                        "lat": 41.54940417,
-                        "lon": 131.4502333
-                    },
-                    {
-                        "lat": 41.58471944,
-                        "lon": 131.4619
-                    },
-                    {
-                        "lat": 41.62003472,
-                        "lon": 131.4735667
-                    },
-                    {
-                        "lat": 41.65535,
-                        "lon": 131.4852333
-                    },
-                    {
-                        "lat": 41.68656667,
-                        "lon": 131.495
-                    },
-                    {
-                        "lat": 41.71778334,
-                        "lon": 131.5047667
-                    },
-                    {
-                        "lat": 41.749,
-                        "lon": 131.5145333
-                    },
-                    {
-                        "lat": 41.78021667,
-                        "lon": 131.5243
-                    },
-                    {
-                        "lat": 41.81821667,
-                        "lon": 131.5364833
-                    },
-                    {
-                        "lat": 41.85463333,
-                        "lon": 131.5501667
-                    },
-                    {
-                        "lat": 41.88303333,
-                        "lon": 131.55915
-                    },
-                    {
-                        "lat": 41.91143333,
-                        "lon": 131.5681333
-                    },
-                    {
-                        "lat": 41.95143333,
-                        "lon": 131.5780833
-                    },
-                    {
-                        "lat": 41.99143333,
-                        "lon": 131.5880333
-                    },
-                    {
-                        "lat": 42.02534166,
-                        "lon": 131.5956583
-                    },
-                    {
-                        "lat": 42.05925,
-                        "lon": 131.6032833
-                    },
-                    {
-                        "lat": 42.092975,
-                        "lon": 131.6110583
-                    },
-                    {
-                        "lat": 42.1267,
-                        "lon": 131.6188333
-                    },
-                    {
-                        "lat": 42.15628333,
-                        "lon": 131.6252167
-                    },
-                    {
-                        "lat": 42.18586667,
-                        "lon": 131.6316
-                    },
-                    {
-                        "lat": 42.21746667,
-                        "lon": 131.6385833
-                    },
-                    {
-                        "lat": 42.258275,
-                        "lon": 131.648575
-                    },
-                    {
-                        "lat": 42.29908333,
-                        "lon": 131.6585667
-                    },
-                    {
-                        "lat": 42.31698333,
-                        "lon": 131.6635667
-                    },
-                    {
-                        "lat": 42.35845,
-                        "lon": 131.66895
-                    },
-                    {
-                        "lat": 42.40861667,
-                        "lon": 131.6675167
-                    },
-                    {
-                        "lat": 42.44256667,
-                        "lon": 131.6644667
-                    },
-                    {
-                        "lat": 42.47651667,
-                        "lon": 131.6614167
-                    },
-                    {
-                        "lat": 42.53188333,
-                        "lon": 131.65835
-                    },
-                    {
-                        "lat": 42.5596875,
-                        "lon": 131.6588958
-                    },
-                    {
-                        "lat": 42.58749167,
-                        "lon": 131.6594417
-                    },
-                    {
-                        "lat": 42.61529583,
-                        "lon": 131.6599875
-                    },
-                    {
-                        "lat": 42.6431,
-                        "lon": 131.6605333
-                    },
-                    {
-                        "lat": 42.68366667,
-                        "lon": 131.6881667
-                    },
-                    {
-                        "lat": 42.70385,
-                        "lon": 131.7220167
-                    },
-                    {
-                        "lat": 42.72246667,
-                        "lon": 131.7565667
-                    },
-                    {
-                        "lat": 42.74288333,
-                        "lon": 131.7950667
-                    },
-                    {
-                        "lat": 42.76185,
-                        "lon": 131.8327333
-                    },
-                    {
-                        "lat": 42.76951667,
-                        "lon": 131.84795
-                    },
-                    {
-                        "lat": 42.79735,
-                        "lon": 131.9046
-                    },
-                    {
-                        "lat": 42.80746667,
-                        "lon": 131.9261333
-                    },
-                    {
-                        "lat": 42.82523333,
-                        "lon": 131.9654333
-                    },
-                    {
-                        "lat": 42.83973333,
-                        "lon": 132.0083333
-                    },
-                    {
-                        "lat": 42.86306667,
-                        "lon": 132.0669
-                    },
-                    {
-                        "lat": 42.88248333,
-                        "lon": 132.1047167
-                    },
-                    {
-                        "lat": 42.90893333,
-                        "lon": 132.1395333
-                    },
-                    {
-                        "lat": 42.95308333,
-                        "lon": 132.1164833
-                    },
-                    {
-                        "lat": 42.9805,
-                        "lon": 132.09385
-                    },
-                    {
-                        "lat": 42.99313333,
-                        "lon": 132.0697333
-                    },
-                    {
-                        "lat": 43.00576667,
-                        "lon": 132.0456167
-                    },
-                    {
-                        "lat": 43.0184,
-                        "lon": 132.0215
-                    },
-                    {
-                        "lat": 43.03103334,
-                        "lon": 131.9973833
-                    },
-                    {
-                        "lat": 43.04366667,
-                        "lon": 131.9732667
-                    },
-                    {
-                        "lat": 43.04545,
-                        "lon": 131.9733667
-                    },
-                    {
-                        "lat": 43.04723333,
-                        "lon": 131.9734667
-                    },
-                    {
-                        "lat": 43.04738333,
-                        "lon": 131.9741167
-                    },
-                    {
-                        "lat": 43.04341667,
-                        "lon": 131.9709833
-                    },
-                    {
-                        "lat": 43.04895556,
-                        "lon": 131.9538472
-                    },
-                    {
-                        "lat": 43.05449445,
-                        "lon": 131.9367111
-                    },
-                    {
-                        "lat": 43.06003334,
-                        "lon": 131.919575
-                    },
-                    {
-                        "lat": 43.06557222,
-                        "lon": 131.9024389
-                    },
-                    {
-                        "lat": 43.07111111,
-                        "lon": 131.8853028
-                    },
-                    {
-                        "lat": 43.07665,
-                        "lon": 131.8681667
-                    },
-                    {
-                        "lat": 43.08325,
-                        "lon": 131.868175
-                    },
-                    {
-                        "lat": 43.08985,
-                        "lon": 131.8681833
-                    }
-                ]
-            },
-            {
-                "rank": 2,
-                "port_id": "RUNJK",
-                "track": [
-                    {
-                        "lat": 35.05663589,
-                        "lon": 129.1333268
-                    },
-                    {
-                        "lat": 35.15563509,
-                        "lon": 129.4162323
-                    },
-                    {
-                        "lat": 35.32669094,
-                        "lon": 129.6165944
-                    },
-                    {
-                        "lat": 35.54214951,
-                        "lon": 129.6963385
-                    },
-                    {
-                        "lat": 35.77247421,
-                        "lon": 129.7629179
-                    },
-                    {
-                        "lat": 35.98799233,
-                        "lon": 129.8101927
-                    },
-                    {
-                        "lat": 36.20836561,
-                        "lon": 129.8794801
-                    },
-                    {
-                        "lat": 36.39821327,
-                        "lon": 129.9426814
-                    },
-                    {
-                        "lat": 36.60374228,
-                        "lon": 130.0170469
-                    },
-                    {
-                        "lat": 36.80532269,
-                        "lon": 130.0896678
-                    },
-                    {
-                        "lat": 37.00898381,
-                        "lon": 130.162495
-                    },
-                    {
-                        "lat": 37.21441573,
-                        "lon": 130.2363165
-                    },
-                    {
-                        "lat": 37.4176053,
-                        "lon": 130.3092171
-                    },
-                    {
-                        "lat": 37.62200721,
-                        "lon": 130.3834069
-                    },
-                    {
-                        "lat": 37.8269124,
-                        "lon": 130.4606492
-                    },
-                    {
-                        "lat": 38.02858581,
-                        "lon": 130.533739
-                    },
-                    {
-                        "lat": 38.22864711,
-                        "lon": 130.6251261
-                    },
-                    {
-                        "lat": 38.42536946,
-                        "lon": 130.7520739
-                    },
-                    {
-                        "lat": 38.61102739,
-                        "lon": 130.8583588
-                    },
-                    {
-                        "lat": 38.79771939,
-                        "lon": 130.964274
-                    },
-                    {
-                        "lat": 38.98439457,
-                        "lon": 131.071822
-                    },
-                    {
-                        "lat": 39.16838597,
-                        "lon": 131.1783687
-                    },
-                    {
-                        "lat": 39.35465099,
-                        "lon": 131.2869662
-                    },
-                    {
-                        "lat": 39.53964899,
-                        "lon": 131.3931492
-                    },
-                    {
-                        "lat": 39.73351367,
-                        "lon": 131.5125447
-                    },
-                    {
-                        "lat": 39.90806285,
-                        "lon": 131.6372508
-                    },
-                    {
-                        "lat": 40.09005663,
-                        "lon": 131.7607747
-                    },
-                    {
-                        "lat": 40.29207763,
-                        "lon": 131.8860007
-                    },
-                    {
-                        "lat": 40.47976881,
-                        "lon": 132.0000822
-                    },
-                    {
-                        "lat": 40.67906609,
-                        "lon": 132.1244607
-                    },
-                    {
-                        "lat": 40.86716496,
-                        "lon": 132.2451252
-                    },
-                    {
-                        "lat": 41.07078895,
-                        "lon": 132.3725893
-                    },
-                    {
-                        "lat": 41.24999131,
-                        "lon": 132.4839192
-                    },
-                    {
-                        "lat": 41.43218918,
-                        "lon": 132.550608
-                    },
-                    {
-                        "lat": 41.62245678,
-                        "lon": 132.600405
-                    },
-                    {
-                        "lat": 41.81353525,
-                        "lon": 132.650739
-                    },
-                    {
-                        "lat": 41.99869819,
-                        "lon": 132.6988502
-                    },
-                    {
-                        "lat": 42.18741601,
-                        "lon": 132.7495302
-                    },
-                    {
-                        "lat": 42.3400791,
-                        "lon": 132.7692693
-                    },
-                    {
-                        "lat": 42.35822245,
-                        "lon": 132.7775936
-                    },
-                    {
-                        "lat": 42.37652592,
-                        "lon": 132.7880415
-                    },
-                    {
-                        "lat": 42.3954177,
-                        "lon": 132.798398
-                    },
-                    {
-                        "lat": 42.41158932,
-                        "lon": 132.8071914
-                    },
-                    {
-                        "lat": 42.43018057,
-                        "lon": 132.8162249
-                    },
-                    {
-                        "lat": 42.44547553,
-                        "lon": 132.825353
-                    },
-                    {
-                        "lat": 42.46315884,
-                        "lon": 132.8345453
-                    },
-                    {
-                        "lat": 42.48072649,
-                        "lon": 132.8440083
-                    },
-                    {
-                        "lat": 42.50116265,
-                        "lon": 132.8541909
-                    },
-                    {
-                        "lat": 42.51875489,
-                        "lon": 132.8630116
-                    },
-                    {
-                        "lat": 42.53816135,
-                        "lon": 132.8742231
-                    },
-                    {
-                        "lat": 42.55759168,
-                        "lon": 132.8850759
-                    },
-                    {
-                        "lat": 42.572228,
-                        "lon": 132.8928811
-                    },
-                    {
-                        "lat": 42.59209505,
-                        "lon": 132.9040852
-                    },
-                    {
-                        "lat": 42.60921919,
-                        "lon": 132.9134081
-                    },
-                    {
-                        "lat": 42.62870268,
-                        "lon": 132.9245913
-                    },
-                    {
-                        "lat": 42.64721254,
-                        "lon": 132.9363477
-                    },
-                    {
-                        "lat": 42.66406893,
-                        "lon": 132.9466401
-                    },
-                    {
-                        "lat": 42.68267434,
-                        "lon": 132.9569659
-                    },
-                    {
-                        "lat": 42.70164168,
-                        "lon": 132.9672173
-                    },
-                    {
-                        "lat": 42.72087035,
-                        "lon": 132.9708866
-                    },
-                    {
-                        "lat": 42.74075951,
-                        "lon": 132.9673469
-                    },
-                    {
-                        "lat": 42.76129855,
-                        "lon": 132.9640183
-                    },
-                    {
-                        "lat": 42.78013741,
-                        "lon": 132.9651585
-                    },
-                    {
-                        "lat": 42.79764324,
-                        "lon": 132.9614819
-                    },
-                    {
-                        "lat": 42.80794796,
-                        "lon": 132.9619509
-                    },
-                    {
-                        "lat": 42.8081136,
-                        "lon": 132.9617483
-                    },
-                    {
-                        "lat": 42.80825012,
-                        "lon": 132.9614641
-                    },
-                    {
-                        "lat": 42.8083035,
-                        "lon": 132.9615257
-                    },
-                    {
-                        "lat": 42.80831233,
-                        "lon": 132.9620095
-                    },
-                    {
-                        "lat": 42.80862563,
-                        "lon": 132.9630221
-                    },
-                    {
-                        "lat": 42.80928047,
-                        "lon": 132.9632721
-                    },
-                    {
-                        "lat": 42.80945634,
-                        "lon": 132.9630577
-                    },
-                    {
-                        "lat": 42.80971784,
-                        "lon": 132.9629289
-                    },
-                    {
-                        "lat": 42.80902035,
-                        "lon": 132.9630985
-                    },
-                    {
-                        "lat": 42.8087196,
-                        "lon": 132.9634065
-                    },
-                    {
-                        "lat": 42.80808444,
-                        "lon": 132.9623055
-                    },
-                    {
-                        "lat": 42.80808792,
-                        "lon": 132.9617043
-                    },
-                    {
-                        "lat": 42.80794681,
-                        "lon": 132.9615442
-                    },
-                    {
-                        "lat": 42.80794559,
-                        "lon": 132.9613446
-                    },
-                    {
-                        "lat": 42.80791764,
-                        "lon": 132.961359
-                    },
-                    {
-                        "lat": 42.80789144,
-                        "lon": 132.9610308
-                    },
-                    {
-                        "lat": 42.80793269,
-                        "lon": 132.9611467
-                    },
-                    {
-                        "lat": 42.80809425,
-                        "lon": 132.9609096
-                    },
-                    {
-                        "lat": 42.80804953,
-                        "lon": 132.9608691
-                    },
-                    {
-                        "lat": 42.80804672,
-                        "lon": 132.9609814
-                    },
-                    {
-                        "lat": 42.80824119,
-                        "lon": 132.9608966
-                    },
-                    {
-                        "lat": 42.80794894,
-                        "lon": 132.9616637
-                    },
-                    {
-                        "lat": 42.80819737,
-                        "lon": 132.9622778
-                    },
-                    {
-                        "lat": 42.80804957,
-                        "lon": 132.9616844
-                    },
-                    {
-                        "lat": 42.80806203,
-                        "lon": 132.9620945
-                    },
-                    {
-                        "lat": 42.80827709,
-                        "lon": 132.9626974
-                    },
-                    {
-                        "lat": 42.80788628,
-                        "lon": 132.9611981
-                    },
-                    {
-                        "lat": 42.80802439,
-                        "lon": 132.9610159
-                    },
-                    {
-                        "lat": 42.80799728,
-                        "lon": 132.9611007
-                    },
-                    {
-                        "lat": 42.80792049,
-                        "lon": 132.9613579
-                    },
-                    {
-                        "lat": 42.80781598,
-                        "lon": 132.9610346
-                    },
-                    {
-                        "lat": 42.80775695,
-                        "lon": 132.9615715
-                    },
-                    {
-                        "lat": 42.80773706,
-                        "lon": 132.9612813
-                    },
-                    {
-                        "lat": 42.80783587,
-                        "lon": 132.9613597
-                    },
-                    {
-                        "lat": 42.79961943,
-                        "lon": 132.8879089
-                    }
-                ]
-            },
-            {
-                "rank": 3,
-                "port_id": "KRKPO",
-                "track": [
-                    {
-                        "lat": 35.06733333,
-                        "lon": 129.1376167
-                    },
-                    {
-                        "lat": 35.07525042,
-                        "lon": 129.1484538
-                    },
-                    {
-                        "lat": 35.08376702,
-                        "lon": 129.1587409
-                    },
-                    {
-                        "lat": 35.09273722,
-                        "lon": 129.1686126
-                    },
-                    {
-                        "lat": 35.10201513,
-                        "lon": 129.1782034
-                    },
-                    {
-                        "lat": 35.11145484,
-                        "lon": 129.1876478
-                    },
-                    {
-                        "lat": 35.12091045,
-                        "lon": 129.1970803
-                    },
-                    {
-                        "lat": 35.13023617,
-                        "lon": 129.2066355
-                    },
-                    {
-                        "lat": 35.13934773,
-                        "lon": 129.2163911
-                    },
-                    {
-                        "lat": 35.14832668,
-                        "lon": 129.2262731
-                    },
-                    {
-                        "lat": 35.1572822,
-                        "lon": 129.236182
-                    },
-                    {
-                        "lat": 35.16632016,
-                        "lon": 129.2460204
-                    },
-                    {
-                        "lat": 35.17551198,
-                        "lon": 129.2557138
-                    },
-                    {
-                        "lat": 35.18490881,
-                        "lon": 129.2652011
-                    },
-                    {
-                        "lat": 35.19456095,
-                        "lon": 129.2744221
-                    },
-                    {
-                        "lat": 35.20446194,
-                        "lon": 129.2833787
-                    },
-                    {
-                        "lat": 35.21449965,
-                        "lon": 129.2921884
-                    },
-                    {
-                        "lat": 35.22455042,
-                        "lon": 129.3009814
-                    },
-                    {
-                        "lat": 35.23449947,
-                        "lon": 129.3098795
-                    },
-                    {
-                        "lat": 35.24429091,
-                        "lon": 129.3189494
-                    },
-                    {
-                        "lat": 35.25389294,
-                        "lon": 129.328235
-                    },
-                    {
-                        "lat": 35.26327757,
-                        "lon": 129.3377756
-                    },
-                    {
-                        "lat": 35.27255618,
-                        "lon": 129.3474392
-                    },
-                    {
-                        "lat": 35.28201755,
-                        "lon": 129.3568754
-                    },
-                    {
-                        "lat": 35.29196199,
-                        "lon": 129.3657194
-                    },
-                    {
-                        "lat": 35.30258316,
-                        "lon": 129.3737395
-                    },
-                    {
-                        "lat": 35.31361433,
-                        "lon": 129.3812768
-                    },
-                    {
-                        "lat": 35.32466448,
-                        "lon": 129.3888272
-                    },
-                    {
-                        "lat": 35.33535282,
-                        "lon": 129.3968712
-                    },
-                    {
-                        "lat": 35.34549498,
-                        "lon": 129.4055961
-                    },
-                    {
-                        "lat": 35.35508339,
-                        "lon": 129.4149246
-                    },
-                    {
-                        "lat": 35.36411696,
-                        "lon": 129.4247703
-                    },
-                    {
-                        "lat": 35.37269714,
-                        "lon": 129.4349866
-                    },
-                    {
-                        "lat": 35.38120871,
-                        "lon": 129.4452615
-                    },
-                    {
-                        "lat": 35.39008495,
-                        "lon": 129.4552547
-                    },
-                    {
-                        "lat": 35.39973111,
-                        "lon": 129.4646274
-                    },
-                    {
-                        "lat": 35.41025531,
-                        "lon": 129.4730579
-                    },
-                    {
-                        "lat": 35.42158676,
-                        "lon": 129.4802343
-                    },
-                    {
-                        "lat": 35.43365139,
-                        "lon": 129.4858495
-                    },
-                    {
-                        "lat": 35.44631189,
-                        "lon": 129.4899378
-                    },
-                    {
-                        "lat": 35.45932298,
-                        "lon": 129.4931158
-                    },
-                    {
-                        "lat": 35.47242888,
-                        "lon": 129.4960572
-                    },
-                    {
-                        "lat": 35.48540856,
-                        "lon": 129.4993426
-                    },
-                    {
-                        "lat": 35.49826007,
-                        "lon": 129.5029655
-                    },
-                    {
-                        "lat": 35.51106645,
-                        "lon": 129.5066921
-                    },
-                    {
-                        "lat": 35.52390945,
-                        "lon": 129.5102922
-                    },
-                    {
-                        "lat": 35.53681883,
-                        "lon": 129.5136886
-                    },
-                    {
-                        "lat": 35.54975967,
-                        "lon": 129.5169941
-                    },
-                    {
-                        "lat": 35.56269298,
-                        "lon": 129.5203337
-                    },
-                    {
-                        "lat": 35.57558809,
-                        "lon": 129.5238051
-                    },
-                    {
-                        "lat": 35.58844913,
-                        "lon": 129.5273935
-                    },
-                    {
-                        "lat": 35.60128937,
-                        "lon": 129.531054
-                    },
-                    {
-                        "lat": 35.61412186,
-                        "lon": 129.5347426
-                    },
-                    {
-                        "lat": 35.62695586,
-                        "lon": 129.5384272
-                    },
-                    {
-                        "lat": 35.63979723,
-                        "lon": 129.5420862
-                    },
-                    {
-                        "lat": 35.65265174,
-                        "lon": 129.5456983
-                    },
-                    {
-                        "lat": 35.66552109,
-                        "lon": 129.5492571
-                    },
-                    {
-                        "lat": 35.67839544,
-                        "lon": 129.5527979
-                    },
-                    {
-                        "lat": 35.69126291,
-                        "lon": 129.5563637
-                    },
-                    {
-                        "lat": 35.70411329,
-                        "lon": 129.5599912
-                    },
-                    {
-                        "lat": 35.71695433,
-                        "lon": 129.5636523
-                    },
-                    {
-                        "lat": 35.72980493,
-                        "lon": 129.5672782
-                    },
-                    {
-                        "lat": 35.74268404,
-                        "lon": 129.5708004
-                    },
-                    {
-                        "lat": 35.75559543,
-                        "lon": 129.574205
-                    },
-                    {
-                        "lat": 35.76851339,
-                        "lon": 129.5775854
-                    },
-                    {
-                        "lat": 35.78140878,
-                        "lon": 129.5810471
-                    },
-                    {
-                        "lat": 35.79425838,
-                        "lon": 129.5846744
-                    },
-                    {
-                        "lat": 35.80708049,
-                        "lon": 129.5884017
-                    },
-                    {
-                        "lat": 35.81991124,
-                        "lon": 129.5920986
-                    },
-                    {
-                        "lat": 35.83278646,
-                        "lon": 129.5956359
-                    },
-                    {
-                        "lat": 35.84572541,
-                        "lon": 129.598937
-                    },
-                    {
-                        "lat": 35.85872478,
-                        "lon": 129.6019971
-                    },
-                    {
-                        "lat": 35.87177962,
-                        "lon": 129.6048167
-                    },
-                    {
-                        "lat": 35.88488364,
-                        "lon": 129.6074027
-                    },
-                    {
-                        "lat": 35.89802413,
-                        "lon": 129.609792
-                    },
-                    {
-                        "lat": 35.91118656,
-                        "lon": 129.6120305
-                    },
-                    {
-                        "lat": 35.92435693,
-                        "lon": 129.6141639
-                    },
-                    {
-                        "lat": 35.93753339,
-                        "lon": 129.6162347
-                    },
-                    {
-                        "lat": 35.95072582,
-                        "lon": 129.6182828
-                    },
-                    {
-                        "lat": 35.96394456,
-                        "lon": 129.6203476
-                    },
-                    {
-                        "lat": 35.97719781,
-                        "lon": 129.6223593
-                    },
-                    {
-                        "lat": 35.99048712,
-                        "lon": 129.6239087
-                    },
-                    {
-                        "lat": 36.00381277,
-                        "lon": 129.6245217
-                    },
-                    {
-                        "lat": 36.01716467,
-                        "lon": 129.623752
-                    },
-                    {
-                        "lat": 36.03041192,
-                        "lon": 129.6214767
-                    },
-                    {
-                        "lat": 36.04334569,
-                        "lon": 129.6177818
-                    },
-                    {
-                        "lat": 36.05575597,
-                        "lon": 129.6127564
-                    },
-                    {
-                        "lat": 36.06745806,
-                        "lon": 129.6064207
-                    },
-                    {
-                        "lat": 36.0783226,
-                        "lon": 129.5986447
-                    },
-                    {
-                        "lat": 36.0882275,
-                        "lon": 129.5892783
-                    },
-                    {
-                        "lat": 36.0969363,
-                        "lon": 129.5782535
-                    },
-                    {
-                        "lat": 36.10345244,
-                        "lon": 129.5660475
-                    },
-                    {
-                        "lat": 36.10646945,
-                        "lon": 129.5533597
-                    },
-                    {
-                        "lat": 36.10495304,
-                        "lon": 129.5408249
-                    },
-                    {
-                        "lat": 36.0994838,
-                        "lon": 129.528693
-                    },
-                    {
-                        "lat": 36.09123375,
-                        "lon": 129.5170729
-                    },
-                    {
-                        "lat": 36.08137579,
-                        "lon": 129.5060732
-                    },
-                    {
-                        "lat": 36.0710828,
-                        "lon": 129.4958026
-                    },
-                    {
-                        "lat": 36.06152768,
-                        "lon": 129.4863698
-                    },
-                    {
-                        "lat": 36.05388333,
-                        "lon": 129.4778833
-                    }
-                ]
-            }
-        ]
-    };
+        });
 
-    // 출발항 정보 추가
-    const departurePort = { "id": "KRBUS", "country": "한국", "city": "부산", "lat": 35.0999, "lon": 129.111 };
+        globalRoutesData = routes;
+        globalPredictions = resp.latest.predictions;
 
-    // 화면 UI 업데이트 (슬라이드에 데이터 반영)
-    displayPredictionResults(resp.latest.predictions, departurePort);
-    displayTimelineResults(resp.timeline, resp.latest, departurePort);
+        $('.box').addClass('is-active');
 
-    // ETA 정보 업데이트 로직 추가
-    if (resp.latest && resp.latest.predictions) {
-        const predictions = resp.latest.predictions;
+        const validMarkers = [];
 
-        const rank1Eta = predictions.find(p => p.rank === 1)?.eta || '정보 없음';
-        const rank2Eta = predictions.find(p => p.rank === 2)?.eta || '정보 없음';
-        const rank3Eta = predictions.find(p => p.rank === 3)?.eta || '정보 없음';
-
-        $('.box.one .eta__time').html('<span class="pill">ETA</span> ' + rank1Eta);
-        $('.box.two .eta__time').html('<span class="pill">ETA</span> ' + rank2Eta);
-        $('.box.three .eta__time').html('<span class="pill">ETA</span> ' + rank3Eta);
-    }
-
-    // 결과 영역 보이기 및 폼 입력 비활성화
-    $('.sidebar__content').removeClass('is-hidden');
-    $('.sidebar__input')
-        .blur()
-        .prop('disabled', true)
-        .attr('aria-disabled', 'true')
-        .addClass('is-locked');
-    $('.cselect__control').prop('disabled', true);
-
-    // ----------------------------------------------------
-    // 지도에 항로 및 마커 그리기 로직
-    // ----------------------------------------------------
-    const markers = [];
-    let lastMarker = null;
-
-    // 1. rank가 1, 2, 3인 항로 데이터 추출
-    const routesData = resp.tracks_topk.filter(trackObj => trackObj.rank >= 1 && trackObj.rank <= 3);
-
-    const routes = [];
-    let top1RouteData = null;
-
-    routesData.forEach(topRouteData => {
-        const trackPoints = topRouteData.track || [];
-        if (trackPoints.length > 0) {
-            const coordinates = trackPoints.map(point => [point.lon, point.lat]);
-
-            // 항로에 출발항 좌표 추가 (모든 항로에 동일하게 적용)
-            if (departurePort) {
-                coordinates.unshift([departurePort.lon, departurePort.lat]);
-            }
-
-            let color = '#007cbf'; // rank 1: 기존 파란색
-            if (topRouteData.rank === 2) {
-                color = '#A9A9A9'; // rank 2: 초록색 008000
-            } else if (topRouteData.rank === 3) {
-                color = '#A9A9A9'; // rank 3: 진한 회색
-            }
-
-            const name = `예상 항로 (Top ${topRouteData.rank})`;
-
-            routes.push({
-                route_name: name,
-                coordinates: coordinates,
-                color: color,
-                rank: topRouteData.rank
+        if (top1RouteData && top1RouteData.track && top1RouteData.track.length > 0) {
+            const firstPoint = top1RouteData.track[0];
+            validMarkers.push({
+                coordinates: [firstPoint.lon, firstPoint.lat],
+                description: `예상 항로 시작점 (Time 0)`
             });
+        }
 
-            if (topRouteData.rank === 1) {
-                top1RouteData = topRouteData; // rank 1 데이터 저장
-            }
+        if (resp.timeline && resp.timeline.length > 0) {
+            resp.timeline.forEach(timeData => {
+                if (timeData.lat && timeData.lon) {
+                    validMarkers.push({
+                        coordinates: [timeData.lon, timeData.lat],
+                        description: `예측 시점: ${timeData.time_point}h`
+                    });
+                }
+            });
+        }
+
+        if (resp.latest && resp.latest.lat && resp.latest.lon) {
+            lastMarker = {
+                coordinates: [resp.latest.lon, resp.latest.lat],
+                description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`
+            };
+        }
+
+        if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
+            window.drawRoutes(routes);
+            window.drawMarkers(validMarkers, lastMarker);
+            window.togglePortMarkersByRank([1, 2, 3]);
+            window.toggleMarkersVisibility(true);
+        } else {
+            console.error("Map functions are not available.");
         }
     });
-    // ─────────── 항로 데이터를 전역 변수에 저장 ───────────
-    globalRoutesData = routes;
-    globalPredictions = resp.latest.predictions;
 
-    // 모든 예측 박스 활성화 (기본값) 및 모든 항로 표시
-    $('.box').addClass('is-active');
+    // 예측 결과 박스 클릭 이벤트 (개별 토글 로직)
+    $(document).on('click', '.box.one, .box.two, .box.three', function () {
+        if (!globalRoutesData || globalRoutesData.length === 0) {
+            console.warn('globalRoutesData is empty. Cannot draw routes.');
+            return;
+        }
 
-    // 2. 새로운 마커 로직 (timeline + latest + 출발항)
-    const validMarkers = [];
+        const $box = $(this);
+        $box.toggleClass('is-active');
 
-    // rank 1 항로의 첫 번째 마커
-    if (top1RouteData && top1RouteData.track && top1RouteData.track.length > 0) {
-        const firstPoint = top1RouteData.track[0];
-        validMarkers.push({
-            coordinates: [firstPoint.lon, firstPoint.lat],
-            description: `예상 항로 시작점 (Time 0)`
+        const activeRanks = [];
+        $('.box.is-active').each(function () {
+            const rank = $(this).hasClass('one') ? 1 : ($(this).hasClass('two') ? 2 : 3);
+            activeRanks.push(rank);
+        });
+
+        const routesToDraw = globalRoutesData.filter(route => activeRanks.includes(route.rank));
+        window.drawRoutes(routesToDraw);
+
+        if (typeof window.togglePortMarkersByRank === 'function') {
+            window.togglePortMarkersByRank(activeRanks);
+        }
+
+        const isRank1Active = $('.box.one').hasClass('is-active');
+        if (typeof window.toggleMarkersVisibility === 'function') {
+            window.toggleMarkersVisibility(isRank1Active);
+        }
+    });
+
+    function toggleMarkersForRank1(isVisible) {
+        if (typeof window.toggleMarkersVisibility === 'function') {
+            window.toggleMarkersVisibility(isVisible);
+        } else {
+            console.warn("toggleMarkersVisibility 함수가 map.js에 존재하지 않습니다.");
+        }
+    }
+
+    // 초기화 버튼: 클릭 이벤트
+    $(document).on('click', '.sidebar__row .sidebar__btn:not(.primary)', function () {
+        $('.sidebar__input').val('');
+        $('.sidebar__vesselinfo .kv strong').text('정보 없음');
+        updateIdType('MMSI');
+        $('#predict-content').addClass('is-hidden');
+        $('.box').removeClass('is-active');
+        globalRoutesData = [];
+        globalPredictions = [];
+        window.clearRoutesAndMarkers();
+        window.showAllPortMarkers();
+        clearTimeline();
+        $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
+        $('.cselect__control').prop('disabled', false);
+        $('.sidebar__divider').next('.sidebar__arrived-message').remove();
+    });
+
+    function clearTimeline() {
+        $('.voy-timeline').empty();
+    }
+
+    // ───────── JSON 데이터를 화면에 표시 ─────────
+    function displayPredictionResults(predictions, departurePort) {
+        if (!predictions || predictions.length === 0) {
+            console.warn('예측 데이터가 없습니다.');
+            return;
+        }
+
+        predictions.forEach(prediction => {
+            let boxSelector;
+            if (prediction.rank === 1) {
+                boxSelector = '.box.one';
+            } else if (prediction.rank === 2) {
+                boxSelector = '.box.two';
+            } else if (prediction.rank === 3) {
+                boxSelector = '.box.three';
+            }
+
+            if (boxSelector) {
+                const $box = $(boxSelector);
+                // 항구 정보 가져오기
+                const portInfo = getPortInfo(prediction.port_id);
+
+                // 디버깅 코드 추가
+                console.log(`Debug Info:`);
+                console.log(`Port ID: ${prediction.port_id}`);
+                console.log(`portInfo 객체:`, portInfo);
+
+                // Top 박스 UI 업데이트
+                if (prediction.rank === 1) {
+                    $box.find('.head__label.num').text(`${prediction.rank}`);
+                } else {
+                    const $label = $box.find('.head__label');
+                    $label.text(`Top - ${prediction.rank}`);
+                }
+                $box.find('.box__head strong').text(`${(prediction.prob * 100).toFixed(2)}%`);
+                $box.find('.last').text(prediction.port_id);
+                // 'sub dest' 클래스에 국가명 / 항구명 업데이트
+                $box.find('.sub.dest').text(`${portInfo.country_name_kr} / ${portInfo.port_name_kr}`);
+            }
         });
     }
 
-    // timeline의 time_point 마커 추가
-    if (resp.timeline && resp.timeline.length > 0) {
-        resp.timeline.forEach(timeData => {
-            if (timeData.lat && timeData.lon) {
-                validMarkers.push({
-                    coordinates: [timeData.lon, timeData.lat],
-                    description: `예측 시점: ${timeData.time_point}h`
+    // 간단 토글 + 선택 저장
+    $(document).on('click', '.cselect__control', function () {
+        const $wrap = $(this).closest('.cselect');
+        const open = $wrap.toggleClass('is-open').hasClass('is-open');
+        $(this).attr('aria-expanded', open);
+    });
+
+    // 옵션 클릭
+    $(document).on('click', '.cselect__option', function () {
+        const value = $(this).data('value');
+        updateIdType(value);
+    });
+
+    // 바깥 클릭 시 닫기
+    $(document).on('click', function (e) {
+        if ($(e.target).closest('.cselect').length === 0) {
+            $('.cselect.is-open').removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
+        }
+    });
+
+    // 아이콘
+    $(function () {
+        $('.sidebar__topbox .iconwrap[data-panel="predict"]').addClass('is-active');
+        $('.panel--predict').addClass('is-active');
+    });
+
+    // 상단 아이콘(버튼) 클릭 → 패널 전환 + 활성 표시
+    $(document).on('click', '.sidebar__topbox .iconwrap', function () {
+        const target = $(this).data('panel');
+        $('.sidebar__topbox .iconwrap').removeClass('is-active');
+        $(this).addClass('is-active');
+        $('.panel').removeClass('is-active').attr('hidden', true);
+        $(`.panel--${target}`).addClass('is-active').removeAttr('hidden');
+        window.dispatchEvent(new Event('resize'));
+    });
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.map-icon-ctrl .iconbtn');
+        if (!btn) return;
+        const type = btn.dataset.type;
+        const on = !btn.classList.contains('is-on');
+        btn.classList.toggle('is-on', on);
+        document.dispatchEvent(new CustomEvent('panel:toggle', {
+            detail: { type, on }
+        }));
+    });
+
+    // ───────── JSON 데이터를 화면에 표시 ─────────
+    function displayTimelineResults(timeline, latest) {
+        $('.voy-timeline').empty();
+        if (!timeline || timeline.length === 0) {
+            return;
+        }
+
+        const $startItem = $('<li class="voy-item"></li>');
+        const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false">
+                            <img src="/images/portpredictImages/vessel_Icon.png" th:src="@{/images/portpredictImages/vessel_Icon.png}"
+                                   alt="출발항 아이콘" />
+                        </button>`);
+        const $startRows = $('<div class="voy-rows"></div>');
+        $startRows.append(`<div class="voy-label">KRBUS</div>`);
+        const $startRow = $(`<div class="voy-row">
+                            <div class="depart_pillbtn">ATD</div>
+                            <div class="voy-chip">${latest.departure_time}</div>
+                        </div>`);
+        $startRows.append($startRow);
+        $startItem.append($startNode);
+        $startItem.append($startRows);
+        $('.voy-timeline').append($startItem);
+
+        timeline.forEach(timeData => {
+            const timePoint = timeData.time_point;
+            const timeStamp = timeData.time_stamp;
+            const predictions = timeData.predictions;
+            const $timelineItem = $('<li class="voy-item"></li>');
+            const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false">
+                                <img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"
+                                       alt="마커 아이콘" />
+                                 </button>`);
+            $timelineItem.append($voyNode);
+            const $voyRows = $('<div class="voy-rows"></div>');
+            $voyRows.append(`<div class="voy-label">출항 후 ${timePoint}시간</div>`);
+
+            if (predictions && predictions.length > 0) {
+                predictions.forEach(prediction => {
+                    const $predictionRow = $(`
+                <div class="voy-row">
+                    <button class="pillbtn" type="button">Top-${prediction.rank}</button>
+                    <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
+                </div>
+                `);
+                    $voyRows.append($predictionRow);
                 });
             }
+            $timelineItem.append($voyRows);
+            $('.voy-timeline').append($timelineItem);
         });
-    }
 
-    // latest의 최종 마커 추가
-    if (resp.latest && resp.latest.lat && resp.latest.lon) {
-        lastMarker = {
-            coordinates: [resp.latest.lon, resp.latest.lat],
-            description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`
-        };
-    }
-
-    // 4. 지도 함수 호출
-    if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
-        window.drawRoutes(routes);
-        window.drawMarkers(validMarkers, lastMarker);
-        // 조회 시 3개 항구 마커도 보이도록 변경
-        window.togglePortMarkersByRank([1, 2, 3]);
-        window.toggleMarkersVisibility(true);
-    } else {
-        console.error("Map functions are not available.");
-    }
-});
-
-// 예측 결과 박스 클릭 이벤트 (개별 토글 로직)
-$(document).on('click', '.box.one, .box.two, .box.three', function () {
-    // 조회 결과가 없으면 함수를 실행하지 않음
-    if (!globalRoutesData || globalRoutesData.length === 0) {
-        console.warn('globalRoutesData is empty. Cannot draw routes.');
-        return;
-    }
-
-    const $box = $(this);
-
-    // 1. 클릭된 박스의 활성/비활성 상태를 토글
-    $box.toggleClass('is-active');
-
-    // 2. 현재 활성화 상태인 모든 박스를 찾아서 rank를 추출
-    const activeRanks = [];
-    $('.box.is-active').each(function () {
-        // .one, .two, .three 클래스를 사용하여 rank를 안전하게 추출
-        const rank = $(this).hasClass('one') ? 1 : ($(this).hasClass('two') ? 2 : 3);
-        activeRanks.push(rank);
-    });
-
-    // 3. 활성화된 rank에 해당하는 항로만 필터링
-    const routesToDraw = globalRoutesData.filter(route => activeRanks.includes(route.rank));
-
-    // 4. 필터링된 항로 배열로 지도 다시 그리기
-    window.drawRoutes(routesToDraw);
-
-    // 5. 예측 항구 마커 토글
-    // 활성화된 rank에 해당하는 항구 마커만 표시
-    if (typeof window.togglePortMarkersByRank === 'function') {
-        window.togglePortMarkersByRank(activeRanks);
-    }
-
-    const isRank1Active = $('.box.one').hasClass('is-active');
-    if (typeof window.toggleMarkersVisibility === 'function') {
-        window.toggleMarkersVisibility(isRank1Active);
-    }
-});
-
-// Rank 1에 해당하는 마커들을 토글합니다.
-function toggleMarkersForRank1(isVisible) {
-    if (typeof window.toggleMarkersVisibility === 'function') {
-        window.toggleMarkersVisibility(isVisible);
-    } else {
-        console.warn("toggleMarkersVisibility 함수가 map.js에 존재하지 않습니다.");
-    }
-}
-
-// 초기화 버튼 : 페이지 최초 상태로 되돌리기
-$(document).on('click', '.sidebar__row .sidebar__btn:not(.primary)', function () {
-    // 1) 입력값 비우기
-    $('.sidebar__input').val('');
-
-    // 2) 셀렉트(MMSI)로 복구
-    const $wrap = $('.cselect');
-    $wrap.find('.cselect__option').attr('aria-selected', 'false');
-    $wrap.find('.cselect__option[data-value="MMSI"]').attr('aria-selected', 'true');
-    $wrap.find('.cselect__value').text('MMSI').attr('data-value', 'MMSI');
-    const name = $wrap.data('name');
-    let $hidden = $wrap.find(`input[type="hidden"][name="${name}"]`);
-    if (!$hidden.length) {
-        $hidden = $('<input>', { type: 'hidden', name });
-        $wrap.append($hidden);
-    }
-    $hidden.val('MMSI');
-    $wrap.removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
-
-    // 3) 결과 영역 숨기기 및 스크롤 상단으로
-    // 첫 번째 슬라이드(선박 정보, 예측 결과)의 내용만 숨김
-    $('#sidebar-content').addClass('is-hidden');
-
-    // 예측 박스 활성 상태 초기화 및 전역 데이터 비우기
-    $('.box').removeClass('is-active');
-    globalRoutesData = [];
-    globalPredictions = [];
-
-    // 지도에서 항로와 마커 지우기
-    window.clearRoutesAndMarkers();
-    // 모든 항구 마커 다시 표시
-    window.showAllPortMarkers();
-
-    // 두 번째 슬라이드(타임라인)의 내용만 비움
-    // 제목과 밑줄은 그대로 유지됩니다.
-    clearTimeline();
-
-    // 입력 필드 활성화
-    $('.sidebar__input')
-        .prop('disabled', false)
-        .removeAttr('aria-disabled')
-        .removeClass('is-locked');
-    $('.cselect__control').prop('disabled', false);
-});
-
-/**
- * 타임라인 내용을 지우고 제목은 유지하는 함수
- */
-function clearTimeline() {
-    $('.voy-timeline').empty();
-}
-
-// ───────── JSON 데이터를 화면에 표시 ─────────
-function displayPredictionResults(predictions) {
-    if (!predictions || predictions.length === 0) {
-        console.warn('예측 데이터가 없습니다.');
-        return;
-    }
-
-    // 각 박스를 업데이트
-    predictions.forEach(prediction => {
-        let boxSelector;
-        if (prediction.rank === 1) {
-            boxSelector = '.box.one';
-        } else if (prediction.rank === 2) {
-            boxSelector = '.box.two';
-        } else if (prediction.rank === 3) {
-            boxSelector = '.box.three';
-        }
-
-        if (boxSelector) {
-            const $box = $(boxSelector);
-            // rank 1은 .num을, 나머지는 .head__label을 직접 찾습니다.
-            if (prediction.rank === 1) {
-                $box.find('.head__label.num').text(`${prediction.rank}`);
-            } else {
-                // 'Top - 2'에서 'Top - '를 제거하고 숫자만 업데이트
-                const $label = $box.find('.head__label');
-                $label.text(`Top - ${prediction.rank}`);
-            }
-            $box.find('.box__head strong').text(`${(prediction.prob * 100).toFixed(2)}%`);
-            $box.find('.last').text(prediction.port_id);
-        }
-    });
-}
-
-
-// 간단 토글 + 선택 저장
-$(document).on('click', '.cselect__control', function () {
-    const $wrap = $(this).closest('.cselect');
-    const open = $wrap.toggleClass('is-open').hasClass('is-open');
-    $(this).attr('aria-expanded', open);
-});
-
-// 옵션 클릭
-$(document).on('click', '.cselect__option', function () {
-    const $opt = $(this);
-    const $wrap = $opt.closest('.cselect');
-    const value = $opt.data('value');
-    const text = $opt.text();
-
-    // 값/표시 업데이트
-    $wrap.find('.cselect__option').attr('aria-selected', 'false');
-    $opt.attr('aria-selected', 'true');
-    $wrap.find('.cselect__value').text(text).attr('data-value', value);
-
-    // hidden input에 값 저장 (form 전송용)
-    const name = $wrap.data('name');
-    let $hidden = $wrap.find('input[type="hidden"][name="' + name + '"]');
-    if (!$hidden.length) {
-        $hidden = $('<input>', { type: 'hidden', name });
-        $wrap.append($hidden);
-    }
-    $hidden.val(value);
-
-    // 닫기
-    $wrap.removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
-});
-
-// 바깥 클릭 시 닫기
-$(document).on('click', function (e) {
-    if ($(e.target).closest('.cselect').length === 0) {
-        $('.cselect.is-open').removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
-    }
-});
-
-// 아이콘 
-// 초기: predict가 기본 활성
-$(function () {
-    // predict 탭/패널 기본 활성
-    $('.sidebar__topbox .iconwrap[data-panel="predict"]').addClass('is-active');
-    $('.panel--predict').addClass('is-active');
-});
-
-// 상단 아이콘(버튼) 클릭 → 패널 전환 + 활성 표시
-$(document).on('click', '.sidebar__topbox .iconwrap', function () {
-    const target = $(this).data('panel'); // 'predict' | 'log'
-
-    // 탭 활성 토글
-    $('.sidebar__topbox .iconwrap').removeClass('is-active');
-    $(this).addClass('is-active');
-
-    // 패널 전환 (is-active + hidden 속성 토글)
-    $('.panel').removeClass('is-active').attr('hidden', true);
-    $(`.panel--${target}`).addClass('is-active').removeAttr('hidden');
-
-    // mapbox 리사이즈
-    window.dispatchEvent(new Event('resize'));
-});
-
-
-
-// 아이콘 버튼 클릭 → ON/OFF 토글 + 커스텀 이벤트 알림
-document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.map-icon-ctrl .iconbtn');
-    if (!btn) return;
-
-    const type = btn.dataset.type;            // 'map' | 'congestion' | 'weather'
-    const on = !btn.classList.contains('is-on');
-
-    btn.classList.toggle('is-on', on);
-
-    // 기존 로직과 동일: 외부에서 듣고 레이어 on/off 처리
-    document.dispatchEvent(new CustomEvent('panel:toggle', {
-        detail: { type, on }
-    }));
-});
-
-/* 예시: 버튼에 따라 동작 다르게 처리 할 경우
-document.addEventListener('panel:toggle', (e) => {
-  const { type, on } = e.detail;
-  if (type === 'map') {
-    // 지도 스타일 토글 처리
-  } else if (type === 'congestion') {
-    // 혼잡도 레이어 on/off
-  } else if (type === 'weather') {
-    // 날씨 레이어 on/off
-  }
-});
-*/
-
-
-
-// --------------- 로그 슬라이드 영역 기능 추가
-
-// timeline 데이터를 화면에 표시하는 기능
-function displayTimelineResults(timeline, latest) {
-    // 1. 기존 타임라인 내용을 비웁니다.
-    $('.voy-timeline').empty();
-
-    if (!timeline || timeline.length === 0) {
-        // 데이터가 없으면 빈 상태로 유지하거나, '데이터 없음' 메시지를 표시할 수 있습니다.
-        // 예를 들어: $('.voy-timeline').append('<li>데이터가 없습니다.</li>');
-        return;
-    }
-
-    // 부산항(출발항) 맨 위 고정
-    const $startItem = $('<li class="voy-item"></li>');
-    const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false">
-                            <img src="/images/portpredictImages/vessel_Icon.png" th:src="@{/images/portpredictImages/vessel_Icon.png}"
-                                 alt="출발항 아이콘" />
-                        </button>`);
-    const $startRows = $('<div class="voy-rows"></div>');
-    $startRows.append(`<div class="voy-label">KRBUS</div>`);
-
-    const $startRow = $(`<div class="voy-row">
-                             <div class="depart_pillbtn">ATD</div>
-                             <div class="voy-chip">${latest.departure_time}</div>
-                         </div>`);
-    $startRows.append($startRow); // voy-rows에 voy-row 추가
-
-    $startItem.append($startNode);
-    $startItem.append($startRows);
-
-    $('.voy-timeline').append($startItem);
-
-    // timeline 루프 돌기
-    timeline.forEach(timeData => {
-        const timePoint = timeData.time_point;
-        const timeStamp = timeData.time_stamp;
-        const predictions = timeData.predictions;
-
-        // 각 time_point에 대한 리스트 아이템(<li>) 생성
-        const $timelineItem = $('<li class="voy-item"></li>');
-
-        // 타임 노드 버튼 생성
-        const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false">
-                                <img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"
-                                     alt="마커 아이콘" />
-                            </button>`);
-        $timelineItem.append($voyNode);
-
-        // 시간 정보와 예측 결과 컨테이너 생성
-        const $voyRows = $('<div class="voy-rows"></div>');
-        $voyRows.append(`<div class="voy-label">출항 후 ${timePoint}시간</div>`);
-
-        // 예측 결과 (predictions) 목록 생성
-        if (predictions && predictions.length > 0) {
-            predictions.forEach(prediction => {
-                const $predictionRow = $(`
-                    <div class="voy-row">
-                        <button class="pillbtn" type="button">Top-${prediction.rank}</button>
-                        <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
-                    </div>
-                `);
-                $voyRows.append($predictionRow);
-            });
-        }
-        $timelineItem.append($voyRows);
-
-        // 완성된 타임라인 항목을 ol 태그에 추가
-        $('.voy-timeline').append($timelineItem);
-    });
-
-    // --------------- 현재 시점 정보 추가 (latest 객체 사용) ---------------
-    if (latest && latest.time_point !== undefined && latest.predictions) {
-        const $latestItem = $('<li class="voy-item"></li>');
-        const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false">
+        if (latest && latest.time_point !== undefined && latest.predictions) {
+            const $latestItem = $('<li class="voy-item"></li>');
+            const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false">
                                     <img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"
-                                         alt="마커 아이콘" />
-                               </button>`);
-        $latestItem.append($latestNode);
+                                           alt="마커 아이콘" />
+                                   </button>`);
+            $latestItem.append($latestNode);
+            const $latestRows = $('<div class="voy-rows"></div>');
+            $latestRows.append(`<div class="voy-label">현재 시점 (출항 후 ${latest.time_point}시간)</div>`);
 
-        const $latestRows = $('<div class="voy-rows"></div>');
-        $latestRows.append(`<div class="voy-label">현재 시점 (출항 후 ${latest.time_point}시간)</div>`);
-
-        if (latest.predictions.length > 0) {
-            latest.predictions.forEach(prediction => {
-                const $predictionRow = $(`
-                    <div class="voy-row">
-                        <button class="pillbtn" type="button">Top-${prediction.rank}</button>
-                        <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
-                    </div>
+            if (latest.predictions.length > 0) {
+                latest.predictions.forEach(prediction => {
+                    const $predictionRow = $(`
+                <div class="voy-row">
+                    <button class="pillbtn" type="button">Top-${prediction.rank}</button>
+                    <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
+                </div>
                 `);
-                $latestRows.append($predictionRow);
-            });
+                    $latestRows.append($predictionRow);
+                });
+            }
+            $latestRows.append(`<div class="voy-row"></div>`);
+            $latestItem.append($latestRows);
+            $('.voy-timeline').append($latestItem);
         }
-        $latestRows.append(`<div class="voy-row"></div>`);
-        $latestItem.append($latestRows);
-        $('.voy-timeline').append($latestItem);
     }
 
-    // --------------- 현재 시점 정보 추가 끝 ---------------
-}
+    // 2) 슬라이드 원형 : 회색 <-> 파랑 + 팝 애니메이션
+    $(document).on('click', '.voy-node', function () {
+        const $node = $(this);
+        $node.toggleClass('is-active');
+        $node.addClass('is-pop');
+        const prev = $node.data('popTimer');
+        if (prev) clearTimeout(prev);
+        const timer = setTimeout(() => {
+            $node.removeClass('is-pop');
+        }, 180);
+        $node.data('popTimer', timer);
+    });
 
-// --------------- 로그 슬라이드 영역 기능 끝
-
-// 2) 슬라이드 원형 : 회색 <-> 파랑 + 팝 애니메이션
-$(document).on('click', '.voy-node', function () {
-    const $node = $(this);
-
-    // 색상/상태 토글 (기존 동작)
-    $node.toggleClass('is-active');
-
-    // --- 클릭 팝 애니메이션 ---
-    $node.addClass('is-pop');              // scale up
-    const prev = $node.data('popTimer');   // 이전 타이머 있으면 정리
-    if (prev) clearTimeout(prev);
-    const timer = setTimeout(() => {
-        $node.removeClass('is-pop');       // 원래 크기로 복귀
-    }, 180); // CSS transition 시간과 비슷하게
-    $node.data('popTimer', timer);
+    function hasPredictResult() {
+        return !$('#predict-content').hasClass('is-hidden');
+    }
+    function openSaveModal() {
+        $('#saveModal').addClass('is-open').attr('aria-hidden', 'false');
+    }
+    function closeSaveModal() {
+        $('#saveModal').removeClass('is-open').attr('aria-hidden', 'true');
+    }
+    $(document).on('click', '.sidebar__btn.save', function () {
+        if (!hasPredictResult()) {
+            alert('먼저 [조회]를 실행해 결과를 확인한 뒤 저장버튼을 클릭해주세요.');
+            return;
+        }
+        openSaveModal();
+    });
+    $(document).on('click', '#saveModal [data-action="no"]', function () {
+        closeSaveModal();
+    });
+    $(document).on('click', '#saveModal .modal__bg, #saveModal [data-action="close"]', function () {
+        closeSaveModal();
+    });
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && $('#saveModal').hasClass('is-open')) {
+            closeSaveModal();
+        }
+    });
+    $(document).on('click', '#saveModal [data-action="yes"]', function () {
+        closeSaveModal();
+        setTimeout(function () {
+            alert('저장되었습니다. "마이페이지 > 내 선박 정보" 에서 확인하세요.');
+        }, 50);
+    });
 });
 
-
-
-
-// 조회가 끝났는지 여부를 판단하는 헬퍼
-function hasPredictResult() {
-    // 조회 후 결과 영역이 열려 있으면 true
-    return !$('#sidebar-content').hasClass('is-hidden');
-}
-
-// 모달 제어
-function openSaveModal() {
-    $('#saveModal').addClass('is-open').attr('aria-hidden', 'false');
-}
-function closeSaveModal() {
-    $('#saveModal').removeClass('is-open').attr('aria-hidden', 'true');
-}
-
-// [결과 저장] 클릭
-$(document).on('click', '.sidebar__btn.save', function () {
-    if (!hasPredictResult()) {
-        alert('먼저 [조회]를 실행해 결과를 확인한 뒤 저장버튼을 클릭해주세요.');
+// 선박 정보를 찾아 HTML에 업데이트하는 함수
+function updateVesselInfo(type, value) {
+    let dataKey;
+    if (type && type.toLowerCase() === 'mmsi') {
+        dataKey = 'vsl_mmsi';
+    } else if (type && type.toLowerCase() === 'imo') {
+        dataKey = 'vsl_imo';
+    } else {
+        console.error("Invalid vessel ID type:", type);
+        alert('유효하지 않은 선박 ID 유형입니다.');
         return;
     }
-    openSaveModal();
-});
+    const foundVessel = vesselData.find(vessel => {
+        const csvValue = String(vessel[dataKey] || '').trim().replace(/[^0-9]/g, '');
+        const inputValue = value.trim().replace(/[^0-9]/g, '');
+        console.log(`--- Debugging Search ---`);
+        console.log(`Search Type: ${type}`);
+        console.log(`Column Key: ${dataKey}`);
+        console.log(`CSV Value (Cleaned): '${csvValue}'`);
+        console.log(`Input Value (Cleaned): '${inputValue}'`);
+        console.log(`Match Result: ${csvValue === inputValue}`);
+        console.log(`------------------------`);
+        return csvValue === inputValue;
+    });
 
-// 모달: 아니오
-$(document).on('click', '#saveModal [data-action="no"]', function () {
-    // 그냥 닫고, 화면/데이터는 그대로 유지
-    closeSaveModal();
-});
-
-// 모달: 바깥 클릭으로 닫기
-$(document).on('click', '#saveModal .modal__bg, #saveModal [data-action="close"]', function () {
-    closeSaveModal();
-});
-
-// 모달: ESC로 닫기
-$(document).on('keydown', function (e) {
-    if (e.key === 'Escape' && $('#saveModal').hasClass('is-open')) {
-        closeSaveModal();
+    if (foundVessel) {
+        $('.sidebar__vesselinfo .kv strong:eq(0)').text(foundVessel.call_sign || '정보 없음');
+        $('.sidebar__vesselinfo .kv strong:eq(1)').text(foundVessel.ship_type || '정보 없음');
+        $('.sidebar__vesselinfo .kv strong:eq(2)').text(foundVessel.vsl_length ? foundVessel.vsl_length + ' m' : '정보 없음');
+        $('.sidebar__vesselinfo .kv strong:eq(3)').text(foundVessel.vsl_width ? foundVessel.vsl_width + ' m' : '정보 없음');
+        $('#predict-content').removeClass('is-hidden');
+    } else {
+        alert('일치하는 선박 정보가 없습니다.');
+        $('#predict-content').addClass('is-hidden');
     }
-});
-
-// 모달: 예 → (테스트) 저장 완료 알림 후 그대로 유지
-$(document).on('click', '#saveModal [data-action="yes"]', function () {
-    closeSaveModal();
-
-    // 실제 저장 API가 붙기 전 임시 처리
-    // ※ 여기서 AJAX 붙이면 됨. 성공 콜백에서 아래 alert 실행.
-    setTimeout(function () {
-        alert('저장되었습니다. "마이페이지 > 내 선박 정보" 에서 확인하세요.');
-    }, 50);
-});
-
-
-
+}
