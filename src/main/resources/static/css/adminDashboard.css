@@ -1,7 +1,6 @@
 /* ============================
-   Admin UI — 공통 스타일 (단일 파일)
-   페이지 구분: body.page-dashboard / body.page-news
-   차트 카드: .adm-card--chart + .chart-canvas
+   Admin UI — 통합 스타일シート
+   적용 범위: Dashboard, News 관리
    ============================ */
 
 /* ------- 색상/토큰 ------- */
@@ -16,16 +15,15 @@
     --adm-shadow: 0 6px 18px rgba(0, 0, 0, .06);
 
     --sb-width: 220px;
-    /* 사이드바 펼친 폭 */
     --sb-width-collapsed: 64px;
-    /* 사이드바 접힘 폭 */
 }
 
+/* ------- 기본 ------- */
 html,
 body {
     height: 100%;
     max-width: 100%;
-    overflow-x: hidden
+    overflow-x: hidden;
 }
 
 body {
@@ -34,13 +32,14 @@ body {
     color: var(--adm-text);
 }
 
-/* ------- 사이드바 레이아웃 ------- */
+/* ------- 레이아웃 ------- */
 body.has-sidebar {
     display: flex;
     min-height: 100vh;
-    background: #f6f7fb
+    background: var(--adm-bg);
 }
 
+/* 사이드바 */
 .adm-sidebar {
     position: fixed;
     top: 0;
@@ -51,20 +50,21 @@ body.has-sidebar {
     color: #cbd5e1;
     z-index: 1000;
     padding: 16px 0;
+    transition: width .25s ease;
 }
 
 .adm-sidebar__brand {
     font-weight: 700;
     font-size: 18px;
     margin: 6px 12px 16px;
-    color: #fff
+    color: #fff;
 }
 
 .adm-nav {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 0 8px
+    padding: 0 8px;
 }
 
 .adm-nav__link {
@@ -72,24 +72,28 @@ body.has-sidebar {
     padding: 12px 14px;
     border-radius: 10px;
     color: #cbd5e1;
-    text-decoration: none
+    text-decoration: none;
+    transition: background .2s ease;
 }
 
 .adm-nav__link:hover,
 .adm-nav__link.is-active {
     background: #1f2937;
-    color: #fff
+    color: #fff;
 }
 
+/* 콘텐츠 */
 .adm-content {
     margin-left: var(--sb-width);
     width: calc(100% - var(--sb-width));
     min-width: 0;
     flex: 1;
+    transition: margin-left .25s ease, width .25s ease;
 }
 
+/* 사이드바 접힘 */
 body.sb-collapsed .adm-sidebar {
-    width: var(--sb-width-collapsed)
+    width: var(--sb-width-collapsed);
 }
 
 body.sb-collapsed .adm-content {
@@ -97,9 +101,10 @@ body.sb-collapsed .adm-content {
     width: calc(100% - var(--sb-width-collapsed));
 }
 
+/* 반응형 */
 @media (max-width:1024px) {
     .adm-sidebar {
-        width: var(--sb-width-collapsed)
+        width: var(--sb-width-collapsed);
     }
 
     .adm-content {
@@ -118,18 +123,18 @@ body.sb-collapsed .adm-content {
     justify-content: space-between;
     padding: 16px 20px;
     background: var(--adm-card);
-    box-shadow: var(--adm-shadow)
+    box-shadow: var(--adm-shadow);
 }
 
 .adm-header__left {
     display: flex;
     align-items: center;
-    gap: 10px
+    gap: 10px;
 }
 
 .adm-title {
     font-size: 20px;
-    font-weight: 700
+    font-weight: 700;
 }
 
 /* ------- 버튼 ------- */
@@ -142,15 +147,16 @@ body.sb-collapsed .adm-content {
     border: 1px solid var(--adm-border);
     background: var(--adm-card);
     border-radius: 10px;
-    cursor: pointer
+    cursor: pointer;
+    transition: box-shadow .2s ease;
 }
 
 .adm-btn:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08)
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
 }
 
 .adm-btn--ghost {
-    background: var(--adm-ghost)
+    background: var(--adm-ghost);
 }
 
 .adm-dot {
@@ -161,46 +167,46 @@ body.sb-collapsed .adm-content {
     border-radius: 50%;
     position: absolute;
     right: -4px;
-    top: -4px
+    top: -4px;
 }
 
 .adm-dot.show {
-    display: inline-block
+    display: inline-block;
 }
 
 /* ------- 카드/그리드 ------- */
 .adm-wrap {
     max-width: 1200px;
     margin: 24px auto;
-    padding: 0 16px
+    padding: 0 16px;
 }
 
 .adm-grid {
     display: grid;
-    gap: 16px
+    grid-gap: 20px;
 }
 
 /* 대시보드: 2열 */
 .page-dashboard .adm-grid {
-    grid-template-columns: 1fr 1fr
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-gap: 20px;
+    /* 카드 사이 간격 */
 }
 
-@media (max-width:900px) {
-    .page-dashboard .adm-grid {
-        grid-template-columns: 1fr
-    }
+/* 최근 문의 카드는 가로 전체 */
+.page-dashboard .adm-card--full {
+    grid-column: 1 / -1;
 }
 
+
+/* 카드 */
 .adm-card {
     background: var(--adm-card);
     border-radius: 16px;
     box-shadow: var(--adm-shadow);
     overflow: hidden;
-    height: auto
-}
-
-.adm-card--full {
-    grid-column: 1 / -1
+    height: auto;
 }
 
 .adm-card__hd {
@@ -208,46 +214,42 @@ body.sb-collapsed .adm-content {
     align-items: center;
     justify-content: space-between;
     padding: 16px 16px 8px;
-    border-bottom: 1px solid var(--adm-border)
+    border-bottom: 1px solid var(--adm-border);
 }
 
 .adm-card__hd h3 {
     font-size: 16px;
-    font-weight: 700
+    font-weight: 700;
 }
 
 .adm-card__bd {
-    padding: 16px
+    padding: 16px;
 }
 
-/* 도구줄 */
 .adm-card__tools {
     display: flex;
     align-items: center;
-    gap: 8px
+    gap: 8px;
 }
 
 .adm-select {
     padding: 6px 8px;
     border: 1px solid var(--adm-border);
     border-radius: 8px;
-    background: #fff
+    background: #fff;
 }
 
 .adm-inline {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: var(--adm-muted)
+    color: var(--adm-muted);
 }
 
-/* ------- 차트 카드 전용 ------- */
+/* ------- 차트 카드 ------- */
 .adm-card--chart .adm-card__bd {
     height: 320px;
-    /* 차트 높이 고정 */
     position: relative;
-    padding: 16px;
-    /* 카드 안 여백 */
 }
 
 .chart-canvas {
@@ -255,67 +257,65 @@ body.sb-collapsed .adm-content {
     inset: 0;
     width: 100% !important;
     height: 100% !important;
-    display: block
 }
 
 /* ------- 표/리스트 ------- */
 .adm-table-wrap {
     width: 100%;
-    overflow: auto
+    overflow: auto;
 }
 
 .adm-table {
     width: 100%;
-    border-collapse: collapse
+    border-collapse: collapse;
 }
 
 .adm-table th,
 .adm-table td {
     border-bottom: 1px solid var(--adm-border);
     padding: 10px 12px;
-    text-align: left
+    text-align: left;
 }
 
 .adm-table thead th {
     background: #fafafa;
-    font-weight: 700
+    font-weight: 700;
 }
 
 .adm-table td.ellipsis {
     max-width: 480px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis
+    text-overflow: ellipsis;
 }
 
 .adm-empty {
     color: var(--adm-muted);
-    padding: 16px
+    padding: 16px;
 }
 
-/* 리스트 (스크롤 영역이 필요한 섹션에서만 쓰기) */
 .adm-list {
     max-height: 360px;
-    overflow: auto
+    overflow: auto;
 }
 
 .adm-item {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--adm-border)
+    border-bottom: 1px solid var(--adm-border);
 }
 
 .adm-item:last-child {
-    border-bottom: none
+    border-bottom: none;
 }
 
 .adm-item__title {
     font-weight: 700;
-    margin-bottom: 4px
+    margin-bottom: 4px;
 }
 
 .adm-item__meta {
     color: var(--adm-muted);
-    font-size: 12px
+    font-size: 12px;
 }
 
 /* ------- 드로어 / 오버레이 ------- */
@@ -332,11 +332,11 @@ body.sb-collapsed .adm-content {
     z-index: 1100;
     display: flex;
     flex-direction: column;
-    border-left: 1px solid rgba(0, 0, 0, .06)
+    border-left: 1px solid rgba(0, 0, 0, .06);
 }
 
 .adm-drawer.open {
-    transform: translateX(0)
+    transform: translateX(0);
 }
 
 .adm-drawer__hd {
@@ -348,13 +348,13 @@ body.sb-collapsed .adm-content {
     position: sticky;
     top: 0;
     background: #fff;
-    z-index: 1
+    z-index: 1;
 }
 
 .adm-drawer__bd {
     padding: 12px 16px 20px;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch
+    -webkit-overflow-scrolling: touch;
 }
 
 .adm-overlay {
@@ -364,24 +364,24 @@ body.sb-collapsed .adm-content {
     opacity: 0;
     pointer-events: none;
     transition: opacity .2s ease;
-    z-index: 1090
+    z-index: 1090;
 }
 
 .adm-overlay.show {
     opacity: 1;
-    pointer-events: auto
+    pointer-events: auto;
 }
 
 body.no-scroll {
     overflow: hidden;
-    overscroll-behavior: contain
+    overscroll-behavior: contain;
 }
 
-/* 문의 로그 아이템 */
+/* ------- 문의 로그 ------- */
 .adm-loglist {
     list-style: none;
     margin: 0;
-    padding: 0
+    padding: 0;
 }
 
 .adm-logitem {
@@ -393,15 +393,15 @@ body.no-scroll {
     padding: 12px 14px;
     border-bottom: 1px solid var(--adm-border);
     cursor: pointer;
-    transition: background .15s ease
+    transition: background .15s ease;
 }
 
 .adm-logitem:hover {
-    background: #fafbff
+    background: #fafbff;
 }
 
 .adm-logitem.unread {
-    box-shadow: inset 3px 0 0 red
+    box-shadow: inset 3px 0 0 red;
 }
 
 .adm-logitem .badge {
@@ -414,39 +414,39 @@ body.no-scroll {
     background: #eef2ff;
     color: #3b5bfd;
     user-select: none;
-    white-space: nowrap
+    white-space: nowrap;
 }
 
 .adm-logitem.unread .badge {
     background: #ffe9ea;
-    color: red
+    color: red;
 }
 
 .adm-logitem .title {
     font-weight: 700;
     margin-top: 2px;
-    margin-right: 4px
+    margin-right: 4px;
 }
 
 .adm-logitem .title.ellipsis {
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis
+    text-overflow: ellipsis;
 }
 
 .adm-logitem .meta {
     color: var(--adm-muted);
-    font-size: 12px
+    font-size: 12px;
 }
 
 .badge-new {
     background: #fee2e2;
-    color: #991b1b
+    color: #991b1b;
 }
 
 .badge-done {
     background: #e5e7eb;
-    color: #374151
+    color: #374151;
 }
 
 /* ------- 토스트 ------- */
@@ -463,29 +463,26 @@ body.no-scroll {
     transform: translateY(14px);
     transition: opacity .25s ease, transform .25s ease;
     max-width: 360px;
-    line-height: 1.4
+    line-height: 1.4;
 }
 
 .adm-toast.show {
     opacity: 1;
-    transform: translateY(0)
+    transform: translateY(0);
 }
 
 /* =========================================================
    페이지별 보정
    ========================================================= */
 
-/* (뉴스 관리) — 카드가 내용만큼 늘어나도록: 고정 높이 해제 */
+/* 뉴스 관리: 카드 자동 높이 */
 .page-news .adm-card__bd {
     max-height: none;
     overflow: visible;
     padding-bottom: 16px;
 }
 
-/* (뉴스 관리) — 표 컨테이너: 가로만 스크롤, 세로는 카드가 커짐 */
 .page-news .adm-table-wrap {
     overflow-x: auto;
-    overflow-y: visible
+    overflow-y: visible;
 }
-
-/* (대시보드) — 그리드/차트는 위 기본 규칙 사용 */
