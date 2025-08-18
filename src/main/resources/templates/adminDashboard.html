@@ -13,87 +13,130 @@
     <!-- 대시보드 전용 CSS -->
     <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
 
-    <!-- Chart.js & jQuery -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
-<body>
-    <!-- 헤더 -->
-    <header class="adm-header">
-        <div class="adm-header__left">
-            <h1 class="adm-title">관리자 대시보드</h1>
-        </div>
-        <div class="adm-header__right">
-            <button id="askBtn" class="adm-btn">
-                문의관리
-                <span id="noticeDot" class="adm-dot" aria-hidden="true"></span>
-            </button>
-        </div>
-    </header>
+<body class="has-sidebar">
+    <!-- ===== 사이드바 ===== -->
+    <aside class="adm-sidebar page-dashboard">
+        <div class="adm-sidebar__brand">관리</div>
+        <nav class="adm-nav">
+            <a href="/admin" class="adm-nav__link" data-match="/admin($|/)"><span>대시보드</span></a>
+            <a href="/admin/news" class="adm-nav__link" data-match="/admin/news"><span>뉴스 관리</span></a>
+        </nav>
+    </aside>
 
-    <!-- 컨텐츠 -->
-    <main class="adm-wrap">
-        <section class="adm-grid">
-            <!-- 카드 1: 사용자 유형 도넛 -->
-            <article class="adm-card">
-                <div class="adm-card__hd">
-                    <h3>사용자 유형 분포</h3>
-                </div>
-                <div class="adm-card__bd">
-                    <canvas id="userTypeChart" height="220"></canvas>
-                </div>
-            </article>
+    <!-- ===== 메인 컨텐츠 래퍼 ===== -->
+    <div class="adm-content">
+        <!-- 헤더 -->
+        <header class="adm-header">
+            <div class="adm-header__left">
+                <button id="sbToggle" class="adm-btn adm-btn--ghost" type="button" aria-label="메뉴">☰</button>
+                <h1 class="adm-title">관리자 대시보드</h1>
+            </div>
+            <div class="adm-header__right">
+                <button id="askBtn" class="adm-btn" type="button" aria-haspopup="dialog" aria-controls="askLogPanel">
+                    문의관리 <span id="noticeDot" class="adm-dot"></span>
+                </button>
+            </div>
+        </header>
 
-            <!-- 카드 2: 월별 주차 가입자 수 -->
-            <article class="adm-card">
-                <div class="adm-card__hd">
-                    <h3>월별 주차 가입자 수</h3>
-                    <div class="adm-card__tools">
-                        <label class="adm-inline">
-                            최근
-                            <select id="weeksSelect" class="adm-select">
-                                <option value="8">8주</option>
-                                <option value="12" selected>12주</option>
-                                <option value="16">16주</option>
-                                <option value="24">24주</option>
-                            </select>
-                        </label>
+        <!-- 컨텐츠 -->
+        <main class="adm-wrap">
+            <section class="adm-grid">
+                <!-- 카드 1: 사용자 유형 도넛 -->
+                <article class="adm-card">
+                    <div class="adm-card__hd">
+                        <h3>사용자 유형 분포</h3>
                     </div>
-                </div>
-                <div class="adm-card__bd">
-                    <canvas id="weeklySignupChart" height="220"></canvas>
-                </div>
-            </article>
-
-            <!-- 카드 3: 최근 문의 + 실시간 -->
-            <article class="adm-card adm-card--full">
-                <div class="adm-card__hd">
-                    <h3>최근 문의</h3>
-                    <div>
-                        <button id="refreshAsk" class="adm-btn adm-btn--ghost">새로고침</button>
+                    <div class="adm-card__bd">
+                        <canvas id="userTypeChart" height="220" aria-label="사용자 유형 도넛 차트"></canvas>
                     </div>
-                </div>
-                <div id="askList" class="adm-list" aria-live="polite" aria-busy="false">
-                    <!-- JS가 채움 -->
-                </div>
-            </article>
-        </section>
-    </main>
+                </article>
 
-    <!-- 토스트 -->
-    <div id="toast" class="adm-toast" role="status" aria-live="polite"></div>
+                <!-- 카드 2: 월별 주차 가입자 수 -->
+                <article class="adm-card">
+                    <div class="adm-card__hd">
+                        <h3>월별 주차 가입자 수</h3>
+                        <div class="adm-card__tools">
+                            <label class="adm-inline">
+                                최근
+                                <select id="weeksSelect" class="adm-select" aria-label="조회 주차 선택">
+                                    <option value="4" selected>4주</option>
+                                    <option value="8">8주</option>
+                                    <option value="12">12주</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="adm-card__bd">
+                        <canvas id="weeklySignupChart" height="220" aria-label="주차별 가입자 수 막대 차트"></canvas>
+                    </div>
+                </article>
 
-    <!-- 대시보드 JS (내가 준 JS 넣어주면 됨) -->
+                <!-- 카드 3: 최근 문의 + 실시간 -->
+                <article class="adm-card adm-card--full">
+                    <div class="adm-card__hd">
+                        <h3>최근 문의</h3>
+                        <div>
+                            <button id="refreshAsk" class="adm-btn adm-btn--ghost" type="button">새로고침</button>
+                        </div>
+                    </div>
+
+                    <div class="adm-card__bd">
+                        <div class="adm-table-wrap">
+                            <table class="adm-table" id="askTable" aria-label="최근 문의 표">
+                                <thead>
+                                    <tr>
+                                        <th style="width:80px">번호</th>
+                                        <th>문의 제목</th>
+                                        <th style="width:160px">글쓴이</th>
+                                        <th style="width:180px">시간</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="askTableBody"></tbody>
+                            </table>
+                            <div id="askEmpty" class="adm-empty" hidden>문의가 없습니다.</div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <!-- 오버레이 & 사이드 드로어(문의 로그) -->
+        <div id="drawerOverlay" class="adm-overlay" aria-hidden="true"></div>
+
+        <aside id="askLogPanel" class="adm-drawer" aria-hidden="true" aria-label="문의 로그 패널" role="dialog">
+            <header class="adm-drawer__hd">
+                <strong>문의 로그</strong>
+                <button id="closeLog" class="adm-btn adm-btn--ghost" type="button" aria-label="닫기">닫기</button>
+            </header>
+            <div class="adm-drawer__bd">
+                <ul id="logList" class="adm-loglist"></ul>
+                <div id="logEmpty" class="adm-empty" hidden>로그가 없습니다.</div>
+            </div>
+        </aside>
+
+        <!-- 토스트 -->
+        <div id="toast" class="adm-toast" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- 기존 JS -->
     <script src="/js/adminDashboard.js" th:src="@{/js/adminDashboard.js}"></script>
+
+    <!-- 사이드바 활성/접기 스크립트 -->
     <script>
-        // 선택 주차 변경 핸들링 (선택)
-        document.addEventListener('DOMContentLoaded', () => {
-            const select = document.getElementById('weeksSelect');
-            if (select && typeof loadWeeklySignups === 'function') {
-                select.addEventListener('change', () => loadWeeklySignups(Number(select.value)));
-            }
-        });
+        (function () {
+            const cur = location.pathname + location.search;
+            document.querySelectorAll('.adm-nav__link').forEach(a => {
+                const pat = a.getAttribute('data-match');
+                if (pat && new RegExp(pat).test(cur)) a.classList.add('is-active');
+            });
+            document.getElementById('sbToggle')?.addEventListener('click', () => {
+                document.body.classList.toggle('sb-collapsed');
+            });
+        })();
     </script>
 </body>
 

@@ -24,8 +24,13 @@
 
     <!-- 지도 map.js -->
     <script defer th:src="@{/js/map.js}"></script>
+
+    <!-- csv 파일 읽기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
     <!-- 지도 위 본문 내용 js -->
     <script defer th:src="@{/js/portpredict.js}"></script>
+
 </head>
 
 <body>
@@ -43,7 +48,7 @@
 
         <!-- 우상단 아이콘 컨트롤 -->
         <div class="map-icon-ctrl" aria-label="지도 보조 컨트롤">
-            <button class="iconbtn" data-type="map" data-tip="지도 스타일">
+            <button class="iconbtn" data-type="style" data-tip="지도 스타일">
                 <img src="/images/portpredictImages/map.png" th:src="@{/images/portpredictImages/map.png}"
                     alt="지도 스타일" />
             </button>
@@ -118,7 +123,7 @@
                 </div>
 
                 <!-- 가운데만 스크롤 되는 영역 -->
-                <div id="sidebar-content" class="sidebar__content is-hidden">
+                <div id="predict-content" class="sidebar__content is-hidden">
                     <!-- 선박 정보 -->
                     <div class="sidebar__vesselinfo">
                         <h3 class="sidebar__sub">선박 정보</h3>
@@ -150,7 +155,7 @@
                                         <div class="arrow">»</div>
                                         <div>
                                             <b class="last">CNSHA</b>
-                                            <div class="sub">중국 / 상하이</div>
+                                            <div class="sub dest">중국 / 상하이</div>
                                         </div>
                                     </div>
                                 </div>
@@ -173,7 +178,7 @@
                                         <div class="arrow">»</div>
                                         <div>
                                             <b class="last">HKHKG</b>
-                                            <div class="sub">홍콩 / 홍콩</div>
+                                            <div class="sub dest">홍콩 / 홍콩</div>
                                         </div>
                                     </div>
                                 </div>
@@ -196,7 +201,7 @@
                                         <div class="arrow">»</div>
                                         <div>
                                             <b class="last">TWKHH</b>
-                                            <div class="sub">대만 / 가오슝</div>
+                                            <div class="sub dest">대만 / 가오슝</div>
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +218,7 @@
             </div>
 
             <!-- 2) 로그 슬라이드 바 -->
-            <div class="sidebar__content logpanel">
+            <div id="log-content" class="sidebar__content logpanel">
                 <div class="sidebar__header">
                     <h2 class="sidebar__secondtitle">시점별 예측 타임라인</h2>
                     <hr class="secondtitle_hr">

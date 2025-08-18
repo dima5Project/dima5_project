@@ -63,6 +63,7 @@ public class PredictUserEntity {
                 .userEmail(predictUserDTO.getUserEmail())
                 .userType(predictUserDTO.getUserType())
                 .userRole(predictUserDTO.getUserRole())
+                .joinDate(predictUserDTO.getJoinDate())
                 .build();
     }
 }

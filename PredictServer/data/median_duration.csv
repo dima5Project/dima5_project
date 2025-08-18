@@ -1,4 +1,4 @@
-port_name,median_duration_hr,vessel_count
+port_id,median_duration_hr,vessel_count
 PHMNL,168.66666666666666,4
 VNHPH,118.83333333333333,9
 RUNJK,115.66666666666667,4

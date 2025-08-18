@@ -40,11 +40,12 @@ class Dima5ProjectApplicationTests {
         assertTrue(vslId.isPresent(), "vsl_id not found for mmsi=" + mmsi);
     }
 
+    // (USE HERE !!!)
 	@Test
 	void predictByImoOrMmsi() throws Exception {
     
 		// 여기서 값 imo 또는 mmsi 지정
-    String imo  = "9595802";
+    String imo  = "9187485";
     String mmsi = "373126000";
 
     Map<String, Object> result = vesselService.predictByImoOrMmsi(imo, mmsi);
