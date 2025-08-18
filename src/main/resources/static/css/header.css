@@ -244,8 +244,22 @@ a {
     justify-content: center;
     width: auto;
     /* 콘텐츠에 맞춰 늘어나도록 함 */
-    max-width: 180px;
+    max-width: 250px;
     min-width: 100px;
+}
+
+.loginBox {
+    background-color: #013895;
+    display: flex;
+    /* flexbox 사용 */
+    align-items: center;
+    justify-content: center;
+    max-width: 250px;
+    min-width: 100px;
+    height: 36px;
+    border-radius: 8px;
+    padding: 0 10px;
+    gap: 13px;
 }
 
 /* 로그인/회원가입 버튼 */
@@ -263,7 +277,7 @@ a.join_button:hover {
     font-weight: 700;
 }
 
-.login_area:hover .login_button {
+.login_area:hover .loginBox {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
@@ -276,6 +290,7 @@ a.join_button:hover {
 .user_id {
     font-size: 14px;
     font-weight: 400px;
+    color: #ffffff;
 }
 
 .login_area .submenu_wrapper {

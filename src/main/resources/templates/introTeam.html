@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -13,103 +12,88 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/introTeam.css}">
+    <link rel="stylesheet" th:href="@{/css/faq.css}">
+    <script defer th:src="@{/js/faq.js}"></script>
 
     <title>팀 소개 페이지</title>
 </head>
 
 <body>
-    <div sec:authorize="isAnonymous()">
-        <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
-    </div>
-    <div sec:authorize="isAuthenticated()">
-        <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
-    </div>
-
-    <div class="top_bg">
-        <div class="header_title">
-            <p class="title">부3갈매기</p>
-            <p class="sub_title">3조를 소개합니다</p>
+    <div class="page">
+        <div sec:authorize="isAnonymous()">
+            <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
         </div>
-    </div>
+        <div sec:authorize="isAuthenticated()">
+            <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
+        </div>
 
-    <div class="main_container">
-        <aside class="sidebar">
-            <h2 class="sidebar_title">소개페이지</h2>
-            <nav class="sidebar_nav">
-                <a th:href="@{/intro/service}" class="sidebar_link active">
-                    <span>서비스 소개</span>
-                    <img src="/images/introduceImages/move_arrow.png" th:src="@{/images/introduceImages/move_arrow.png}"
-                        alt="arrow icon">
-                </a>
-                <a th:href="@{/intro/team}" class="sidebar_link">
-                    <span>팀 소개</span>
-                    <img src="/images/introduceImages/move_arrow.png" th:src="@{/images/introduceImages/move_arrow.png}"
-                        alt="arrow icon">
-                </a>
-            </nav>
-        </aside>
+        <div class="top_bg">
+            <div class="header_title">
+                <p class="title">부3갈매기</p>
+                <p class="sub_title">3조를 소개합니다</p>
+            </div>
+        </div>
 
         <div class="main_container">
+            <aside class="sidebar">
+                <h2 class="sidebar_title">소개페이지</h2>
+                <nav class="sidebar_nav">
+                    <a th:href="@{/intro/service}" class="sidebar_link active">
+                        <span>서비스 소개</span>
+                        <img src="/images/introduceImages/move_arrow.png"
+                            th:src="@{/images/introduceImages/move_arrow.png}" alt="arrow icon">
+                    </a>
+                    <a th:href="@{/intro/team}" class="sidebar_link">
+                        <span>팀 소개</span>
+                        <img src="/images/introduceImages/move_arrow.png"
+                            th:src="@{/images/introduceImages/move_arrow.png}" alt="arrow icon">
+                    </a>
+                </nav>
+            </aside>
+
             <div class="content_area">
                 <div class="card_container">
-                    <div class="team_container">
-                        <img class="background_image" src="/images/introduceImages/portcast_team.png"
-                            th:src="@{/images/introduceImages/portcast_team.png}" alt="portcastTeam">
+                    <!-- 배경 이미지는 CSS로 넣기: url만 바꿔주세요 -->
+                    <div class="team_container" style="--bg: url('/images/introduceImages/portcast_team.png');">
 
-                        <div class="intro_wrap team_member ringu">
-                            <div class="intro_text ringu">
-                                <p class="name ringu">김규린</p>
-
-                                <div class="text_group ringu">
-                                    <p>프론트엔드</p>
-                                    <p>발표</p>
-                                </div>
+                        <!-- 규린 (메모지 중심 좌표) -->
+                        <div class="intro_wrap team_member ringu" style="--x:19%; --y:75.1%; --text-offset:30px;">
+                            <p class="name">김규린</p>
+                            <div class="text_group">
+                                <p>프론트엔드, 발표</p>
                             </div>
                         </div>
 
-                        <div class="intro_wrap team_member mejin">
-                            <div class="intro_text mejin">
-                                <p class="name">김혜진</p>
-
-                                <div class="text_group mejin">
-                                    <p>백엔드</p>
-                                    <p>기획</p>
-                                    <p>PPT</p>
-                                </div>
+                        <!-- 혜진 -->
+                        <div class="intro_wrap team_member mejin" style="--x:33.9%; --y:75.1%; --text-offset:30px;">
+                            <p class="name">김혜진</p>
+                            <div class="text_group">
+                                <p>백엔드, 기획, PPT</p>
                             </div>
                         </div>
 
-                        <div class="intro_wrap team_member jeligongju">
-                            <div class="intro_text jeligongju">
-                                <p class="name">문현진</p>
-
-                                <div class="text_group">
-                                    <p>프론트엔드</p>
-                                    <p>PPT</p>
-                                </div>
+                        <!-- 현진 -->
+                        <div class="intro_wrap team_member jeligongju"
+                            style="--x:48.8%; --y:75.1%; --text-offset:30px;">
+                            <p class="name">문현진</p>
+                            <div class="text_group">
+                                <p>프론트엔드, PPT</p>
                             </div>
                         </div>
 
-                        <div class="intro_wrap team_member ginicool">
-                            <div class="intro_text ginicool">
-                                <p class="name">배시원</p>
-
-                                <div class="text_group ginicool">
-                                    <p>백엔드</p>
-                                    <p>PPT</p>
-                                </div>
+                        <!-- 시원 -->
+                        <div class="intro_wrap team_member ginicool" style="--x:64.1%; --y:75.1%; --text-offset:30px;">
+                            <p class="name">배시원</p>
+                            <div class="text_group">
+                                <p>백엔드, PPT</p>
                             </div>
                         </div>
 
-                        <div class="intro_wrap team_member na">
-                            <div class="intro_text na">
-                                <p class="name">박근화</p>
-
-                                <div class="text_group na">
-                                    <p>프론트엔드</p>
-                                    <p>발표</p>
-                                    <p>조장</p>
-                                </div>
+                        <!-- 근화 -->
+                        <div class="intro_wrap team_member na" style="--x:79.6%; --y:75.1%; --text-offset:30px;">
+                            <p class="name">박근화</p>
+                            <div class="text_group">
+                                <p>프론트엔드, 발표, 조장</p>
                             </div>
                         </div>
 
@@ -118,7 +102,10 @@
             </div>
         </div>
 
+
+        <div th:replace="~{fragment/faq :: widget}"></div>
         <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+    </div>
 </body>
 
 </html>

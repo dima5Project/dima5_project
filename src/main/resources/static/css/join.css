@@ -53,22 +53,24 @@ input {
   padding: 20px 200px 60px 200px;
 }
 
-.signup_header {
-  /* 로고 등 상단 여백*/
-  margin: 0 50px 20px 0;
-}
-
-/* 로고 영역 */
-.logo {
-  display: inline-flex;
+.signup_header a.logo {
+  display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 0;
+  height: 80px;
 }
 
-.logo_text {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.5;
+/* 이미지 크기 조정 */
+.signup_header a.logo img:first-child {
+  width: 100px;
+  height: 60px;
+}
+
+.signup_header a.logo img:last-child {
+  height: 35px;
+  width: auto;
+  /* 높이에 맞춰 너비 자동 조정 */
 }
 
 /* 메인 영역 구조 */
