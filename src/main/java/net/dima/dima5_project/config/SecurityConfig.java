@@ -47,9 +47,9 @@ public class SecurityConfig {
                                                 "/images/**",
                                                 "/css/**",
                                                 "/js/**",
-                                                "/videos/**"
-
-                                ).permitAll() // 모든 사람들에게 주어지는 경로
+                                                "/videos/**",
+                                                "/ws-chat/**")
+                                .permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );

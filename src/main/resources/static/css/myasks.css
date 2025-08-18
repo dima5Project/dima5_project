@@ -24,7 +24,7 @@ main {
 }
 
 .qna-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
@@ -44,10 +44,10 @@ main {
     color: #ddd;
 }
 
+
 /* ================== 문의 내역 테이블 스타일 ================== */
 .table-wrap {
     max-width: 1040px;
-    /* main과 동일하게 너비 설정 */
     margin: 40px auto 20px auto;
     padding: 20px;
     background-color: #fff;

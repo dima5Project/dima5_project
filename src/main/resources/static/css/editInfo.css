@@ -50,7 +50,7 @@ body {
 
 .mp-container {
     display: grid;
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: 170px 1fr;
     gap: 24px;
 }
 
@@ -119,7 +119,7 @@ body {
 }
 
 .mp-summary__hello .hello {
-    margin: 0;
+    margin: 0 0 10px 0;
     font-size: 18px;
     font-weight: 700;
     color: #111;
@@ -149,7 +149,7 @@ body {
 .mp-summary__stats li {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     font-size: 13px;
     color: #333;
     text-align: center;
@@ -161,8 +161,7 @@ body {
     font-size: 18px;
     font-weight: 700;
     color: #013895;
-    cursor: default;
-    /* a → span 변경에 맞게 */
+    text-decoration: none;
 }
 
 /* 섹션 공통 */
