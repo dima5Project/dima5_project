@@ -18,6 +18,7 @@ a {
     text-decoration: none;
 }
 
+/* top 배경색 */
 .top_bg {
     width: 100%;
     height: 435px;
@@ -28,23 +29,24 @@ a {
     align-items: center;
 }
 
+/* top 제목, 소제목 */
 .header_title {
     position: relative;
     top: 100px;
     text-align: center;
 }
 
-.header_title.title {
+.header_title .title {
     font-size: 28px;
-    font-weight: 700px;
+    font-weight: 700;
     margin-bottom: 30px;
     color: #ffffff;
     z-index: 2;
 }
 
-.header_title.sub_title {
+.header_title .sub_title {
     font-size: 18px;
-    font-weight: 500px;
+    font-weight: 500;
     color: #ffffff;
     z-index: 2;
 }
@@ -54,6 +56,7 @@ a {
     display: flex;
     min-height: 100vh;
     padding: 20px;
+    background-color: #0081c0;
     /* 전체 페이지에 균일한 여백 */
 }
 
@@ -67,8 +70,8 @@ a {
     width: 150px;
     flex-shrink: 0;
     position: absolute;
-    top: 170px;
-    left: 180px;
+    top: 605px;
+    left: 100px;
     margin-right: 20px;
     /* 콘텐츠 영역과의 간격 */
 }
@@ -100,96 +103,24 @@ a {
     background: #f2f5f9;
 }
 
-/* 콘텐츠 영역 */
-.content_area {
-    flex-grow: 1;
-    /* 남은 공간을 모두 차지 */
-    background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    /* 카드 컨테이너를 가로 중앙에 정렬 */
-    align-items: center;
-    /* 카드 컨테이너를 세로 중앙에 정렬 */
-}
-
-/* 팀원 카드들을 담는 컨테이너 */
-.card_container {
-    display: flex;
-    justify-content: center;
-    /* 카드들을 가로 중앙에 정렬 */
-    align-items: stretch;
-    /* 모든 카드의 높이를 통일 */
-    gap: 0;
-    /* 카드 사이의 간격 */
+.team_container {
+    position: relative;
     width: 100%;
-    border-radius: 50px;
-    height: 350px;
+    /* 배경 이미지에 맞게 높이 설정 또는 비율 유지 */
+    padding: 56.25%;
 }
 
-/* 각 팀원 카드 */
-.intro_wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 150px;
-    height: 100%;
-    text-align: center;
-    background-color: #f2f5f9;
-    padding: 20px 10px;
-}
-
-.intro_wrap.first {
-    border-radius: 50px 0 0 50px;
-}
-
-.intro_wrap.end {
-    border-radius: 0 50px 50px 0;
-}
-
-.img_wrapper {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-bottom: 10px;
-    margin-top: 40px;
-    border: 2px solid #ccc;
-}
-
-.img_wrapper img.char {
+.background_image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.intro_text {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    flex-grow: 1;
-    min-height: 80px;
-    padding-top: 10px;
-    justify-content: flex-start;
-    padding-top: 10px;
-}
-
-.text_group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.intro_text .name {
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 5px;
-}
-
-.rectangle {
-    width: 30px;
-    height: 2px;
-    background-color: #013895;
-    margin-bottom: 5px;
+.team_member {
+    position: absolute;
+    top: 20%;
+    left: 10%;
 }
