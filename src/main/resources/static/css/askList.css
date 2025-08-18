@@ -30,7 +30,7 @@ main {
 
 
 .qna-header {
-    padding-top: 20vh;
+    padding-top: 12vh;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
@@ -55,14 +55,31 @@ main {
 }
 
 .qna-category button {
-    padding: 8px 16px;
+    /* 세로 크기: height + line-height */
+    height: 45px;
+    line-height: 1;
+    /* 브라우저 기본 줄높이 영향 제거 */
+
+    /* 가로 크기: padding */
+    padding: 0 35px;
+    /* ← 좌우 여백으로 폭 조절 */
+
+    /* 글자 크기 */
+    font-size: 16px;
+
     margin: 5px;
     border: 1px solid #aaa;
     background: #fff;
-    border-radius: 20px;
+    border-radius: 9999px;
     cursor: pointer;
     font-weight: 500;
-    color: #000;
+    color: #333;
+
+    /* 텍스트 수직 중앙정렬(추천) */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     transition: all 0.2s ease;
 }
 
@@ -137,6 +154,12 @@ main {
     border-bottom: 1px solid #ccc;
 }
 
+/* 제목 열만 왼쪽 정렬 */
+.qna-table td.toggle-password {
+    text-align: left;
+    /* 셀 안 텍스트/아이콘 모두 좌측으로 */
+}
+
 .answered {
     font-weight: bold;
     color: #0066ff;
@@ -144,31 +167,32 @@ main {
 }
 
 .secret {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #4a73c6;
+    /* 아이콘 색 */
+    font-size: 12px;
+    /* 필요 시 */
     font-weight: bold;
 }
 
-/* ===== 제목칸 잠금 아이콘 크기/정렬 ===== */
-
-/* 제목 셀을 플렉스 컨테이너로 */
-.qna-table td.toggle-password {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    /* 제목과 아이콘 간격 */
-    text-align: left;
-    /* 기존 정렬 유지 */
-}
-
-/* 보조 스타일 */
-.qna-table .secret {
-    margin-left: 0;
-    line-height: 1;
-}
-
-.qna-table .icon-lock-img {
+.icon-lock {
     width: 14px;
     height: 14px;
-    flex: 0 0 auto;
+    display: block;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 
@@ -234,22 +258,36 @@ main {
 
 .pagination {
     margin-top: 30px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
 }
 
 .page-btn {
-    background: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    /* 폴백: flex 미지원 대비 */
+    border-radius: 50%;
+    padding: 0;
     border: none;
-    margin: 0 4px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
+    text-decoration: none;
+    transition: background-color .2s, color .2s;
 }
 
-.page-btn.active {
-    font-weight: bold;
-    text-decoration: underline;
+/* 활성/호버 색 */
+.page-btn.active,
+.page-btn:hover {
+    background: #013895;
+    color: #fff;
 }
 
+/* 글쓰기 버튼 */
 .write-btn-wrap {
     text-align: right;
     margin-top: 20px;
@@ -274,7 +312,7 @@ main {
 /* 사용자가 업로드한 첨부파일  */
 .attach {
     display: inline-block;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background-color: #f0f4f8;
     /* 은은한 배경색 */
     border: 1px solid #d9e2ec;
@@ -282,7 +320,7 @@ main {
     border-radius: 8px;
     /* 둥근 모서리 */
     margin-top: 8px;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .attach strong {
@@ -305,4 +343,71 @@ main {
 .attach a:hover {
     text-decoration: underline;
     /* 호버 시 밑줄 */
+}
+
+/* .qna-category 바로 다음 나오는 .qna-search 위쪽 간격을 직접 지정 */
+.qna-category+.qna-search {
+    margin-top: 60px;
+    /* 원하는 값으로 조절 */
+}
+
+/* 상세행 레이아웃 */
+.detail-row .detail-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.detail-row .detail-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.detail-row .detail-arrow {
+    margin-top: 5px;
+}
+
+.detail-row .detail-right {
+    flex: 1;
+    /* = flex-grow:1 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 첨부 박스: 오른쪽 정렬 + 위쪽 여백 */
+.detail-row .attach {
+    align-self: flex-end;
+    /* 박스 자체를 오른쪽으로 */
+    /* width:max-content;     // 내용만큼만 폭으로 보이고 싶으면 해제 */
+}
+
+/* 상세내용 텍스트만 왼쪽 정렬 */
+.qna-table .detail-row .detail-box {
+    text-align: left;
+    font-size: 14px;
+    color: #5f5f5f;
+}
+
+/* 라벨/값 한 줄 정렬 */
+.detail-line {
+    display: flex;
+    align-items: baseline;
+    /* 기준선 맞춤 */
+    gap: 8px;
+}
+
+/* 라벨/값 스타일 */
+.detail-label {
+    white-space: nowrap;
+    color: #5f5f5f;
+}
+
+.detail-value {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
