@@ -10,7 +10,7 @@ body {
 }
 
 main {
-    max-width: 1040px;
+    max-width: 1150px;
     margin: 60px auto;
     /*위아래 60px 여백, 좌우는 auto → 가로 가운데 정렬*/
     padding: 0 20px;
@@ -280,11 +280,18 @@ main {
     transition: background-color .2s, color .2s;
 }
 
-/* 활성/호버 색 */
-.page-btn.active,
-.page-btn:hover {
+/* 화살표(맨 앞/뒤) 제외: 가운데 숫자만 hover/active 색상 */
+.pagination>.page-btn:not(:first-child):not(:last-child):hover,
+.pagination>.page-btn:not(:first-child):not(:last-child).active {
     background: #013895;
     color: #fff;
+}
+
+/* 비활성 화살표는 완전 비활성화 */
+.page-btn.disabled,
+.page-btn[disabled] {
+    background: transparent;
+    color: inherit;
 }
 
 /* 글쓰기 버튼 */
