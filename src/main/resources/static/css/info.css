@@ -14,6 +14,14 @@ main {
     padding: 0 20px;
 }
 
+button.material-icons {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
 /* 상단 히어로 */
 .info-header-bg {
     background-color: #0f1035;
@@ -270,11 +278,13 @@ main {
 /* 그래프 */
 #chartCard {
     grid-area: chart;
+    /* css grid 레이아웃에서 이 요소가 차지할 영역의 이름을 chart로 지정함. 부모 컨테이너에서 위치 쉽게 제어 가능 */
     min-height: 300px;
 }
 
 #chartCard canvas {
     width: 100% !important;
+    /* 부모 요소(chartCard)의 100%로 설정 */
     height: 100% !important;
     display: block;
 }
@@ -287,6 +297,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    max-height: 452px;
 }
 
 /* 큰 온도 카드 */
@@ -378,6 +389,7 @@ main {
 #timezoneCard {
     grid-area: tz;
     min-height: 180px;
+    max-height: 452px;
 }
 
 #timezoneCard h3 {
@@ -432,57 +444,201 @@ main {
 /* 공휴일 */
 #holidayCard {
     grid-area: holiday;
-    min-height: 180px;
+    min-height: 150px;
+    max-height: 452px;
 }
 
-.calendar-header {
+.calendar-wrapper {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* 내용이 넘칠 경우 스크롤바 생성 */
+}
+
+.calendarBox {
+    /* 달력 크기와 라운드, 배경 지정 */
+    width: 100%;
+    /* 부모 컨테이너의 너비를 꽉 채우도록 변경 */
+    background: #fff;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* 패딩이 너비에 포함되도록 설정 */
+    flex-shrink: 0;
+    margin: 0px;
+}
+
+.calendarBox .nav,
+.material-icons img {
+    display: flex;
+    /* Flexbox 레이아웃을 활성화합니다. */
+    align-items: center;
+    /* 자식 요소들을 수직 방향으로 중앙 정렬합니다. */
+    justify-content: space-between;
+    /* 자식 요소들 사이에 균등한 공간을 배분하여 양 끝으로 정렬합니다. */
+    margin-bottom: 5px;
+}
+
+.calendarBox .nav .current-date {
+    /* 월 표시 배치 */
+    font-size: 22px;
+    font-weight: 600;
+    color: #000;
+}
+
+.calendarBox .nav button {
+    /* 이동 화살표 배치 */
+    width: 38px;
+    height: 38px;
+    font-size: 30px;
+    color: #878787;
+}
+
+.calendarBox .nav button.left img {
+    transform: rotate(-90deg);
+    /* 왼쪽 화살표를 180도 회전 */
+}
+
+.calendarBox .nav button.right img {
+    transform: rotate(90deg);
+    /* 왼쪽 화살표를 180도 회전 */
+}
+
+button.material-icons.right {
+    text-align: right;
+    padding-right: 10px;
+    /* Optional: Add some right padding */
+}
+
+button.material-icons.right img.right {
+    display: inline-block;
+    /* Allows text to flow around the image */
+    vertical-align: middle;
+    /* Vertically align with potential text */
+}
+
+.calendar {
+    max-height: none;
+}
+
+header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
 }
 
-.calendar-header strong {
-    font-size: 16px;
-}
-
-.calendar-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-}
-
-.calendar-table th {
-    color: #444;
-    font-size: 14px;
-    padding-bottom: 6px;
-}
-
-.calendar-table td {
+.calendar ul {
+    /* 요일과 날짜들을 가로로 배치 */
+    display: flex;
+    list-style: none;
+    flex-wrap: wrap;
     text-align: center;
-    vertical-align: top;
-    height: 48px;
+}
+
+.calendar .weeks li {
     font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.calendar .weeks li.sun {
+    color: #B91C1C;
+}
+
+.calendar .weeks li.sat {
+    color: #1E40AF;
+}
+
+.calendar .days {
+    margin-bottom: 15px;
+}
+
+.calendar ul li {
+    /* 요일과 날짜의 width값 */
+    width: calc(100% / 7);
+    /* 오늘의 날짜 표시 위치를 잡기 위한 position */
     position: relative;
-    color: #111;
+    box-sizing: border-box;
+    /* 패딩과 보더가 너비에 포함되도록 설정 */
 }
 
-.calendar-date.today {
-    background-color: #ffecec;
+.calendar .days li {
+    /* li요소들을 z-index로 살짝 띄워주기 */
+    z-index: 1;
+    margin-top: 0;
+    padding: 1.2vh;
+    cursor: pointer;
+}
+
+.days li.inactive {
+    /* 이전 달의 날짜에 색상 다르게 적용 */
+    color: #aaa;
+}
+
+.days li.active {
+    /* 오늘의 날짜를 표시하기 위한 가상 요소 */
+    color: #fff;
+}
+
+.calendar .days li::before {
+    /* .active를 기준으로 위치 배치 */
+    position: absolute;
+    content: '';
+    height: 2vw;
+    width: 2vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
-    font-weight: bold;
-    color: #d60000;
+    z-index: -1;
 }
 
-.calendar-date .dot {
+.days li:hover::before {
+    /* 날짜를 hover 했을 때의 배경색 변경 */
+    background: #f2f2f2;
+}
+
+.days li.active::before {
+    /* 오늘의 날짜 배경색은 포인트 컬러 색으로 변경 */
+    background: #1E40AF;
+}
+
+.calendar .days li.holiday {
+    position: relative;
+    /* 가상 요소를 위한 기준점 */
+}
+
+.calendar .days li.holiday::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    /* 날짜 아래에 위치하도록 조절 */
+    left: 50%;
+    transform: translateX(-50%);
     width: 6px;
+    /* 점의 크기 */
     height: 6px;
-    background-color: #b48ced;
+    /* 점의 크기 */
+    background-color: #B91C1C;
+    /* 빨간색 점 */
     border-radius: 50%;
-    margin: 2px auto 0;
+    /* 원 형태로 만듦 */
 }
 
-/* 오늘 텍스트 */
-#todayText p {
+#holidayListContainer {
+    flex-grow: 1;
+    /* 남은 공간을 모두 차지하도록 확장 */
+    overflow-y: auto;
+    /* 내용이 넘치면 스크롤 가능하게 설정 */
+    padding-top: 5px;
+    /* 달력과의 간격 */
+}
+
+#holidayListContainer ul {
+    line-height: 1.5;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+#holidayListContainer ul li {
     margin-bottom: 10px;
 }
