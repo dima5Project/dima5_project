@@ -1,103 +1,53 @@
 // 선박정보, 항구정보 전역변수 선언
-
 let vesselData = [];
-
 let portData = [];
-
 // 전역 변수 초기화
-
 let globalRoutesData = [];
-
 let globalPredictions = [];
 
-
-
 // 페이지 로드 시 CSV 데이터를 불러오는 함수
-
 async function loadVesselData() {
-
     try {
-
         const response = await fetch('/data/vessel_master.csv');
-
         const csvText = await response.text();
-
         vesselData = Papa.parse(csvText, {
-
             header: true,
-
             skipEmptyLines: true
-
         }).data;
-
         console.log("Vessel data loaded successfully:", vesselData.length, "records.");
-
     } catch (error) {
-
         console.error("Failed to load vessel data:", error);
-
     }
-
 }
-
-
 
 // 항구 데이터 CSV를 불러오는 함수
-
 async function loadPortData() {
-
     try {
-
         const response = await fetch('/data/port_name.csv');
-
         const csvText = await response.text();
-
         portData = Papa.parse(csvText, {
-
             header: true,
-
             skipEmptyLines: true
-
         }).data;
-
         console.log("Port data loaded successfully:", portData.length, "records.");
-
     } catch (error) {
-
         console.error("Failed to load port data:", error);
-
     }
-
 }
 
-
-
 // --- 항구 ID로 항구 정보를 찾는 함수 ---
-
 function getPortInfo(portId) {
-
     if (!portData || portData.length === 0) {
-
         console.warn("Port data is not loaded.");
-
         return { country_name_kr: '정보 없음', port_name_kr: '정보 없음' };
-
     }
-
     const foundPort = portData.find(port => port.port_id && port.port_id.toUpperCase() === portId.toUpperCase());
-
     if (foundPort) {
-
         return foundPort;
-
     } else {
-
         console.warn(`Port ID not found: ${portId}`);
-
         return { country_name_kr: '정보 없음', port_name_kr: '정보 없음' };
-
     }
-
 }
 
 
@@ -105,43 +55,24 @@ function getPortInfo(portId) {
 // ───────── 선박 ID 타입 상태를 관리하는 전용 함수 ─────────
 
 function updateIdType(type) {
-
     const $wrap = $('.cselect');
 
-
-
     // UI 업데이트
-
     $wrap.find('.cselect__value').text(type).attr('data-value', type);
-
     $wrap.find('.cselect__option').attr('aria-selected', 'false');
-
     $wrap.find(`.cselect__option[data-value="${type}"]`).attr('aria-selected', 'true');
 
-
-
     // 숨겨진 input 값 업데이트
-
     let $hidden = $wrap.find('input[type="hidden"][name="idType"]');
-
     if (!$hidden.length) {
-
         $hidden = $('<input>', { type: 'hidden', name: 'idType' });
-
         $wrap.append($hidden);
-
     }
-
     $hidden.val(type);
 
-
-
     // 드롭다운 닫기
-
     $wrap.removeClass('is-open').find('.cselect__control').attr('aria-expanded', 'false');
-
 }
-
 
 
 $(function () {
@@ -991,72 +922,123 @@ $(function () {
     });
 
 
-
+    // ====== 저장 모달 관련 새로운 로직 시작 ======
     function hasPredictResult() {
-
-        return !$('#predict-content').hasClass('is-hidden');
-
+        // globalPredictions 변수가 비어있지 않은지 확인
+        return globalPredictions && globalPredictions.length > 0;
     }
 
     function openSaveModal() {
+        // 모달 초기 상태로 리셋
+        const saveModal = document.getElementById('saveModal');
+        const modalTitle = saveModal.querySelector('.modal__title');
+        const modalActions = saveModal.querySelector('.modal__actions');
 
-        $('#saveModal').addClass('is-open').attr('aria-hidden', 'false');
+        modalTitle.textContent = '결과를 저장할까요?';
+        modalActions.innerHTML = `
+            <button class="modal__btn primary" data-action="yes">예</button>
+            <button class="modal__btn secondary" data-action="no">아니오</button>
+        `;
 
+        // 새로 생성된 버튼에 이벤트 리스너 다시 연결
+        modalActions.querySelector('[data-action="yes"]').addEventListener('click', handleSaveYesClick);
+        modalActions.querySelector('[data-action="no"]').addEventListener('click', closeSaveModal);
+
+        saveModal.classList.add('is-open');
+        saveModal.setAttribute('aria-hidden', 'false');
     }
 
     function closeSaveModal() {
-
-        $('#saveModal').removeClass('is-open').attr('aria-hidden', 'true');
-
+        const saveModal = document.getElementById('saveModal');
+        saveModal.classList.remove('is-open');
+        saveModal.setAttribute('aria-hidden', 'true');
     }
 
+    // '예' 버튼 클릭 시 호출될 비동기 함수
+    async function handleSaveYesClick() {
+        const saveModal = document.getElementById('saveModal');
+        const modalTitle = saveModal.querySelector('.modal__title');
+        const modalActions = saveModal.querySelector('.modal__actions');
+
+        // 로딩 상태로 변경
+        modalTitle.textContent = '저장 중...';
+        modalActions.innerHTML = '<p>잠시만 기다려주세요.</p>';
+
+        // 저장할 데이터 준비
+        const dataToSave = {
+            vesselId: $('.sidebar__vesselinfo .kv strong:eq(0)').text(),
+            predictions: globalPredictions,
+            routes: globalRoutesData
+        };
+
+        try {
+            const response = await fetch('/api/result-save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataToSave)
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log('Save successful:', responseData.id);
+
+                // 성공 메시지로 모달 내용 변경
+                modalTitle.textContent = '저장되었습니다.';
+                modalActions.innerHTML = `<p>마이페이지 > 내 선박 정보 에서 확인해주세요.</p><button class="modal__btn primary" data-action="close">확인</button>`;
+
+                // 새로운 '확인' 버튼에 닫기 기능 연결
+                modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
+            } else {
+                // 실패 메시지로 모달 내용 변경
+                const errorData = await response.json();
+                modalTitle.textContent = '저장 실패';
+                modalActions.innerHTML = `<p>오류가 발생했습니다: ${errorData.message || '알 수 없는 오류'}</p><button class="modal__btn primary" data-action="close">닫기</button>`;
+
+                modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
+            }
+        } catch (error) {
+            console.error('API 호출 중 오류 발생:', error);
+            modalTitle.textContent = '저장 실패';
+            modalActions.innerHTML = `<p>네트워크 오류가 발생했습니다. 다시 시도해주세요.</p><button class="modal__btn primary" data-action="close">닫기</button>`;
+
+            modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
+        }
+    }
+
+    // '저장' 버튼 클릭 이벤트
     $(document).on('click', '.sidebar__btn.save', function () {
-
         if (!hasPredictResult()) {
-
             alert('먼저 [조회]를 실행해 결과를 확인한 뒤 저장버튼을 클릭해주세요.');
-
             return;
-
         }
-
         openSaveModal();
-
     });
 
+    // '아니오' 버튼과 배경 클릭 이벤트
     $(document).on('click', '#saveModal [data-action="no"]', function () {
-
         closeSaveModal();
-
     });
 
-    $(document).on('click', '#saveModal .modal__bg, #saveModal [data-action="close"]', function () {
-
+    $(document).on('click', '#saveModal .modal__bg', function () {
         closeSaveModal();
-
     });
 
+    // Escape 키로 모달 닫기
     $(document).on('keydown', function (e) {
-
         if (e.key === 'Escape' && $('#saveModal').hasClass('is-open')) {
-
             closeSaveModal();
-
         }
-
     });
 
-    $(document).on('click', '#saveModal [data-action="yes"]', function () {
-
+    // '확인' 버튼 클릭 이벤트 (성공/실패 모달)
+    $(document).on('click', '#saveModal [data-action="close"]', function () {
         closeSaveModal();
-
-        setTimeout(function () {
-
-            alert('저장되었습니다. "마이페이지 > 내 선박 정보" 에서 확인하세요.');
-
-        }, 50);
-
     });
+
+    // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
+    $(document).off('click', '#saveModal [data-action="yes"]').on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
 
 });
 
