@@ -94,7 +94,13 @@
                             <td class="toggle-password">
                                 <span th:text="${q.askTitle}">제목</span>
                                 <span class="secret" th:if="${q.askPwd != null and !#strings.isEmpty(q.askPwd)}">
-                                    <img class="icon-lock-img" th:src="@{/images/askImages/lock.svg}" alt="비밀글">
+                                    <!-- 잠금 아이콘 -->
+                                    <svg class="icon-lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" />
+                                    </svg>
+                                    <span class="sr-only">비밀글</span>
+                                    <!--<img class="icon-lock-img" th:src="@{/images/askImages/lock.svg}" alt="비밀글">-->
                                 </span>
                                 <span class="answered" th:if="${q.replyStatus == true}">[답변 완료]</span>
                             </td>
@@ -121,14 +127,26 @@
                         <!-- 상세 내용 -->
                         <tr class="detail-row hidden" th:attr="data-id=${q.askSeq}">
                             <td colspan="5">
-                                <div class="detail-box" th:text="${q.askContent}">내용</div>
-                                <!-- 첨부파일 표시 -->
-                                <div class="attach" th:if="${q.savedFilename != null}" style="margin-top:8px;">
-                                    <strong>첨부파일: </strong>
-                                    <a th:href="@{/ask/download(askSeq=${q.askSeq})}"
-                                        th:text="${q.originalFilename != null ? q.originalFilename : '다운로드'}">
-                                        다운로드
-                                    </a>
+                                <div class="detail-wrap">
+                                    <div class="detail-left">
+                                        <span class="detail-arrow">↳</span>
+                                    </div>
+
+                                    <div class="detail-right">
+                                        <div class="detail-box detail-line">
+                                            <span class="detail-label">[제목] :</span>
+                                            <span class="detail-value" th:text="${q.askTitle}">제목</span>
+                                        </div>
+
+                                        <div class="detail-box" th:text="${q.askContent}">내용</div>
+                                        <div class="attach" th:if="${q.savedFilename != null}">
+                                            <strong>첨부파일: </strong>
+                                            <a th:href="@{/ask/download(askSeq=${q.askSeq})}"
+                                                th:text="${q.originalFilename != null ? q.originalFilename : '다운로드'}">
+                                                다운로드
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -151,8 +169,8 @@
             <!-- 이전 -->
             <a class="page-btn" th:classappend="${list.first} ? ' disabled' : ''"
                 th:href="@{/ask(page=${list.number - 1}, searchItem=${searchItem}, searchWord=${searchWord})}"
-                th:if="${!list.first}">&lt;</a>
-            <button class="page-btn disabled" th:if="${list.first}">&lt;</button>
+                th:if="${!list.first}">&laquo;</a>
+            <button class="page-btn disabled" th:if="${list.first}">&laquo;</button>
 
             <!-- 페이지 번호 1..totalPages -->
             <th:block th:each="i : ${#numbers.sequence(1, list.totalPages)}">
@@ -163,8 +181,8 @@
             <!-- 다음 -->
             <a class="page-btn" th:classappend="${list.last} ? ' disabled' : ''"
                 th:href="@{/ask(page=${list.number + 1}, searchItem=${searchItem}, searchWord=${searchWord})}"
-                th:if="${!list.last}">&gt;</a>
-            <button class="page-btn disabled" th:if="${list.last}">&gt;</button>
+                th:if="${!list.last}">&raquo;</a>
+            <button class="page-btn disabled" th:if="${list.last}">&raquo;</button>
         </section>
 
         <!-- 글쓰기 -->

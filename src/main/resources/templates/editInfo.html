@@ -18,6 +18,9 @@
     <!-- <script defer th:src="@{/js/editInfo.js}"></script> -->
 
     <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link rel="stylesheet" th:href="@{/css/faq.css}">
+    <script defer th:src="@{/js/faq.js}"></script>
 </head>
 
 <body>
@@ -168,6 +171,7 @@
     </main>
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+    <div th:replace="~{fragment/faq :: widget}"></div>
 
 </body>
 

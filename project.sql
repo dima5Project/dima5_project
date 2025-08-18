@@ -212,3 +212,17 @@ CREATE TABLE IF NOT EXISTS result_save
 SELECT * FROM result_save;
 -- DELETE FROM result_save;
 COMMIT;
+
+-- 13. 관리자 로그 저장 테이블
+-- Drop table if Exists admin_notice;
+create table if not exists admin_notice(
+	id 		Bigint auto_increment primary key,
+	event_type varchar(30) not null,
+	ask_seq Bigint not null,
+	title varchar(255) not null,
+	writer varchar(100) not null,
+	created_at datetime not null default current_timestamp,
+	is_read Tinyint(1) not null default 0
+);
+
+select * from admin_notice;
