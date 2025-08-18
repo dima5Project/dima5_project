@@ -12,9 +12,8 @@
   border: 2px solid #0f1035;
   border-radius: 10px;
   width: 100%;
-  max-width: 550px;
-  /* max-height: 570px; */
-  height: auto;
+  max-width: 650px;
+  height: 365px;
   display: flex;
   flex-direction: row;
   align-items: strectch;
@@ -32,15 +31,20 @@
   /* 로고와 텍스트 사이 공간 조절 */
   background-color: #0f1035;
   height: 100%;
-  width: 200px;
+  flex-basis: 40%;
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
-  color: white;
+  color: #ffffff;
+  margin: 0;
 }
 
 .logo_icon {
   width: 35px;
   height: 35px;
+  /* color: #ffffff;
+  z-index: 2; */
+  filter: invert(100%);
+  /* 기존의 어두운 색 로고를 흰색으로 반전*/
 }
 
 .logo_text {
@@ -58,11 +62,20 @@
   display: flex;
   /* 세로 정렬 */
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* width: 100%;
+  max-width: 300px;
+  margin: 10px; */
+  padding: 0;
+  flex-grow: 1;
+}
+
+.form_group,
+.login_button,
+.join_wrap {
   width: 100%;
   max-width: 300px;
-  margin: 10px;
-  padding: 40px;
-  flex-grow: 1;
 }
 
 /* 입력 필드 하나의 덩어리를 그룹화 */
@@ -152,7 +165,7 @@
   flex-direction: column;
   align-items: center;
   margin-top: 10px;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* 링크 - 마우스 올리면 밑줄이 생김*/
