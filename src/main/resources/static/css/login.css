@@ -27,8 +27,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  /* 로고와 텍스트 사이 공간 조절 */
   background-color: #0f1035;
   height: 100%;
   flex-basis: 40%;
@@ -39,22 +37,10 @@
 }
 
 .logo_icon {
-  width: 35px;
-  height: 35px;
+  width: 170px;
+  height: 170px;
   /* color: #ffffff;
   z-index: 2; */
-  filter: invert(100%);
-  /* 기존의 어두운 색 로고를 흰색으로 반전*/
-}
-
-.logo_text {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  /* 텍스트 굵게 */
-  font-size: 24px;
-  color: #ffffff;
-  margin: 0;
-  /* 바깥쪽 여백. 다른 요소와 거리 조절 */
 }
 
 /* 폼 스타일 */
@@ -63,11 +49,10 @@
   /* 세로 정렬 */
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   /* width: 100%;
   max-width: 300px;
   margin: 10px; */
-  padding: 0;
+  padding: 40px;
   flex-grow: 1;
 }
 
@@ -76,6 +61,7 @@
 .join_wrap {
   width: 100%;
   max-width: 300px;
+  margin: 0 auto;
 }
 
 /* 입력 필드 하나의 덩어리를 그룹화 */

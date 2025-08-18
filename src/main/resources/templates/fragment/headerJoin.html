@@ -17,7 +17,10 @@
             <div class="navbar_left">
                 <div class="navbar_logo">
                     <a th:href="@{/}">
-                        <img src="/images/headerImages/logo.png" th:src="@{/images/headerImages/logo.png}" alt="로고">
+                        <img class="ship" src="/images/headerImages/shipLogo.png"
+                            th:src="@{/images/headerImages/shipLogo.png}" alt="로고">
+                        <img class="text" src="/images/headerImages/letterLogo.png"
+                            th:src="@{/images/headerImages/letterLogo.png}" alt="로고">
                     </a>
                 </div>
             </div>
@@ -60,13 +63,13 @@
 
             <div class="navbar_right">
                 <div class="login_area nav_item has_submenu">
-                    <div class="login_button">
+                    <div class="loginBox">
                         <svg class="user_icon" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M7 8C7.79113 8 8.56448 7.76541 9.22228 7.32588C9.88008 6.88635 10.3928 6.26164 10.6955 5.53074C10.9983 4.79983 11.0775 3.99556 10.9231 3.21964C10.7688 2.44372 10.3878 1.73098 9.82843 1.17157C9.26902 0.612164 8.55629 0.231202 7.78036 0.0768607C7.00444 -0.0774802 6.20017 0.00173312 5.46927 0.304484C4.73836 0.607234 4.11365 1.11992 3.67412 1.77772C3.2346 2.43552 3 3.20888 3 4C3 5.06087 3.42143 6.07828 4.17157 6.82843C4.92172 7.57857 5.93913 8 7 8ZM13 18C13.2652 18 13.5196 17.8946 13.7071 17.7071C13.8946 17.5196 14 17.2652 14 17C14 15.1435 13.2625 13.363 11.9497 12.0503C10.637 10.7375 8.85652 10 7 10C5.14348 10 3.36301 10.7375 2.05025 12.0503C0.737498 13.363 2.76642e-08 15.1435 0 17C0 17.2652 0.105357 17.5196 0.292893 17.7071C0.48043 17.8946 0.734784 18 1 18H13Z"
                                 fill="white">
                         </svg>
-                        <div class="user_id" th:text="|${#authentication.principal.username}님|"></div>
+                        <div class="user_id" th:text="|안녕하세요, ${#authentication.principal.username}님|"></div>
                     </div>
                     <div id="submenu_user_wrapper" class="submenu_wrapper">
                         <div id="submenu_user" class="submenu">
@@ -76,66 +79,51 @@
                     </div>
                 </div>
 
-                <div id="langToggle" class="lang_selector">
-                    <img src="/images/headerImages/lang_icon.png" th:src="@{/images/headerImages/lang_icon.png}"
-                        alt="언어 선택" class="lang_icon">
-                    <img src="/images/headerImages/arrow_down.svg" th:src="@{/images/headerImages/arrow_down.svg}"
-                        alt="화살표" class="arrow_icon">
-                    <div id="submenu_lang_wrapper" class="submenu_wrapper">
-                        <div id="submenu_lang" class="submenu">
-                            <div class="lang_item">KOR</div>
-                            <div class="lang_item">ENG</div>
-                            <div class="lang_item">JPN</div>
-                        </div>
-                    </div>
+                <div class="hamburger_menu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
                 </div>
-            </div>
 
-            <div class="hamburger_menu">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </div>
-
-            <nav class="sub_nav">
-                <div class="navbar_menu">
-                    <div class="nav_item has_submenu" data-active-path-prefix="/intro"
-                        data-submenu-id="submenu_intro_wrapper">
-                        <a th:href="@{/intro/service}" class="nav_link">소개</a>
-                        <div id="submenu_intro_wrapper" class="submenu_wrapper">
-                            <div id="submenu_intro" class="submenu">
-                                <a th:href="@{/intro/service}" class="submenu_item">서비스 소개</a>
-                                <a th:href="@{/intro/team}" class="submenu_item">팀 소개</a>
+                <nav class="sub_nav">
+                    <div class="navbar_menu">
+                        <div class="nav_item has_submenu" data-active-path-prefix="/intro"
+                            data-submenu-id="submenu_intro_wrapper">
+                            <a th:href="@{/intro/service}" class="nav_link">소개</a>
+                            <div id="submenu_intro_wrapper" class="submenu_wrapper">
+                                <div id="submenu_intro" class="submenu">
+                                    <a th:href="@{/intro/service}" class="submenu_item">서비스 소개</a>
+                                    <a th:href="@{/intro/team}" class="submenu_item">팀 소개</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="nav_item" data-active-path-prefix="/predict">
-                        <a th:href="@{/predict/init}" class="nav_link">예측 서비스</a>
-                    </div>
+                        <div class="nav_item" data-active-path-prefix="/predict">
+                            <a th:href="@{/predict/init}" class="nav_link">예측 서비스</a>
+                        </div>
 
-                    <div class="nav_item has_submenu" data-active-path-prefix="/port"
-                        data-submenu-id="submenu_info_wrapper">
-                        <a th:href="@{/port/info}" class="nav_link">부가정보</a>
-                        <div id="submenu_info_wrapper" class="submenu_wrapper">
-                            <div id="submenu_info" class="submenu">
-                                <a th:href="@{/port/info}" class="submenu_item">날씨</a>
-                                <a th:href="@{/port/info}" class="submenu_item">혼잡도</a>
-                                <a th:href="@{/port/info}" class="submenu_item">운영 정보</a>
+                        <div class="nav_item has_submenu" data-active-path-prefix="/port"
+                            data-submenu-id="submenu_info_wrapper">
+                            <a th:href="@{/port/info}" class="nav_link">부가정보</a>
+                            <div id="submenu_info_wrapper" class="submenu_wrapper">
+                                <div id="submenu_info" class="submenu">
+                                    <a th:href="@{/port/info}" class="submenu_item">날씨</a>
+                                    <a th:href="@{/port/info}" class="submenu_item">혼잡도</a>
+                                    <a th:href="@{/port/info}" class="submenu_item">운영 정보</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="nav_item" data-active-path-prefix="/news">
-                        <a th:href="@{/news/main}" class="nav_link">뉴스룸</a>
+                        <div class="nav_item" data-active-path-prefix="/news">
+                            <a th:href="@{/news/main}" class="nav_link">뉴스룸</a>
+                        </div>
+                        <div class="nav_item" data-active-path-prefix="/ask">
+                            <a th:href="@{/ask}" class="nav_link">문의</a>
+                        </div>
                     </div>
-                    <div class="nav_item" data-active-path-prefix="/ask">
-                        <a th:href="@{/ask}" class="nav_link">문의</a>
-                    </div>
-                </div>
-            </nav>
+                </nav>
 
-        </div>
+            </div>
     </nav>
 </body>
 

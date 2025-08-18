@@ -16,6 +16,12 @@ body {
     padding-top: 80px;
 }
 
+a {
+    list-style: none;
+    color: #000000;
+    text-decoration: none;
+}
+
 /* 네비게이션 바 전체 외곽. 초기 상태 */
 .navbar {
     background-color: #fcfcfd;
@@ -59,9 +65,27 @@ body {
     min-width: 150px;
 }
 
+.navbar_logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar_logo>a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
 /* 왼쪽 로고 */
-.navbar_logo img {
-    height: 40px;
+.navbar_logo img.ship {
+    height: 65px;
+    padding: 0;
+}
+
+.navbar_logo img.text {
+    height: 30px;
 }
 
 /* 가운데 메뉴 영역 */
@@ -204,7 +228,7 @@ body {
 /* 오른쪽 영역 (로그인 + 언어 선택) */
 .navbar_right {
     display: flex;
-    gap: 30px;
+    gap: 7px;
     align-items: center;
     justify-content: center;
     height: 80px;
@@ -225,32 +249,18 @@ body {
 }
 
 /* 로그인/회원가입 버튼 */
-.login_button {
-    background-color: #013895;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: bold;
+.login_button,
+.join_button,
+.navbar_right span {
     text-decoration: none;
-    transition: background-color 0.3s;
-    display: flex;
-    gap: 5px;
-    padding: 6px;
-    justify-content: center;
-    height: 30px;
-    width: auto;
-    min-width: 100px;
-    max-width: 180px;
-    display: flex;
-    align-items: center;
-    /* 세로 중앙 정렬 */
-    justify-content: center;
-    /* 가로 중앙 정렬 */
-    box-sizing: border-box;
+    color: #013895;
+    font-weight: 700;
 }
 
-a.login_button:hover {
-    background-color: #337ed9;
+a.login_button:hover,
+a.join_button:hover {
+    color: #337ed9;
+    font-weight: 700;
 }
 
 .login_area:hover .login_button {
@@ -290,70 +300,6 @@ a.login_button:hover {
 
 .login_area .submenu_item:hover {
     background-color: #337ed9;
-}
-
-/* 언어 선택 드롭다운 (버튼의 기준) */
-.lang_selector {
-    position: relative;
-    /* 드롭다운 위치 기준 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 100%;
-    cursor: pointer;
-    height: 20px;
-}
-
-.lang_icon {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
-.arrow_icon {
-    transition: transform 0.3s ease;
-    width: 12px;
-    height: 12px;
-}
-
-/* 언어 선택 드롭다운 박스에만 개별적인 스타일 적용 */
-#submenu_lang_wrapper {
-    /* 언어 선택 드롭다운의 너비를 작게 설정 */
-    width: 75px;
-}
-
-/* 열렸을 때 화살표 회전 */
-.lang_selector.active .arrow_icon {
-    transform: rotate(180deg);
-}
-
-/* 드롭다운 항목 */
-.lang_item {
-    display: block;
-    width: 100%;
-    padding: 8px 8px;
-    color: black;
-    text-decoration: none;
-    font-size: 14px;
-    white-space: nowrap;
-    transition: background-color 0.2s;
-    text-align: center;
-}
-
-/* hover 효과 */
-.lang_item:hover {
-    background-color: #f0f0f0;
-    width: 100%;
-}
-
-.lang_selector:hover>.submenu_wrapper {
-    display: none;
-}
-
-/* 언어 드롭다운을 보이게 */
-.lang_selector.active>.submenu_wrapper {
-    display: block;
 }
 
 /* 햄버거 버튼 */
