@@ -77,6 +77,12 @@ let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 let currentHolidayData = [];
 
+const month = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
+
+const daysTag = document.querySelector('.days');
+const currentDateElement = document.querySelector('.current-date');
+const prevNextIcon = document.querySelectorAll('.nav button');
+
 // ==========================
 // 자동 업데이트용 항구 목록
 // ==========================
@@ -106,15 +112,18 @@ function initEventBindings() {
         loadHoliday(countryNameKr);
     });
 
-    $("#searchBtn").on("click", function () {
-        isUserInteracting = true;
-        stopAutoUpdate();
+    $("body").on("click", function () {
+        if (!isUserInteracting) {
+            isUserInteracting = true;
+            stopAutoUpdate();
+        }
+    });
 
+    $("#portSelect").on("change", function () {
         // 사용자가 선택한 항구 정보를 가져옴
         let portId = $("#portSelect").val();
         let portNameKr = portIdToName[portId];
-
-        let coords = portCoordinates[portId];
+        let coords = portCoordinates[portNameKr];
 
         // portId, coords 중 선택을 안 한 것이 있으면 경고창을 띄움
         if (!portId || !coords) {
@@ -129,6 +138,22 @@ function initEventBindings() {
 
         // 선택된 항구로 데이터 로드
         updateInfoCardsAndGraphs();
+    });
+
+    // 달력 이전/다음 버튼 이벤트 리스너 추가 (가장 올바른 위치)
+    prevNextIcon.forEach(icon => {
+        icon.addEventListener('click', () => {
+            currentMonth = icon.className.includes('left') ? currentMonth - 1 : currentMonth + 1;
+
+            if (currentMonth < 0 || currentMonth > 11) {
+                const date = new Date(currentYear, currentMonth);
+                currentYear = date.getFullYear();
+                currentMonth = date.getMonth();
+            }
+
+            renderCalendar(currentHolidayData); // 공휴일 데이터를 다시 전달하여 렌더링
+            updateHolidayListAndToday(currentHolidayData); // 공휴일 목록도 다시 렌더링
+        });
     });
 }
 
@@ -145,12 +170,8 @@ function loadInitialData() {
 
         loadCountries().done(() => {
             $("#countrySelect").val(currentCountryNameKr);
-            // loadPorts()의 완료를 기다린 후 항구 설정
             loadPorts(currentCountryNameKr).done(() => {
                 $("#portSelect").val(currentPortId);
-
-                initCalendar();
-
                 updateInfoCardsAndGraphs();
             });
         });
@@ -159,122 +180,99 @@ function loadInitialData() {
     });
 }
 
-// 달력 초기화
-function initCalendar() {
-    const container = document.getElementById('calendar');
-    if (!container) {
-        console.error('Calendar container not found!');
-        return;
+// 달력 렌더링 함수
+function renderCalendar(holidays) {
+    const today = new Date();
+    const todayDate = today.getDate();
+
+    // API에서 받은 holidayDate 문자열을 그대로 Set에 저장
+    const holidayDates = new Set(holidays.map(h => h.holidayDate));
+
+    let firstDayofMonth = new Date(currentYear, currentMonth, 1).getDay();
+    let lastDateofMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let lastDateofLastMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+    let liTag = '';
+
+    // 이전 달의 날짜들을 li에 추가
+    for (let i = firstDayofMonth; i > 0; i--) {
+        liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
     }
 
-    calendar = new tui.Calendar(container, {
-        defaultView: 'month', // 월간 뷰로 설정
-        taskView: false,
-        template: {
-            monthDayname: function (dayname) {
-                return '<span class="tui-full-calendar-dayname-name">' + dayname.label + '</span>';
-            },
-            monthGridHeader: function (model) {
-                return '<div><span class="tui-full-calendar-month-grid-cell-date">' + model.date + '</span></div>';
-            },
-            // 공휴일을 강조하는 템플릿
-            milestone: function (milestone) {
-                return '<span style="color:#d60000; font-weight:bold;">' + milestone.title + '</span>';
-            }
-        },
-        calendars: [{
-            id: '1',
-            name: 'Holiday',
-            color: '#d60000',
-            bgColor: '#FEE2E2',
-            dragBgColor: '#FEE2E2',
-            borderColor: '#FCA5A5'
-        }]
+    // 현재 달의 날짜들을 li에 추가
+    for (let i = 1; i <= lastDateofMonth; i++) {
+        let classes = '';
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+        // 오늘 날짜인지 확인
+        if (i === todayDate && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+            classes += 'active';
+        }
+
+        // 공휴일인지 확인: YYYY-MM-DD 형식으로 비교
+        if (holidayDates.has(dateStr)) {
+            classes += (classes.length > 0 ? ' ' : '') + 'holiday';
+        }
+
+        liTag += `<li class="${classes}">${i}</li>`;
+    }
+
+    // 다음 달의 날짜들을 li에 추가
+    let lastDayofMonth = new Date(currentYear, currentMonth, lastDateofMonth).getDay();
+    let remainingDays = 6 - lastDayofMonth;
+    for (let i = 1; i <= remainingDays; i++) {
+        liTag += `<li class="inactive">${i}</li>`;
+    }
+
+    currentDateElement.innerHTML = `${currentYear}년 ${month[currentMonth]}`;
+    daysTag.innerHTML = liTag;
+}
+
+// 달력 아래에 공휴일 목록과 오늘 날짜를 표시하는 함수
+function updateHolidayListAndToday(allHolidays) {
+    let listContainer = $('#holidayListContainer');
+    listContainer.empty();
+
+    // 1. 오늘 날짜 정보 추가
+    let today = new Date();
+    let days = ["일", "월", "화", "수", "목", "금", "토"];
+    let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 (${days[today.getDay()]})`;
+    listContainer.append(`<p>${todayText}</p>`);
+
+    // 2. 공휴일 목록 추가 (이번 달 공휴일만 필터링)
+    let currentMonthStr = String(currentMonth + 1).padStart(2, '0');
+    let currentMonthHolidays = allHolidays.filter(h => {
+        // holidayDate 문자열을 직접 비교
+        return h.holidayDate.startsWith(`${currentYear}-${currentMonthStr}`);
     });
 
-    console.log("tui.calendar 인스턴스가 초기화되었습니다.");
+    if (currentMonthHolidays.length > 0) {
+        let listHTML = '<h4>이번 달 공휴일</h4><ul>';
+        currentMonthHolidays.forEach(holiday => {
+            const date = new Date(holiday.holidayDate);
+            const day = date.getDate();
+            const dayOfWeek = days[date.getDay()];
+            listHTML += `<li>${day}일(${dayOfWeek}) : ${holiday.holidayName}</li>`; // 'holiday_name' 필드 사용
+        });
+        listHTML += '</ul>';
+        listContainer.append(listHTML);
+    } else {
+        listContainer.append('<p>이번 달에는 공휴일이 없습니다.</p>');
+    }
 }
 
 // 공휴일 + 달력
-function loadHoliday(country) {
-    $.get(`/api/info/holiday/${country}`, function (data) {
-        if (Array.isArray(data) && data.length > 0) {
-            currentHolidayData = data;
-            drawHolidayCalendar(data);
-        } else {
-            currentHolidayData = [];
-            drawHolidayCalendar([]);
-        }
+function loadHoliday(countryNameKr) {
+    let requestCountryName = countryNameKr;
+    if (countryNameKr === '한국') {
+        requestCountryName = '대한민국';
+    }
+
+    $.get(`/api/info/holiday/${requestCountryName}`, function (data) {
+        currentHolidayData = data;
+        renderCalendar(data); // 달력 그리드를 렌더링
+        updateHolidayListAndToday(data); // 공휴일 목록을 렌더링
     });
-}
-function drawHolidayCalendar(holidays) {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth(); // 0-indexed
-    const todayDate = today.getDate();
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month + 1, 0).getDate();
-    const holidayDates = holidays.map(h => new Date(h.holidayDate).getDate());
-
-    // 월 이동 UI (HTML 템플릿)
-    const monthTitle = `<div class="calendar-header">
- <button onclick="prevMonth()"> ◀ </button>
- <strong>${currentYear}년 ${currentMonth + 1}월</strong>
- <button onclick="nextMonth()"> ▶ </button>
-    </div>`;
-
-    let calendarHTML = `<table class="calendar-table"><thead><tr>`;
-    const days = ["일", "월", "화", "수", "목", "금", "토"];
-    days.forEach(d => calendarHTML += `<th>${d}</th>`);
-    calendarHTML += `</tr></thead><tbody><tr>`;
-
-    for (let i = 0; i < firstDay; i++) {
-        calendarHTML += `<td></td>`;
-    }
-
-    for (let d = 1; d <= lastDate; d++) {
-        const isToday = d === todayDate;
-        const isHoliday = holidayDates.includes(d);
-
-        let classes = "calendar-date";
-        if (isToday) classes += " today";
-        if (isHoliday) classes += " holiday";
-
-        calendarHTML += `<td class="${classes}">${d}`;
-        if (isHoliday) {
-            calendarHTML += `<div class="dot"></div>`;
-        }
-        calendarHTML += `</td>`;
-
-        if ((firstDay + d) % 7 === 0) {
-            calendarHTML += `</tr><tr>`;
-        }
-    }
-
-    calendarHTML += `</tr></tbody></table>`;
-    $("#holidayCalendarContainer").html(monthTitle + calendarHTML);
-
-    const todayText = `<strong>오늘 날짜:</strong> ${year}년 ${month + 1}월 ${todayDate}일 (${days[today.getDay()]})`;
-    $("#todayText").html(`<p>${todayText}</p>`);
-}
-
-// 이전 / 다음 달 이동 함수
-function prevMonth() {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    }
-    drawHolidayCalendar(currentHolidayData);
-}
-
-function nextMonth() {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-    drawHolidayCalendar(currentHolidayData);
 }
 
 // 모든 정보 카드를 업데이트하는 공통 함수
@@ -291,7 +289,7 @@ function updateInfoCardsAndGraphs() {
     loadDockingGraph(currentPortId);
     // 시차 + 공휴일
     loadTimezone(currentCountryNameKr);
-    loadHoliday(currentCountryNameKr);
+    loadHoliday(currentCountryNameKr); // loadHoliday가 달력 렌더링을 포함
 }
 
 // 자동 업데이트 중지
@@ -385,102 +383,6 @@ function loadTimezone(countryNameKr) {
         $("#foreignTime").text(foreignTime);
         $("#foreignUtc").text(foreignUtc);
     });
-}
-
-// 공휴일 + 달력
-function loadHoliday(countryNameKr) {
-    $.get(`/api/info/holiday/${countryNameKr}`, function (data) {
-        if (calendar) {
-            calendar.destroy(); // 기존 달력 인스턴스 제거
-        }
-
-        let events = data.map(holiday => {
-            return {
-                title: holiday.holidayName,
-                start: holiday.holidayDate,
-                allDay: true
-            };
-        });
-
-        // 캘린더 컨테이너 요소 가져오기
-        const container = document.getElementById('calendar');
-
-        // 캘린더 인스턴스 생성
-        calendar = new tui.Calendar(container, {
-            defaultView: 'week', // 'month', 'week', 'day' 중 선택 가능
-            taskView: false,     // 일정(task) 뷰 비활성화
-            template: {
-                // 주간/일간 뷰에서 시간 헤더에 표시할 템플릿
-                timegridDisplayPrimaryTime: function (time) {
-                    const hour = time.hour;
-                    return hour + ':00';
-                },
-                // 주간/일간 뷰에서 주 헤더에 표시할 템플릿
-                milestone: function (milestone) {
-                    return '<span class="tui-full-calendar-milestone">' + milestone.title + '</span>';
-                }
-            },
-            calendars: [
-                {
-                    id: '1',
-                    name: 'My Calendar',
-                    color: '#ffffff',
-                    bgColor: '#9e5fff',
-                    dragBgColor: '#9e5fff',
-                    borderColor: '#9e5fff'
-                }
-            ]
-        });
-
-        // 샘플 일정 추가 (선택 사항)
-        calendar.createSchedules([
-            {
-                id: '1',
-                calendarId: '1',
-                title: '홈페이지 개발 회의',
-                category: 'time',
-                dueDateClass: '',
-                start: '2025-08-16T10:00:00',
-                end: '2025-08-16T12:00:00'
-            }
-        ]);
-
-        // 초기화된 캘린더 렌더링
-        calendar.render();
-
-    }); // <-- `$.get` 호출을 닫는 올바른 위치
-}
-
-// 달력 아래에 공휴일 목록과 오늘 날짜를 표시하는 함수
-function updateHolidayListAndToday(startDate, endDate, allHolidays) {
-    let listContainer = $('#holidayListContainer');
-    listContainer.empty();
-
-    // 1. 오늘 날짜 정보 추가
-    let today = new Date();
-    let days = ["일", "월", "화", "수", "목", "금", "토"];
-    let todayText = `<strong>오늘 날짜:</strong> ${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일 (${days[today.getDay()]})`;
-    listContainer.append(`<p>${todayText}</p>`);
-
-    // 2. 공휴일 목록 추가 (기존 코드와 동일)
-    let currentMonthHolidays = allHolidays.filter(h => {
-        const holidayDate = new Date(h.holidayDate);
-        return holidayDate >= startDate && holidayDate < endDate;
-    });
-
-    if (currentMonthHolidays.length > 0) {
-        let listHTML = '<h4>이번 달 공휴일</h4><ul>';
-        currentMonthHolidays.forEach(holiday => {
-            const date = new Date(holiday.holidayDate);
-            const day = date.getDate();
-            const dayOfWeek = days[date.getDay()];
-            listHTML += `<li>${day}일(${dayOfWeek}) : ${holiday.holidayName}</li>`;
-        });
-        listHTML += '</ul>';
-        listContainer.append(listHTML);
-    } else {
-        listContainer.append('<p>이번 달에는 공휴일이 없습니다.</p>');
-    }
 }
 
 // 날씨 카드
