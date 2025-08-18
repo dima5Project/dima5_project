@@ -17,9 +17,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="has-sidebar">
+<body class="has-sidebar page-dashboard">
     <!-- ===== 사이드바 ===== -->
-    <aside class="adm-sidebar page-dashboard">
+    <aside class="adm-sidebar">
         <div class="adm-sidebar__brand">관리</div>
         <nav class="adm-nav">
             <a href="/admin" class="adm-nav__link" data-match="/admin($|/)"><span>대시보드</span></a>
@@ -46,7 +46,7 @@
         <main class="adm-wrap">
             <section class="adm-grid">
                 <!-- 카드 1: 사용자 유형 도넛 -->
-                <article class="adm-card">
+                <article class="adm-card adm-card--chart">
                     <div class="adm-card__hd">
                         <h3>사용자 유형 분포</h3>
                     </div>
@@ -56,7 +56,7 @@
                 </article>
 
                 <!-- 카드 2: 월별 주차 가입자 수 -->
-                <article class="adm-card">
+                <article class="adm-card adm-card--chart">
                     <div class="adm-card__hd">
                         <h3>월별 주차 가입자 수</h3>
                         <div class="adm-card__tools">
