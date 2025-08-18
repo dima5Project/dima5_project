@@ -13,11 +13,12 @@
   border-radius: 10px;
   width: 100%;
   max-width: 550px;
-  max-height: 570px;
+  /* max-height: 570px; */
+  height: auto;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px;
+  flex-direction: row;
+  align-items: strectch;
+  padding: 0;
 }
 
 /* 로고 영역 */
@@ -26,9 +27,15 @@
   /* 로고 이미지와 텍스트를 세로 방향으로 정렬 */
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   /* 로고와 텍스트 사이 공간 조절 */
-  margin: 20px;
+  background-color: #0f1035;
+  height: 100%;
+  width: 200px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  color: white;
 }
 
 .logo_icon {
@@ -41,7 +48,7 @@
   font-weight: 700;
   /* 텍스트 굵게 */
   font-size: 24px;
-  color: #000000;
+  color: #ffffff;
   margin: 0;
   /* 바깥쪽 여백. 다른 요소와 거리 조절 */
 }
@@ -54,6 +61,8 @@
   width: 100%;
   max-width: 300px;
   margin: 10px;
+  padding: 40px;
+  flex-grow: 1;
 }
 
 /* 입력 필드 하나의 덩어리를 그룹화 */
