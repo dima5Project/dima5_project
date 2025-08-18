@@ -51,6 +51,7 @@ function toggleBox() {
               <button onclick="selectFAQ('회원 / 로그인 관련')">회원 / 로그인 관련</button>
               <button onclick="selectFAQ('예측 서비스 이용 가이드')">예측 서비스 이용 가이드</button>
               <button onclick="selectFAQ('기타 문의')">기타 문의</button>
+              <button onclick="startChat()" class="faq-subquestion-button">1:1 상담원 채팅</button>
             </div>
           </div>
           <div class="faq-time">${getTime()}</div>
@@ -143,6 +144,15 @@ const faqData = {
       answer: `1:1 문의, 제휴 제안 등은
 portcast@naver.com 또는 02-2642-9451 로 연락 바랍니다.`
     }
+  ],
+
+
+  "1:1 상담원 연결": [
+    {
+      question: "1:1 상담원 연결",
+      answer: `1:1 상담원 연결을 시작합니다.
+      질문을 남겨주시면 성실히 답변 드리겠습니다.`
+    }
   ]
 };
 
@@ -216,6 +226,17 @@ function showAnswer(category, question) {
   if (lastAssistant.querySelector('.faq-nav-buttons')) {
     lastAssistant.classList.add('nav-type');
   }
+  // '기타 문의' 답변 말풍선 아래에 1:1 채팅 버튼 노출
+  if (category === "기타 문의") {
+    const bubble = lastAssistant.querySelector('.faq-bubble');
+    if (bubble && !bubble.querySelector('.faq-livechat-inline')) {
+      bubble.insertAdjacentHTML('beforeend', `
+      <div class="faq-livechat-inline" style="margin-top:10px">
+        <button class="faq-subquestion-button" onclick="startChat()">1:1 상담원 채팅</button>
+      </div>
+    `);
+    }
+  }
   scrollToBottom();
 }
 
@@ -231,6 +252,7 @@ function renderInitialFAQButtons() {
             <button onclick="selectFAQ('회원 / 로그인 관련')">회원 / 로그인 관련</button>
             <button onclick="selectFAQ('예측 서비스 이용 가이드')">예측 서비스 이용 가이드</button>
             <button onclick="selectFAQ('기타 문의')">기타 문의</button>
+            <button onclick="startChat()" class="faq-subquestion-button">1:1 상담원 채팅</button>
           </div>
         </div>
         <div class="faq-time">${currentTime}</div>
@@ -285,4 +307,5 @@ function scrollToBottom() {
   }
   faqBody.scrollTop = faqBody.scrollHeight;
 }
+
 
