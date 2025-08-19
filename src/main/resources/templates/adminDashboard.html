@@ -8,7 +8,11 @@
 
     <!-- Reset & Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Google Fonts: Noto Sans KR (400/500/700) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- 대시보드 전용 CSS -->
     <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
@@ -25,6 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- head 안 어딘가 -->
     <link rel="stylesheet" href="/css/faq.css">
+
 </head>
 
 <body class="has-sidebar page-dashboard">
@@ -75,9 +80,9 @@
                             <label class="adm-inline">
                                 최근
                                 <select id="weeksSelect" class="adm-select" aria-label="조회 주차 선택">
-                                    <option value="4" selected>4주</option>
+                                    <option value="4">4주</option>
                                     <option value="8">8주</option>
-                                    <option value="12">12주</option>
+                                    <option value="12" selected>12주</option>
                                 </select>
                             </label>
                         </div>
@@ -151,7 +156,7 @@
         })();
     </script>
 
-    <!-- ▼▼▼ 반드시 본문 외곽(보통 body 끝부분)에 드로어로 유지 ▼▼▼ -->
+    <!-- ▼▼▼ 드로어(상담 채팅 패널) — body 끝 위치에 고정 ▼▼▼ -->
     <aside id="chatPanel" class="adm-drawer adm-chat" aria-hidden="true" aria-label="상담 채팅 패널" role="dialog">
         <header class="adm-drawer__hd">
             <strong>상담 채팅</strong>
@@ -176,7 +181,9 @@
                         <button id="btnCloseRoom" class="adm-btn adm-btn--ghost" type="button" disabled>방 종료</button>
                     </div>
                 </div>
+
                 <div class="adm-chatlog" id="chatLog" aria-live="polite"></div>
+
                 <div class="adm-chat-input">
                     <textarea id="adminMsg" rows="2" placeholder="메시지를 입력하세요" disabled></textarea>
                     <button id="adminSend" class="adm-btn" type="button" disabled>보내기</button>
