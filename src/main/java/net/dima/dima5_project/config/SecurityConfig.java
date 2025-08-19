@@ -32,7 +32,7 @@ public class SecurityConfig {
                                                 "/",
                                                 "/api/**",
                                                 "/main",
-                                                "/intro/**", 
+                                                "/intro/**",
                                                 "/user/**",
                                                 "/news/**",
                                                 "/port/info/**",
@@ -44,16 +44,11 @@ public class SecurityConfig {
                                                 "/css/**",
                                                 "/js/**",
                                                 "/videos/**",
-<<<<<<< HEAD
                                                 "/admin/**",
-                                                "/api/result-save/**"
-                                ).permitAll() // 모든 사람들에게 주어지는 경로
-                                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
-=======
+                                                "/api/result-save/**",
                                                 "/ws-chat/**")
                                 .permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
->>>>>>> 113ced89f0e6eb09d5559187a5cf1d0326e8e4bf
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 
