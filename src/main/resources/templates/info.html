@@ -47,7 +47,7 @@
         <div class="search-container">
             <select id="countrySelect"></select>
             <select id="portSelect"></select>
-            <button id="searchBtn" disabled>검색</button>
+            <button id="searchBtn">검색</button>
         </div>
 
         <div class="extra-info-container">
@@ -80,118 +80,118 @@
                 </div>
             </div>
 
-
-
-            <div class="info-card tall-weather" id="weatherCard">
-                <h3>🌤️ 날씨</h3>
-
-                <!-- 큰 온도 카드 -->
-                <div class="wx-main">
-                    <div class="wx-main-label">🌡 온도</div>
-                    <div class="wx-main-value" id="temperature">로딩 중...</div>
-                </div>
-
-                <!-- 2×2 정보 카드 -->
-                <div class="wx-grid">
-                    <div class="wx-tile">
-                        <div class="wx-tile-head">
-                            <span class="wx-label">날씨</span>
-                        </div>
-                        <div class="wx-value" id="mainWeather">로딩 중...</div>
-                    </div>
-
-                    <div class="wx-tile">
-                        <div class="wx-tile-head">
-                            <span class="wx-label">풍속</span>
-                        </div>
-                        <div class="wx-value" id="windSpeed">로딩 중...</div>
-                    </div>
-
-                    <div class="wx-tile">
-                        <div class="wx-tile-head">
-                            <span class="wx-label">강수량</span>
-                        </div>
-                        <div class="wx-value" id="rainVolume">로딩 중...</div>
-                    </div>
-
-                    <div class="wx-tile">
-                        <div class="wx-tile-head">
-                            <span class="wx-label">풍향</span>
-                        </div>
-                        <div class="wx-value" id="windDirLabel">로딩 중...</div>
-                    </div>
-                </div>
-            </div>
-
-
+            <!-- 항만 혼잡도 추이 그래프 -->
             <div class="info-card" id="chartCard">
                 <canvas id="graphCanvas"></canvas>
             </div>
 
-            <div class="info-card" id="timezoneCard">
-                <h3>🕜 시차 정보</h3>
+            <div class="cards-row">
+                <div class="info-card tall-weather" id="weatherCard">
+                    <h3>🌤️ 날씨</h3>
 
-                <!-- 한국 -->
-                <div class="tz-block">
-                    <span class="tz-badge">한국</span><br />
-                    <div id="koreaTime" class="tz-time">로딩 중</div>
-                    <div class="tz-date">
-                        <span class="utc">UTC+09:00</span>
+                    <!-- 큰 온도 카드 -->
+                    <div class="wx-main">
+                        <div class="wx-main-label">🌡 온도</div>
+                        <div class="wx-main-value" id="temperature">로딩 중...</div>
                     </div>
-                </div>
 
-                <div class="tz-sep"></div>
-
-                <!-- 해외 -->
-                <div class="tz-block">
-                    <span class="tz-badge" id="countryName">로딩중</span><br />
-                    <div id="foreignTime" class="tz-time">로딩중</div>
-                    <div class="tz-date">
-                        <span class="utc" id="foreignUtc">로딩중</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 달력 -->
-            <div class="info-card" id="holidayCard">
-                <h3>📆 공휴일 달력</h3>
-                <div class="calendar-wrapper">
-                    <div class="calendarBox">
-
-                        <header>
-                            <div class="nav">
-                                <button class="material-icons left">
-                                    <img class="left" src="/images/infoImages/arrow_team.png"
-                                        th:src="@{/images/infoImages/arrow_team.png}" alt="화살표">
-                                </button>
-                                <p class="current-date">September 2022</p>
-                                <button class="material-icons right">
-                                    <img class="right" src="/images/infoImages/arrow_team.png"
-                                        th:src="@{/images/infoImages/arrow_team.png}" alt="화살표">
-                                </button>
+                    <!-- 2×2 정보 카드 -->
+                    <div class="wx-grid">
+                        <div class="wx-tile">
+                            <div class="wx-tile-head">
+                                <span class="wx-label">날씨</span>
                             </div>
-                        </header>
+                            <div class="wx-value" id="mainWeather">로딩 중...</div>
+                        </div>
 
-                        <div class="calendar">
-                            <ul class="weeks">
-                                <li class="sun">SUN</li>
-                                <li>MON</li>
-                                <li>TUE</li>
-                                <li>WED</li>
-                                <li>THU</li>
-                                <li>FRI</li>
-                                <li class="sat">SAT</li>
-                            </ul>
+                        <div class="wx-tile">
+                            <div class="wx-tile-head">
+                                <span class="wx-label">풍속</span>
+                            </div>
+                            <div class="wx-value" id="windSpeed">로딩 중...</div>
+                        </div>
 
-                            <ul class="days">
+                        <div class="wx-tile">
+                            <div class="wx-tile-head">
+                                <span class="wx-label">강수량</span>
+                            </div>
+                            <div class="wx-value" id="rainVolume">로딩 중...</div>
+                        </div>
 
-                            </ul>
-
+                        <div class="wx-tile">
+                            <div class="wx-tile-head">
+                                <span class="wx-label">풍향</span>
+                            </div>
+                            <div class="wx-value" id="windDirLabel">로딩 중...</div>
                         </div>
                     </div>
                 </div>
 
-                <div id="holidayListContainer"></div>
+                <div class="info-card" id="timezoneCard">
+                    <h3>🕜 시차 정보</h3>
+
+                    <!-- 한국 -->
+                    <div class="tz-block">
+                        <span class="tz-badge">한국</span><br />
+                        <div id="koreaTime" class="tz-time">로딩 중</div>
+                        <div class="tz-date">
+                            <span class="utc">UTC+09:00</span>
+                        </div>
+                    </div>
+
+                    <div class="tz-sep"></div>
+
+                    <!-- 해외 -->
+                    <div class="tz-block">
+                        <span class="tz-badge" id="countryName">로딩중</span><br />
+                        <div id="foreignTime" class="tz-time">로딩중</div>
+                        <div class="tz-date">
+                            <span class="utc" id="foreignUtc">로딩중</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 달력 -->
+                <div class="info-card" id="holidayCard">
+                    <h3>📆 공휴일 달력</h3>
+                    <div class="calendar-wrapper">
+                        <div class="calendarBox">
+
+                            <header>
+                                <div class="nav">
+                                    <button class="material-icons left">
+                                        <img class="left" src="/images/infoImages/arrow_team.png"
+                                            th:src="@{/images/infoImages/arrow_team.png}" alt="화살표">
+                                    </button>
+                                    <p class="current-date">September 2022</p>
+                                    <button class="material-icons right">
+                                        <img class="right" src="/images/infoImages/arrow_team.png"
+                                            th:src="@{/images/infoImages/arrow_team.png}" alt="화살표">
+                                    </button>
+                                </div>
+                            </header>
+
+                            <div class="calendar">
+                                <ul class="weeks">
+                                    <li class="sun">SUN</li>
+                                    <li>MON</li>
+                                    <li>TUE</li>
+                                    <li>WED</li>
+                                    <li>THU</li>
+                                    <li>FRI</li>
+                                    <li class="sat">SAT</li>
+                                </ul>
+
+                                <ul class="days">
+
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="holidayListContainer"></div>
+                </div>
             </div>
 
 
