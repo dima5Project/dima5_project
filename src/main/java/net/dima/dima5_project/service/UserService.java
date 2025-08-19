@@ -134,7 +134,7 @@ public class UserService {
 
     public Page<ResultSaveDTO> getMySaves(String userId, Pageable pageable) {
         return resultSaveRepository
-                .findByUserId_UserIdOrderBySaveSeqDesc(userId, pageable)
+                .findByUserId_UserId(userId, pageable)
                 .map(ResultSaveDTO::toDTO);
     }
 

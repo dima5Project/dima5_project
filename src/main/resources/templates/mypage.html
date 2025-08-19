@@ -118,7 +118,6 @@
                                     <th>TOP1 항구명</th>
                                     <th>확률</th>
                                     <th>ETA</th>
-                                    <th>삭제</th>
                                     <th>재검색</th>
                                 </tr>
                             </thead>
@@ -132,24 +131,9 @@
                                     <td th:text="${save.top1Port != null ? save.top1Port : '없음'}">VNHPH</td>
                                     <td th:text="${save.top1Pred != null ? #numbers.formatDecimal(save.top1Pred * 100,1,2) + '%' : '없음'}">88%</td>
                                     <td th:text="${save.eta != null ? #temporals.format(save.eta, 'yyyy-MM-dd HH:mm') : '없음'}">2025-08-31</td>
-                                    <td><button type="button" class="btn-delete"
-                                            th:attr="data-id=${save.saveSeq}">삭제</button></td>
                                     <td><button type="button" class="btn-search-again"
                                             th:attr="data-id=${save.saveSeq}" th:href="@{/predict(idValue=${save.searchVsl})}">재검색</button></td>
                                 </tr>
-                                <!-- 혹여나 안되면 여기 사용 -->
-                                <!-- <tbody>
-                                    <tr th:each="save, stat : ${saves.content}">
-                                        <td th:text="${stat.index + 1}">1</td>
-                                        <td th:text="${save.searchVsl}">112233</td>
-                                        <td th:text="${save.lat}">31.14567</td>
-                                        <td th:text="${save.lon}">127.9872</td>
-                                        <td th:text="${save.top1Port}">VNHPH</td>
-                                        <td th:text="${T(java.lang.Math).round(save.top1Pred)} + '%'">88%</td>
-                                        <td th:text="${save.eta != null ? #temporals.format(save.eta, 'yyyy-MM-dd') : '-'}">2025-08-31</td>
-                                        <td><button type="button" class="btn-delete" th:attr="data-id=${save.saveSeq}">삭제</button></td>
-                                        <td><button type="button" class="btn-search-again" th:attr="data-id=${save.saveSeq}">재검색</button></td>
-                                    </tr> -->
                             </tbody>
                         </table>
                     </div>

@@ -46,28 +46,34 @@
                     <th>TOP1 항구명</th>
                     <th>확률</th>
                     <th>ETA</th>
-                    <th>삭제</th>
                     <th>재검색</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="ship, stat : ${shipList}">
                     <td th:text="${stat.count}">1</td>
-                    <td th:text="${ship.searchVsl.vslId}">112233</td>
-                    <td th:text="${ship.lat}">31.14567</td>
-                    <td th:text="${ship.lon}">127.9872</td>
-                    <td th:text="${ship.top1Port}">VNHPH</td>
-                    <td th:text="${ship.top1Pred + '%'}">88%</td>
-                    <td th:text="${#temporals.format(ship.eta, 'yyyy-MM-dd')}">2025-08-31</td>
-                    <td><button type="button" class="btn-delete">삭제</button></td>
-                    <td><button type="button" class="btn-search-again">재검색</button></td>
+                    <td th:text="${ship.searchVsl}">112233</td>
+                    <td th:text="${ship.lat == 0 ? '없음' : #numbers.formatDecimal(ship.lat,1,6)}">31.14567</td>
+                    <td th:text="${ship.lon == 0 ? '없음' : #numbers.formatDecimal(ship.lon,1,6)}">127.9872</td>
+                    <td th:text="${ship.top1Port != null ? ship.top1Port : '없음'}">VNHPH</td>
+                    <td th:text="${ship.top1Pred != null ? #numbers.formatDecimal(ship.top1Pred * 100,1,2) + '%' : '없음'}">88%</td>
+                    <td th:text="${ship.eta != null ? #temporals.format(ship.eta, 'yyyy-MM-dd HH:mm:ss') : '없음'}">2025-08-31</td>
+                    <td>
+                        <button class="btn-search-again" type="button"
+                            th:attr="data-id=${ship.saveSeq}"
+                            th:href="@{/predict(idValue=${ship.searchVsl})}">재검색</button>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(shipList)}">
+                    <td colspan="9">저장된 선박이 없습니다.</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div class="back-link-container">
-        <a th:href="@{/mypage}" class="back-link">← 마이페이지로 돌아가기</a>
+        <a th:href="@{/mypage/main}" class="back-link">← 마이페이지로 돌아가기</a>
     </div>
 
     <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
