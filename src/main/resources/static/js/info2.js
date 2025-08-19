@@ -83,6 +83,23 @@ const daysTag = document.querySelector('.days');
 const currentDateElement = document.querySelector('.current-date');
 const prevNextIcon = document.querySelectorAll('.nav button');
 
+// =========================
+// 대기 상태 변수
+// =========================
+// 사용자가 드롭다운에서 고른 값(아직 조회 전)
+let pending = {
+    country: null,
+    portId: null,
+    portNameKr: null
+};
+
+// =========================
+// 딥링크 모드 감지
+// =========================
+const urlParams = new URLSearchParams(window.location.search);
+const deepLinkPortId = urlParams.get('port'); // 예: CNSHA
+const hasDeepLink = !!(deepLinkPortId && portIdToName[deepLinkPortId]);
+
 // ==========================
 // 자동 업데이트용 항구 목록
 // ==========================
@@ -102,42 +119,61 @@ $(document).ready(function () {
 // 2. 이벤트 바인딩
 // ==========================
 function initEventBindings() {
+    $("#countrySelect").off("change").off("change.info");
+    $("#portSelect").off("change").off("change.info");
+    $("#searchBtn").off("click").off("click.info");
+
     $("#countrySelect").on("change", function () {
         isUserInteracting = true;
         stopAutoUpdate();
 
-        let countryNameKr = $(this).val();
-        loadPorts(countryNameKr);
-        loadTimezone(countryNameKr);
-        loadHoliday(countryNameKr);
+        pending.country = $(this).val();        // 상태만 저장
+        pending.portId = null;                  // 국가 바뀌면 포트 초기화
+        pending.portNameKr = null;
+
+        loadPorts(pending.country).done(() => {
+            $("#portSelect").val("");             // “항구 선택” 초기화
+            toggleSearchBtn();                    // (선택 완료 여부에 따라 버튼 제어)
+        });
     });
+
+    $("#portSelect").on("change", function () {
+        isUserInteracting = true;
+        stopAutoUpdate();
+
+        pending.portId = $(this).val();               // 상태만 저장
+        pending.portNameKr = portIdToName[pending.portId] || null;
+
+        toggleSearchBtn();                             // 버튼 활성/비활성
+    });
+
+    $("#searchBtn").on("click", function () {
+        isUserInteracting = true;
+        stopAutoUpdate();
+
+        // 유효성 검사
+        if (!pending.country || !pending.portId || !pending.portNameKr) {
+            alert("국가와 항구를 모두 선택해주세요.");
+            return;
+        }
+
+        // 여기서만 “현재 조회 상태”로 반영
+        currentCountryNameKr = pending.country;
+        currentPortId = pending.portId;
+        currentPortNameKr = pending.portNameKr;
+
+        // 조회 실행
+        updateInfoCardsAndGraphs();
+
+        toggleSearchBtn();
+    });
+
 
     $("body").on("click", function () {
         if (!isUserInteracting) {
             isUserInteracting = true;
             stopAutoUpdate();
         }
-    });
-
-    $("#searchBtn").on("click", function () {
-        // 사용자가 선택한 항구 정보를 가져옴
-        let portId = $("#portSelect").val();
-        let portNameKr = portIdToName[portId];
-        let coords = portCoordinates[portNameKr];
-
-        // portId, coords 중 선택을 안 한 것이 있으면 경고창을 띄움
-        if (!portId || !coords) {
-            alert("국가와 항구를 모두 선택해주세요.");
-            return;
-        }
-
-        // 검색 시 전역 변수 업데이트
-        currentPortId = portId;
-        currentPortNameKr = portNameKr;
-        currentCountryNameKr = $("#countrySelect").val();
-
-        // 선택된 항구로 데이터 로드
-        updateInfoCardsAndGraphs();
     });
 
     // 달력 이전/다음 버튼 이벤트 리스너 추가 (가장 올바른 위치)
@@ -164,20 +200,49 @@ function initEventBindings() {
 
 // 페이지 로딩 시 초기 데이터 로드 및 자동 업데이트 시작
 function loadInitialData() {
-    $.get(`/api/info/port/${encodeURIComponent(currentPortId)}`, function (p) {
-        currentCountryNameKr = p.countryNameKr;
-        currentPortNameKr = p.portNameKr;
+    // 1) 이번 초기 로딩에 사용할 portId 결정
+    const idToLoad = hasDeepLink ? deepLinkPortId : currentPortId;
 
+    $.get(`/api/info/port/${encodeURIComponent(idToLoad)}`, function (p) {
+        // 2) API 응답으로 현재 상태 세팅
+        currentPortId = idToLoad;
+        currentPortNameKr = p.portNameKr || portIdToName[idToLoad];
+        currentCountryNameKr = p.countryNameKr || portNameToCountry[currentPortNameKr];
+
+        // pending도 동기화 (검색 버튼 UX 일관성)
+        pending.country = currentCountryNameKr;
+        pending.portId = currentPortId;
+        pending.portNameKr = currentPortNameKr;
+
+        // 3) 셀렉트 채우고 값 반영
         loadCountries().done(() => {
             $("#countrySelect").val(currentCountryNameKr);
             loadPorts(currentCountryNameKr).done(() => {
                 $("#portSelect").val(currentPortId);
+
+                // 4) 딥링크면 즉시 조회 실행 + 자동 업데이트는 멈춤
+                //    (예측 페이지에서 클릭해 들어왔을 때 바로 보여주기 위함)
                 updateInfoCardsAndGraphs();
+                toggleSearchBtn();
+
+                if (hasDeepLink) {
+                    // 자동 순환(랜덤 포트 갱신) 완전히 중단
+                    isUserInteracting = true; // startAutoUpdate()의 조건을 깨서 예방
+                    stopAutoUpdate();         // 혹시 돌고 있으면 정지
+                } else {
+                    // 일반 진입이면 기존 자동 업데이트 유지
+                    startAutoUpdate();
+                }
             });
         });
-
-        startAutoUpdate();
     });
+}
+function toggleSearchBtn() {
+    const ok = !!(pending.country && pending.portId);
+    $("#searchBtn")
+        .prop("disabled", !ok)          // 비활성화 토글
+        .attr("aria-disabled", String(!ok))   // 접근성
+        .attr("title", ok ? "" : "국가와 항구를 선택하세요");
 }
 
 // 달력 렌더링 함수
@@ -276,21 +341,21 @@ function loadHoliday(countryNameKr) {
 }
 
 // 모든 정보 카드를 업데이트하는 공통 함수
-function updateInfoCardsAndGraphs() {
-    let coords = portCoordinates[currentPortNameKr];
+// function updateInfoCardsAndGraphs() {
+//     let coords = portCoordinates[currentPortNameKr];
 
-    if (coords) {
-        // 날씨
-        loadWeather(coords.lat, coords.lon);
-    }
+//     if (coords) {
+//         // 날씨
+//         loadWeather(coords.lat, coords.lon);
+//     }
 
-    // 혼잡도 카드 + 그래프
-    loadDocking(currentPortId);
-    loadDockingGraph(currentPortId);
-    // 시차 + 공휴일
-    loadTimezone(currentCountryNameKr);
-    loadHoliday(currentCountryNameKr); // loadHoliday가 달력 렌더링을 포함
-}
+//     // 혼잡도 카드 + 그래프
+//     loadDocking(currentPortId);
+//     loadDockingGraph(currentPortId);
+//     // 시차 + 공휴일
+//     loadTimezone(currentCountryNameKr);
+//     loadHoliday(currentCountryNameKr); // loadHoliday가 달력 렌더링을 포함
+// }
 
 // 자동 업데이트 중지
 function stopAutoUpdate() {
@@ -596,48 +661,98 @@ function drawChart(data) { // 외부에서 전달받은 data를 이용해 차트
 }
 
 // 선택 항구의 맵박스
-document.addEventListener("DOMContentLoaded", async () => {
-    // 1. URL에서 portId 가져오기
-    const params = new URLSearchParams(window.location.search);
-    const portId = params.get('port');
 
-    if (!portId) {
-        console.error("URL에 portId가 없습니다.");
-        return;
-    }
+let map, mapMarker;
 
+async function updateMapByPortId(portId) {
     try {
-        // 2. portId로 항구 정보 가져오기 (메인 페이지에서 사용했던 API 재활용)
         const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`);
         if (!res.ok) throw new Error('hover API 실패');
         const portInfo = await res.json();
-
-        // 3. 위도, 경도 정보 추출
         const lat = portInfo.latitude;
         const lng = portInfo.longitude;
 
-        if (!lat || !lng) {
-            console.error("API 응답에 유효한 위도/경도 정보가 없습니다.");
-            return;
-        }
+        if (lat == null || lng == null) return;
 
-        // 4. Mapbox 지도 초기화
         mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/light-v10',
-            center: [lng, lat], // 해당 항구 중심으로 설정
-            zoom: 12, // 항구 하나만 보이도록 줌 레벨 조정
-            attributionControl: false
-        });
-
-        // 5. 지도에 마커 추가
-        new mapboxgl.Marker()
-            .setLngLat([lng, lat])
-            .addTo(map);
-
+        if (!map) {
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/light-v10',
+                center: [lng, lat],
+                zoom: 12,
+                attributionControl: false
+            });
+            mapMarker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+        } else {
+            map.setCenter([lng, lat]);
+            map.setZoom(12);
+            if (!mapMarker) mapMarker = new mapboxgl.Marker().addTo(map);
+            mapMarker.setLngLat([lng, lat]);
+        }
     } catch (e) {
-        console.error("데이터 로딩 또는 지도 초기화 실패:", e);
+        console.error('지도 업데이트 실패:', e);
     }
-});
+}
+
+function updateInfoCardsAndGraphs() {
+    const coords = portCoordinates[currentPortNameKr];
+
+    if (coords) {
+        loadWeather(coords.lat, coords.lon);
+    }
+    loadDocking(currentPortId);
+    loadDockingGraph(currentPortId);
+    loadTimezone(currentCountryNameKr);
+    loadHoliday(currentCountryNameKr);
+
+    // 지도도 여기서만 갱신
+    updateMapByPortId(currentPortId);
+}
+
+// document.addEventListener("DOMContentLoaded", async () => {
+//     // 1. URL에서 portId 가져오기
+//     const params = new URLSearchParams(window.location.search);
+//     const portId = params.get('port');
+
+//     if (!portId) {
+//         console.error("URL에 portId가 없습니다.");
+//         return;
+//     }
+
+//     try {
+//         // 2. portId로 항구 정보 가져오기 (메인 페이지에서 사용했던 API 재활용)
+//         const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`);
+//         if (!res.ok) throw new Error('hover API 실패');
+//         const portInfo = await res.json();
+
+//         // 3. 위도, 경도 정보 추출
+//         const lat = portInfo.latitude;
+//         const lng = portInfo.longitude;
+
+//         if (!lat || !lng) {
+//             console.error("API 응답에 유효한 위도/경도 정보가 없습니다.");
+//             return;
+//         }
+
+//         // 4. Mapbox 지도 초기화
+//         mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
+
+//         const map = new mapboxgl.Map({
+//             container: 'map',
+//             style: 'mapbox://styles/mapbox/light-v10',
+//             center: [lng, lat], // 해당 항구 중심으로 설정
+//             zoom: 12, // 항구 하나만 보이도록 줌 레벨 조정
+//             attributionControl: false
+//         });
+
+//         // 5. 지도에 마커 추가
+//         new mapboxgl.Marker()
+//             .setLngLat([lng, lat])
+//             .addTo(map);
+
+//     } catch (e) {
+//         console.error("데이터 로딩 또는 지도 초기화 실패:", e);
+//     }
+// });
