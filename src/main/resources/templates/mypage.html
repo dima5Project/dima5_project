@@ -131,8 +131,12 @@
                                     <td th:text="${save.top1Port != null ? save.top1Port : '없음'}">VNHPH</td>
                                     <td th:text="${save.top1Pred != null ? #numbers.formatDecimal(save.top1Pred * 100,1,2) + '%' : '없음'}">88%</td>
                                     <td th:text="${save.eta != null ? #temporals.format(save.eta, 'yyyy-MM-dd HH:mm') : '없음'}">2025-08-31</td>
-                                    <td><button type="button" class="btn-search-again"
-                                            th:attr="data-id=${save.saveSeq}" th:href="@{/predict(idValue=${save.searchVsl})}">재검색</button></td>
+                                    <td>
+                                        <a type="button" 
+                                            class="btn-search-again"
+                                            th:attr="data-id=${save.saveSeq}" 
+                                            th:href="@{/predict(idValue=${save.searchVsl})}">재검색</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
