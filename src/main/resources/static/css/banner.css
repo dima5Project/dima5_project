@@ -14,7 +14,7 @@ body {
 }
 
 body {
-  min-height: 150vh;
+  /* min-height: 150vh; */
   /* 페이지의 최소 높이를 150vh로 설정하여 강제로 스크롤바 생성 */
   overflow-y: scroll;
 }
