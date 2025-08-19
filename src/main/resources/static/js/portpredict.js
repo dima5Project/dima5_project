@@ -216,6 +216,10 @@ $(function () {
             const resp = await response.json();
 
             console.log("API로부터 받은 데이터:", resp); // 디버깅
+            // ★ 저장용 전역 값 세팅 (이 3줄을 꼭 추가)
+            window.currentLat = Number(resp?.latest?.lat ?? 0);
+            window.currentLon = Number(resp?.latest?.lon ?? 0);
+            window.globalPredictions = Array.isArray(resp?.latest?.predictions) ? resp.latest.predictions : [];
 
 
 
@@ -954,58 +958,93 @@ $(function () {
         saveModal.setAttribute('aria-hidden', 'true');
     }
 
+
     // '예' 버튼 클릭 시 호출될 비동기 함수
     async function handleSaveYesClick() {
-        const saveModal = document.getElementById('saveModal');
-        const modalTitle = saveModal.querySelector('.modal__title');
+        const saveModal    = document.getElementById('saveModal');
+        const modalTitle   = saveModal.querySelector('.modal__title');
         const modalActions = saveModal.querySelector('.modal__actions');
 
-        // 로딩 상태로 변경
+        // 로딩 상태
         modalTitle.textContent = '저장 중...';
         modalActions.innerHTML = '<p>잠시만 기다려주세요.</p>';
 
-        // 저장할 데이터 준비
-        const dataToSave = {
-            vesselId: $('.sidebar__vesselinfo .kv strong:eq(0)').text(),
-            predictions: globalPredictions,
-            routes: globalRoutesData
+        // 1) 입력값/Top1 추출
+        const typedId = document.querySelector('.sidebar__input')?.value?.trim() || '';
+        const preds   = Array.isArray(window.globalPredictions) ? window.globalPredictions : [];
+        const top1    = preds.find(p => p.rank === 1)
+                        || preds.sort((a,b) => (b?.prob||0) - (a?.prob||0))[0]
+                        || null;
+
+        // 2) 좌표 (조회 성공 직후 resp.latest.lat/lon을 전역 저장해두세요)
+        const lat = (typeof window.currentLat === 'number') ? window.currentLat : 0;
+        const lon = (typeof window.currentLon === 'number') ? window.currentLon : 0;
+
+        // 3) ETA 원본/ISO
+        const rawEta = top1?.eta ?? null; // 서버에서 종종 '정보 없음'이 올 수도 있으니 원본으로 판단
+        const etaISO = rawEta ? rawEta.replace(' ', 'T') : null; // → "2025-08-21T14:30:32"
+
+
+        // 4) 저장할 값이 없으면 안내만 (API 호출 X)
+        if (!typedId || !top1 || !top1.port_id || typeof top1.prob !== 'number' || !etaISO) {
+            modalTitle.textContent = '저장할 결과가 없습니다';
+            modalActions.innerHTML = `
+            <p>
+                선박: ${typedId || '없음'}<br>
+                항구: ${top1?.port_id || '없음'} / 확률: ${typeof top1?.prob === 'number' ? top1.prob : '없음'}<br>
+                ETA: ${rawEta || '없음'}
+            </p>
+            <button class="modal__btn primary" data-action="close">확인</button>`;
+            modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
+            return; // ★ API 호출 안 함
+        }
+
+        // 4) 서버 DTO (백엔드 ResultSaveDTO와 1:1)
+        const dtoPayload = {
+            searchVsl: typedId,     // 사용자가 입력한 IMO/MMSI
+            lat: Number(lat),
+            lon: Number(lon),
+            top1Port: top1.port_id || '없음',
+            top1Pred: typeof top1?.prob === 'number' ? top1.prob : 0.0,
+            eta: etaISO             // "YYYY-MM-DDTHH:mm:ss"
         };
+
+        console.log('[SAVE] payload =', dtoPayload);
 
         try {
             const response = await fetch('/api/result-save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dataToSave)
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dtoPayload)
             });
 
             if (response.ok) {
-                const responseData = await response.json();
-                console.log('Save successful:', responseData.id);
-
-                // 성공 메시지로 모달 내용 변경
+                // 응답 바디가 없을 수도 있으니 방어
+                await response.json().catch(() => ({}));
                 modalTitle.textContent = '저장되었습니다.';
-                modalActions.innerHTML = `<p>마이페이지 > 내 선박 정보 에서 확인해주세요.</p><button class="modal__btn primary" data-action="close">확인</button>`;
-
-                // 새로운 '확인' 버튼에 닫기 기능 연결
+                modalActions.innerHTML = `
+                    <p>마이페이지 &gt; 내 선박 정보에서 확인해주세요.</p>
+                    <button class="modal__btn primary" data-action="close">확인</button>`;
                 modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
             } else {
-                // 실패 메시지로 모달 내용 변경
-                const errorData = await response.json();
+                let msg = '알 수 없는 오류';
+                try { const e = await response.json(); msg = e?.message || msg; } catch {}
                 modalTitle.textContent = '저장 실패';
-                modalActions.innerHTML = `<p>오류가 발생했습니다: ${errorData.message || '알 수 없는 오류'}</p><button class="modal__btn primary" data-action="close">닫기</button>`;
-
+                modalActions.innerHTML = `
+                    <p>오류가 발생했습니다: ${msg}</p>
+                    <button class="modal__btn primary" data-action="close">닫기</button>`;
                 modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
             }
         } catch (error) {
-            console.error('API 호출 중 오류 발생:', error);
+            console.error('API 호출 오류:', error);
             modalTitle.textContent = '저장 실패';
-            modalActions.innerHTML = `<p>네트워크 오류가 발생했습니다. 다시 시도해주세요.</p><button class="modal__btn primary" data-action="close">닫기</button>`;
-
+            modalActions.innerHTML = `
+                <p>네트워크 오류가 발생했습니다. 다시 시도해주세요.</p>
+                <button class="modal__btn primary" data-action="close">닫기</button>`;
             modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
         }
     }
+
 
     // '저장' 버튼 클릭 이벤트
     $(document).on('click', '.sidebar__btn.save', function () {
@@ -1038,7 +1077,8 @@ $(function () {
     });
 
     // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
-    $(document).off('click', '#saveModal [data-action="yes"]').on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
+    $(document).off('click', '#saveModal [data-action="yes"]')
+                .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
 
 });
 

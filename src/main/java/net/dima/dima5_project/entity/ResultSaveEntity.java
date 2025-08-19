@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.dima.dima5_project.dto.ResultSaveDTO;
 
 @Data
 @AllArgsConstructor
@@ -30,10 +29,8 @@ public class ResultSaveEntity {
     @Column(name = "save_seq")
     private Long saveSeq;
 
-    // FK: result_save.search_vsl -> vessel_master.vsl_id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "search_vsl", referencedColumnName = "vsl_id", nullable = false)
-    private VesselMasterEntity searchVsl;
+    @Column(name="search_vsl", length = 300)
+    private String searchVsl;
 
     // FK: result_save.user_id -> predict_user.user_id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,18 +49,16 @@ public class ResultSaveEntity {
     @Column(name = "eta")
     private LocalDateTime eta;
 
-    public static ResultSaveEntity fromDTO(ResultSaveDTO dto,
-            VesselMasterEntity vsl, // vslId로 조회해 온 엔티티
-            PredictUserEntity user) { // userId로 조회해 온 엔티티
-        return ResultSaveEntity.builder()
-                .saveSeq(dto.getSaveSeq())
-                .searchVsl(vsl)
-                .userId(user)
-                .lat(dto.getLat())
-                .lon(dto.getLon())
-                .top1Port(dto.getTop1Port())
-                .top1Pred(dto.getTop1Pred())
-                .eta(dto.getEta())
-                .build();
-    }
+    // public static ResultSaveEntity fromDTO(ResultSaveDTO dto, PredictUserEntity user) { // userId로 조회해 온 엔티티
+    //     return ResultSaveEntity.builder()
+    //             .saveSeq(dto.getSaveSeq())
+    //             .searchVsl(dto.getSearchVsl())
+    //             .userId(user)
+    //             .lat(dto.getLat())
+    //             .lon(dto.getLon())
+    //             .top1Port(dto.getTop1Port())
+    //             .top1Pred(dto.getTop1Pred())
+    //             .eta(dto.getEta())
+    //             .build();
+    // }
 }

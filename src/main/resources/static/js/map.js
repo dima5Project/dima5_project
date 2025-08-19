@@ -10,25 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
         attributionControl: false
     });
 
-    document.addEventListener('panel:toggle', (e) => {
-        const { type, on } = e.detail;
-        if (type === 'style') {
-            const newStyle = on ? 'mapbox://styles/mapbox/navigation-day-v1' : 'mapbox://styles/mapbox/light-v10';
-            map.setStyle(newStyle, {
-                keepLayers: true,
-                keepSources: true
-            });
-        }
-    });
-
-
     const routeSourceId = 'route-source';
     const routeLayerId = 'route-layer';
     const markerSourceId = 'marker-source';
     const markerLayerId = 'marker-layer';
     const lastMarkerSourceId = 'last-marker-source';
     const lastMarkerLayerId = 'last-marker-layer';
-    let allPortMarkers = [];
+    let allPortMarkers = []; // 모든 항구 마커를 저장할 배열
 
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -49,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         className: 'busan-popup-container'
     });
 
+    // 최신 위치 마커에 대한 팝업 변수 추가
     const marineHoverPopup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false,
@@ -63,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = Date.now();
         const cached = hoverCache.get(portId);
         if (cached && (now - cached.t) < HOVER_TTL_MS) return cached.v;
-        const res = await fetch(`/ api / info / hover / ${encodeURIComponent(portId)}`, {
+        const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`, {
             cache: 'no-cache'
         });
         if (!res.ok) throw new Error('hover API 실패: ' + portId);
@@ -103,16 +92,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return dirs[i];
     }
 
+    // 보조: 각도→방위(예: N, E, S, W)
     function bearingToText(deg) {
         const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
         return dirs[Math.round((((deg % 360) + 360) % 360) / 45)];
     }
 
+    // 최신 위치 마커 팝업을 위한 HTML 생성 함수
     function buildMarinePopupHTML(d) {
         const waveDirectionText = bearingToText(d.waveDirection);
         const currentDirectionText = bearingToText(d.currentDirection);
         return `
-            < div div class= "marine-popup" >
+            <div class="marine-popup">
                 <div class="marine-popup__item">
                     <span class="marine-popup__label">파고</span>
                     <span class="marine-popup__value">${d.waveHeight}m</span>
@@ -141,12 +132,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="marine-popup__label">날씨</span>
                     <span class="marine-popup__value">${d.weatherText}</span>
                 </div>
-            </ > `;
+            </div>`;
     }
 
+    // 사용자가 제공한 새로운 팝업 디자인으로 교체
     function buildPopupHTML(d) {
         return `
-                < div div class= "marine-popup" >
+    <div class="marine-popup">
       <div class="header">
         <svg class="icon" viewBox="0 0 24 24" fill="none">
           <path d="M12 22s7-6.28 7-12a7 7 0 1 0-14 0c0 5.72 7 12 7 12z" stroke="#fff" stroke-width="2" fill="none"/>
@@ -217,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="value">${d.weatherText}</div>
         </div>
       </div>
-    </ > `;
+    </div>`;
     }
 
     function buildPortHoverCardHTML({ portId, windSpdMS, windDirDeg, tempC, congestion, tzText }) {
@@ -230,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 '원활';
 
         return `
-                < div div class= "port-hover-card" >
+    <div class="port-hover-card">
       <div class="port-hover-card__hd">${portId}</div>
       <div class="port-hover-card__divider"></div>
       <div class="port-hover-card__bd">
@@ -258,16 +250,16 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="port-row__val">UTC ${tzText || '+0'}</div>
         </div>
       </div>
-    </ > `;
+    </div>`;
     }
 
     function buildBusanHoverCardHTML() {
         return `
-                < div div class= "port-hover-card busan-hover-card" >
-                <div class="port-hover-card__hd">
-                    KRBUS
-                </div>
-    </ > `;
+    <div class="port-hover-card busan-hover-card">
+      <div class="port-hover-card__hd">
+        KRBUS
+      </div>
+    </div>`;
     }
 
     async function loadSvgText(url) {
@@ -320,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!f.geometry || f.geometry.type !== 'Point') return;
             const [lng, lat] = f.geometry.coordinates || [];
             if (typeof lng !== 'number' || typeof lat !== 'number') return;
-            const portId = f.properties?.port_id || '';
+            const portId = f.properties?.port_id || ''; // port_id 추출
 
             const color = f.properties?.color || '#013895';
             const size = f.properties?.size || 28;
@@ -330,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 size
             });
 
+            // DOM 엘리먼트에 port_id 저장
             el.dataset.portId = portId;
 
             el.addEventListener('click', () => {
@@ -340,22 +333,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 new mapboxgl.Popup()
                     .setLngLat([lng, lat])
-                    .setHTML(`< div div style = "font-weight:700" > ${portId}</ > <div style="font-size:12px;color:#666">(${lat.toFixed(4)}, ${lng.toFixed(4)})</div>`)
+                    .setHTML(`<div style="font-weight:700">${portId}</div><div style="font-size:12px;color:#666">(${lat.toFixed(4)}, ${lng.toFixed(4)})</div>`)
                     .addTo(map);
 
                 setTimeout(() => {
-                    window.location.href = `/ port / info ? port = ${encodeURIComponent(portId)}`;
+                    window.location.href = `/port/info?port=${encodeURIComponent(portId)}`;
                 }, 1000);
             });
 
-            const marker = new mapboxgl.Marker({
+            const marker = new mapboxgl.Marker({ // 마커 인스턴스 저장
                 element: el,
                 anchor: 'bottom'
             })
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-            allPortMarkers.push(marker);
+            allPortMarkers.push(marker); // 마커를 배열에 저장
 
             el.addEventListener('mouseenter', async () => {
                 const pid = f.properties?.port_id || 'Unknown';
@@ -368,13 +361,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 } catch (e) {
                     console.error('HOVER API ERROR for', pid, e);
                     const html = `
-            < div div class= "port-hover-card" >
+      <div class="port-hover-card">
         <div class="port-hover-card__hd">${pid}</div>
         <div class="port-hover-card__divider"></div>
         <div class="port-hover-card__bd">
           <div class="port-row__val" style="padding:8px 0;">데이터를 불러오지 못했습니다.</div>
         </div>
-      </ > `;
+      </div>`;
                     hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
                 }
             });
@@ -390,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!portId) return;
 
-                window.location.assign(`/ port / info ? port = ${encodeURIComponent(portId)}`);
+                window.location.assign(`/port/info?port=${encodeURIComponent(portId)}`);
             });
         });
     }
@@ -416,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'line-cap': 'round'
             },
             paint: {
-                'line-color': ['get', 'color'],
+                'line-color': ['get', 'color'], // GeoJSON feature의 'color' 속성 값을 사용하도록 변경
                 'line-width': 4
             }
         });
@@ -434,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
             source: markerSourceId,
             paint: {
                 'circle-radius': 6,
-                'circle-color': '#34495e',
+                'circle-color': '#34495e', // timeline 마커 색상 (짙은 청회색)
                 'circle-stroke-width': 1,
                 'circle-stroke-color': '#fff'
             }
@@ -453,13 +446,39 @@ document.addEventListener("DOMContentLoaded", () => {
             source: lastMarkerSourceId,
             paint: {
                 'circle-radius': 8,
-                'circle-color': '#00bfff',
+                'circle-color': '#00bfff', // latest 마커 색상 (짙은 빨간색)
                 'circle-stroke-width': 2,
                 'circle-stroke-color': '#fff'
             }
         });
 
         await addPortMarkers().catch(console.error);
+
+        const SVG_URL = '/images/portpredictImages/port_icon.svg';
+        const svgText = await loadSvgText(SVG_URL);
+        const busanEl = makeSvgMarker(svgText, {
+            color: '#013895',
+            size: 28
+        });
+        busanEl.dataset.portId = 'KRBUS'; // 부산 마커에도 ID 부여
+
+        busanEl.addEventListener('mouseenter', () => {
+            const html = buildBusanHoverCardHTML();
+            busanHoverPopup.setLngLat([129.040, 35.106]).setHTML(html).addTo(map);
+        });
+
+        busanEl.addEventListener('mouseleave', () => {
+            busanHoverPopup.remove();
+        });
+
+        const busanMarker = new mapboxgl.Marker({ // 부산 마커를 배열에 저장
+            element: busanEl,
+            anchor: 'bottom'
+        })
+            .setLngLat([129.040, 35.106])
+            .addTo(map);
+
+        allPortMarkers.push(busanMarker); // 부산 마커를 배열에 저장
 
         // 마지막 마커에 대한 hover 기능 추가
         let hoverTimeout;
@@ -475,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
         map.on('mouseenter', lastMarkerLayerId, (e) => {
             clearTimeout(hoverTimeout);
             const coordinates = e.features[0].geometry.coordinates.slice();
+            // buildMarinePopupHTML 대신 새로운 buildPopupHTML 함수 사용
             const html = buildPopupHTML(marineData);
             marineHoverPopup.setLngLat(coordinates).setHTML(html).addTo(map);
         });
@@ -484,130 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 100);
         });
     });
-
-    // --- 👇 추가된 코드 시작 👇 ---
-    map.on('style.load', async () => {
-        // 스타일 변경 후, 기존 레이어와 소스를 다시 추가합니다.
-
-        // (1) 항로와 마커를 위한 소스 및 레이어 재추가
-        if (!map.getSource(routeSourceId)) {
-            map.addSource(routeSourceId, {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: []
-                }
-            });
-        }
-        if (!map.getLayer(routeLayerId)) {
-            map.addLayer({
-                id: routeLayerId,
-                type: 'line',
-                source: routeSourceId,
-                layout: {
-                    'line-join': 'round',
-                    'line-cap': 'round'
-                },
-                paint: {
-                    'line-color': ['get', 'color'],
-                    'line-width': 4
-                }
-            });
-        }
-
-        if (!map.getSource(markerSourceId)) {
-            map.addSource(markerSourceId, {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: []
-                }
-            });
-        }
-        if (!map.getLayer(markerLayerId)) {
-            map.addLayer({
-                id: markerLayerId,
-                type: 'circle',
-                source: markerSourceId,
-                paint: {
-                    'circle-radius': 6,
-                    'circle-color': '#34495e',
-                    'circle-stroke-width': 1,
-                    'circle-stroke-color': '#fff'
-                }
-            });
-        }
-
-        if (!map.getSource(lastMarkerSourceId)) {
-            map.addSource(lastMarkerSourceId, {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: []
-                }
-            });
-        }
-        if (!map.getLayer(lastMarkerLayerId)) {
-            map.addLayer({
-                id: lastMarkerLayerId,
-                type: 'circle',
-                source: lastMarkerSourceId,
-                paint: {
-                    'circle-radius': 8,
-                    'circle-color': '#00bfff',
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#fff'
-                }
-            });
-        }
-
-        // (2) 기존 항구 마커들 다시 추가
-        allPortMarkers.forEach(marker => marker.remove());
-        allPortMarkers = [];
-        await addPortMarkers().catch(console.error);
-
-        // (3) 부산 마커 다시 추가
-        const SVG_URL = '/images/portpredictImages/port_icon.svg';
-        const svgText = await loadSvgText(SVG_URL);
-        const busanEl = makeSvgMarker(svgText, { color: '#013895', size: 28 });
-        busanEl.dataset.portId = 'KRBUS';
-        const busanMarker = new mapboxgl.Marker({ element: busanEl, anchor: 'bottom' })
-            .setLngLat([129.040, 35.106])
-            .addTo(map);
-        allPortMarkers.push(busanMarker);
-
-        // 부산 마커 이벤트 핸들러 재연결
-        busanEl.addEventListener('mouseenter', () => {
-            const html = buildBusanHoverCardHTML();
-            busanHoverPopup.setLngLat([129.040, 35.106]).setHTML(html).addTo(map);
-        });
-        busanEl.addEventListener('mouseleave', () => {
-            busanHoverPopup.remove();
-        });
-
-        // (4) 마지막 마커에 대한 hover 기능 재연결
-        const marineData = {
-            waveHeight: 1.2,
-            waveDirection: 210,
-            seaSurfaceTemp: 27.5,
-            currentVelocity: 0.4,
-            currentDirection: 90,
-            visibilityKm: 10.0,
-            weatherText: "맑음"
-        };
-        let hoverTimeout;
-        map.on('mouseenter', lastMarkerLayerId, (e) => {
-            clearTimeout(hoverTimeout);
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            const html = buildPopupHTML(marineData);
-            marineHoverPopup.setLngLat(coordinates).setHTML(html).addTo(map);
-        });
-        map.on('mouseleave', lastMarkerLayerId, () => {
-            hoverTimeout = setTimeout(() => marineHoverPopup.remove(), 100);
-        });
-    });
-    // --- 👆 추가된 코드 끝 👆 ---
-
 
     window.drawRoutes = function (routes) {
         if (!map || !map.getSource(routeSourceId)) return;
@@ -619,7 +515,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             properties: {
                 name: route.route_name,
-                color: route.color
+                color: route.color // portpredict.js에서 넘어온 color 속성을 GeoJSON에 추가
             }
         }));
         map.getSource(routeSourceId).setData({
@@ -660,6 +556,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // 마커 레이어의 가시성을 제어합니다.
     window.toggleMarkersVisibility = function (isVisible) {
         if (!map || !map.getLayer(markerLayerId) || !map.getLayer(lastMarkerLayerId)) return;
         const visibility = isVisible ? 'visible' : 'none';
@@ -667,9 +564,10 @@ document.addEventListener("DOMContentLoaded", () => {
         map.setLayoutProperty(lastMarkerLayerId, 'visibility', visibility);
     };
 
+    // 활성화된 랭크에 해당하는 항구 마커만 표시
     window.togglePortMarkersByRank = function (ranksToKeep) {
         const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
-        portIdsToKeep.add('KRBUS');
+        portIdsToKeep.add('KRBUS'); // 부산항은 항상 유지
 
         allPortMarkers.forEach(marker => {
             const portId = marker.getElement().dataset.portId;
@@ -681,6 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // 모든 항구 마커 숨기기 (부산항 제외)
     window.hideAllPortMarkers = function () {
         allPortMarkers.forEach(marker => {
             const portId = marker.getElement().dataset.portId;
@@ -690,6 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // 모든 항구 마커 다시 표시
     window.showAllPortMarkers = function () {
         allPortMarkers.forEach(marker => {
             marker.getElement().style.display = '';

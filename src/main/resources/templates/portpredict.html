@@ -48,15 +48,15 @@
 
         <!-- 우상단 아이콘 컨트롤 -->
         <div class="map-icon-ctrl" aria-label="지도 보조 컨트롤">
-            <button class="iconbtn" data-type="style" data-tip="지도 스타일">
+            <button id="map-style-btn" class="iconbtn" data-type="style" data-tip="지도 스타일">
                 <img src="/images/portpredictImages/map.png" th:src="@{/images/portpredictImages/map.png}"
                     alt="지도 스타일" />
             </button>
-            <button class="iconbtn" data-type="congestion" data-tip="혼잡도">
+            <button id="congestion-btn" class="iconbtn" data-type="congestion" data-tip="혼잡도">
                 <img src="/images/portpredictImages/ship_congestion.png"
                     th:src="@{/images/portpredictImages/ship_congestion.png}" alt="혼잡도" />
             </button>
-            <button class="iconbtn" data-type="weather" data-tip="날씨">
+            <button id="weather-btn" class="iconbtn" data-type="weather" data-tip="날씨">
                 <img src="/images/portpredictImages/weather.png" th:src="@{/images/portpredictImages/weather.png}"
                     alt="날씨" />
             </button>
@@ -112,7 +112,7 @@
                     <!-- 입력 + 버튼 -->
                     <div class="sidebar__section">
                         <div class="sidebar__row">
-                            <input id="imo" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력" />
+                            <input id="imo vslInput" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력" th:value="${prefillVsl}"/>
                             <button class="sidebar__btn primary">조회</button>
                             <button class="sidebar__btn">초기화</button>
                         </div>

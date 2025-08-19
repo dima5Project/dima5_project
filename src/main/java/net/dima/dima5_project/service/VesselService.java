@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dima.dima5_project.repository.VesselMasterRepository;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class VesselService {
 
 
     /**
-     * 
+     * FastAPI 연결하여 특정 imo/mmsi 에 해당하는 선박의 예측 결과 가져오기
      * @param imo
      * @param mmsi
      * @return
