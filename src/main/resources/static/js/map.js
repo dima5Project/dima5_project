@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
-    let supportedPortIds = [];
-
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
@@ -12,195 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
         attributionControl: false
     });
 
-    // === [혼잡도 오버레이: 상태/설정] ===
-    const congestionBtn = document.getElementById('congestion-btn'); // HTML에 이미 있음
-    const CONG = {
-        active: false,
-        sourceId: 'congestion-src',
-        layerId: 'congestion-layer',
-        requestConcurrency: 6, // 동시 요청 제한
-    };
-
-    // 한글 혼잡도 → 내부 등급 매핑
-    function levelToKey(levelText) {
-        if (levelText === '매우 혼잡') return 'high';
-        if (levelText === '혼잡') return 'mid';
-        return 'low';
-    }
-
-
-    // 포트 좌표 조회 (portId -> 한글명 -> lat/lon)
-    function getPortCoordById(portId) {
-        const nameKr = portIdToName[portId];
-        if (!nameKr) return null;
-        const c = portCoordinates[nameKr];
-        if (!c || typeof c.lat !== 'number' || typeof c.lon !== 'number') return null;
-        return [c.lon, c.lat];
-    }
-
-    // 색상 식 (혼잡: 빨강, 보통: 주황, 원활: 초록)
-    const circleColorExpr = [
-        'match',
-        ['get', 'level'],
-        'high', '#ef4444',  // 매우 혼잡
-        'mid', '#f59e0b',  // 혼잡
-        'low', '#22c55e',  // 원활
-        '#9ca3af'           // fallback
-    ];
-
-    // 레이어/소스 보증
-    function ensureCongestionLayer() {
-        if (!map.getSource(CONG.sourceId)) {
-            map.addSource(CONG.sourceId, {
-                type: 'geojson',
-                data: { type: 'FeatureCollection', features: [] }
-            });
-        }
-        if (!map.getLayer(CONG.layerId)) {
-            map.addLayer({
-                id: CONG.layerId,
-                type: 'circle',
-                source: CONG.sourceId,
-                paint: {
-                    'circle-radius': [
-                        'interpolate', ['linear'], ['zoom'],
-                        3, 3, 6, 6, 10, 10, 14, 14
-                    ],
-                    'circle-color': circleColorExpr,
-                    'circle-stroke-width': 1,
-                    'circle-stroke-color': '#ffffff',
-                    'circle-opacity': 0.9
-                }
-            });
-        } else {
-            // 꺼뒀던 걸 다시 켤 때
-            map.setLayoutProperty(CONG.layerId, 'visibility', 'visible');
-        }
-    }
-
-    // 항구별 혼잡도 호출 (동시성 제한)
-    async function fetchAllPortCongestions() {
-        const feats = [];
-        const ids = supportedPortIds.length ? supportedPortIds.slice() : []; // 전역에 이미 선언됨
-        const pool = new Set();
-
-        async function runOne(portId) {
-            try {
-                const coord = getPortCoordById(portId);
-                if (!coord) return;
-
-                const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`, { cache: 'no-cache' });
-                if (!res.ok) throw new Error(`hover API 실패: ${portId}`);
-                const dto = await res.json();
-
-                const dock = dto.docking || {};
-                const level = levelToKey(dock.congestionLevel); // '매우 혼잡'|'혼잡'|'원활' → 'high'|'mid'|'low'
-                const weather = dto.weather || {}; // 필요하면 풍속/풍향/기온도 여기서
-
-                feats.push({
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: coord },
-                    properties: {
-                        portId,
-                        portNameKr: portIdToName[portId] || portId,
-                        countryKr: portNameToCountry[portIdToName[portId]] || '',
-                        level, // 'low' | 'mid' | 'high'
-                        currentShips: dock.currentShips ?? null,
-                        expectedShips: dock.expectedShips ?? null
-                    }
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // 간단한 concurrency 제어
-        let i = 0;
-        async function scheduleNext() {
-            if (i >= ids.length) return;
-            const id = ids[i++];
-            const p = runOne(id).finally(() => pool.delete(p));
-            pool.add(p);
-            if (pool.size >= CONG.requestConcurrency) {
-                await Promise.race(pool);
-            }
-            await scheduleNext();
-        }
-        await scheduleNext();
-        await Promise.all([...pool]);
-
-        return { type: 'FeatureCollection', features: feats };
-    }
-
-    async function loadAndShowCongestion() {
-        ensureCongestionLayer();
-        const geojson = await fetchAllPortCongestions();
-        const src = map.getSource(CONG.sourceId);
-        if (src) src.setData(geojson);
-
-        // 툴팝업(선택) — 간단 정보
-        map.off('mouseenter', CONG.layerId, onEnter);
-        map.off('mouseleave', CONG.layerId, onLeave);
-        map.on('mouseenter', CONG.layerId, onEnter);
-        map.on('mouseleave', CONG.layerId, onLeave);
-
-        function onEnter(e) {
-            map.getCanvas().style.cursor = 'pointer';
-            const f = e.features && e.features[0];
-            if (!f) return;
-            const p = f.properties || {};
-            const levelText = p.level === 'high' ? '매우 혼잡' : (p.level === 'mid' ? '혼잡' : '원활');
-            const html = `
-      <div style="font-weight:700;margin-bottom:4px;">${p.portNameKr || p.portId}</div>
-      <div style="font-size:12px;color:#475569;">${p.countryKr || ''}</div>
-      <div style="margin-top:6px;">혼잡도: <b>${levelText}</b></div>
-      ${(p.currentShips || p.expectedShips) ? `<div style="margin-top:4px;font-size:12px;">정박 ${p.currentShips ?? '-'} · 예정 ${p.expectedShips ?? '-'}</div>` : ''}
-    `;
-            new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-                .setLngLat(e.lngLat)
-                .setHTML(html)
-                .addTo(map);
-        }
-        function onLeave() {
-            map.getCanvas().style.cursor = '';
-            // mapbox 기본 팝업은 leave 시 자동 제거되지 않으므로, 간단히 전체 팝업 제거
-            const popups = document.querySelectorAll('.mapboxgl-popup');
-            popups.forEach(p => p.remove());
-        }
-    }
-
-    function hideCongestion() {
-        if (map.getLayer(CONG.layerId)) {
-            map.setLayoutProperty(CONG.layerId, 'visibility', 'none');
-            // 팝업 정리
-            const popups = document.querySelectorAll('.mapboxgl-popup');
-            popups.forEach(p => p.remove());
-        }
-    }
-
-    // 버튼 이벤트
-    if (congestionBtn) {
-        // 접근성 상태 초기화
-        congestionBtn.setAttribute('aria-pressed', 'false');
-
-        congestionBtn.addEventListener('click', async () => {
-            CONG.active = !CONG.active;
-            congestionBtn.setAttribute('aria-pressed', CONG.active ? 'true' : 'false');
-            if (CONG.active) {
-                await loadAndShowCongestion();
-            } else {
-                hideCongestion();
-            }
-        });
-    }
-
     const routeSourceId = 'route-source';
     const routeLayerId = 'route-layer';
     const markerSourceId = 'marker-source';
     const markerLayerId = 'marker-layer';
     const lastMarkerSourceId = 'last-marker-source';
     const lastMarkerLayerId = 'last-marker-layer';
-    let allPortMarkers = []; // 모든 항구 마커를 저장할 배열
+    let allPortMarkers = [];
+    let congestionMarkers = [];
 
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -221,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
         className: 'busan-popup-container'
     });
 
-    // 최신 위치 마커에 대한 팝업 변수 추가
     const marineHoverPopup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false,
@@ -276,13 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return dirs[i];
     }
 
-    // 보조: 각도→방위(예: N, E, S, W)
     function bearingToText(deg) {
         const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"];
         return dirs[Math.round((((deg % 360) + 360) % 360) / 45)];
     }
 
-    // 최신 위치 마커 팝업을 위한 HTML 생성 함수
     function buildMarinePopupHTML(d) {
         const waveDirectionText = bearingToText(d.waveDirection);
         const currentDirectionText = bearingToText(d.currentDirection);
@@ -319,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`;
     }
 
-    // 사용자가 제공한 새로운 팝업 디자인으로 교체
     function buildPopupHTML(d) {
         return `
     <div class="marine-popup">
@@ -480,6 +293,51 @@ document.addEventListener("DOMContentLoaded", () => {
         return wrapper;
     }
 
+    // 혼잡도를 원으로 표시하도록 수정된 함수
+    async function createCongestionMarkers(geojson, congestionData) {
+        geojson.features.forEach(f => {
+            if (!f.geometry || f.geometry.type !== 'Point') return;
+            const [lng, lat] = f.geometry.coordinates || [];
+            if (typeof lng !== 'number' || typeof lat !== 'number') return;
+            const portId = f.properties?.port_id || '';
+
+            if (portId === 'KRBUS') return;
+
+            const portCongestion = congestionData[portId] || {};
+            const congLevel = (portCongestion.congestionLevel || '원활').trim();
+            let congColor;
+            let size = 12;
+
+            if (congLevel === '매우 혼잡') {
+                congColor = '#e74c3c'; // 빨간색
+                size = 40; // ⭐ 이 값을 원하는 크기로 변경하세요 (예: 20)
+            } else if (congLevel === '혼잡') {
+                congColor = '#f39c12'; // 주황색
+                size = 30; // ⭐ 이 값을 원하는 크기로 변경하세요 (예: 15)
+            } else {
+                congColor = '#2ecc71'; // 초록색
+                size = 20; // ⭐ 이 값을 원하는 크기로 변경하세요 (예: 10)
+            }
+
+            const congestionCircle = document.createElement('div');
+            congestionCircle.className = 'port-congestion-circle';
+            congestionCircle.style.width = `${size}px`;
+            congestionCircle.style.height = `${size}px`;
+            congestionCircle.style.borderRadius = '50%'; // 원 모양으로 만듭니다
+            congestionCircle.style.backgroundColor = congColor;
+            congestionCircle.style.border = '2px solid #fff'; // 흰색 테두리 추가
+
+            const marker = new mapboxgl.Marker({
+                element: congestionCircle,
+                anchor: 'center' // 원의 중심에 마커가 위치하도록 변경
+            })
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+            congestionMarkers.push(marker);
+        });
+    }
+
     async function addPortMarkers() {
         const SVG_URL = '/images/portpredictImages/port_icon.svg';
         const [svgText, geojson] = await Promise.all([
@@ -492,56 +350,31 @@ document.addEventListener("DOMContentLoaded", () => {
             })
         ]);
 
-        supportedPortIds = geojson.features
-            .map(f => f.properties?.port_id)
-            .filter(Boolean)
-            .map(id => String(id).trim().toUpperCase());
-
         geojson.features.forEach(f => {
             if (!f.geometry || f.geometry.type !== 'Point') return;
             const [lng, lat] = f.geometry.coordinates || [];
             if (typeof lng !== 'number' || typeof lat !== 'number') return;
-            const portId = f.properties?.port_id || ''; // port_id 추출
+            const portId = f.properties?.port_id || '';
 
-            const color = f.properties?.color || '#013895';
             const size = f.properties?.size || 28;
-
             const el = makeSvgMarker(svgText, {
-                color,
+                color: f.properties?.color || '#013895',
                 size
             });
 
-            // DOM 엘리먼트에 port_id 저장
             el.dataset.portId = portId;
 
-            el.addEventListener('click', () => {
-                el.classList.add('bump');
-                setTimeout(() => el.classList.remove('bump'), 180);
-
-                if (!portId) return;
-
-                new mapboxgl.Popup()
-                    .setLngLat([lng, lat])
-                    .setHTML(`<div style="font-weight:700">${portId}</div><div style="font-size:12px;color:#666">(${lat.toFixed(4)}, ${lng.toFixed(4)})</div>`)
-                    .addTo(map);
-
-                setTimeout(() => {
-                    window.location.href = `/port/info?port=${encodeURIComponent(portId)}`;
-                }, 1000);
-            });
-
-            const marker = new mapboxgl.Marker({ // 마커 인스턴스 저장
+            const marker = new mapboxgl.Marker({
                 element: el,
                 anchor: 'bottom'
             })
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-            allPortMarkers.push(marker); // 마커를 배열에 저장
+            allPortMarkers.push(marker);
 
             el.addEventListener('mouseenter', async () => {
                 const pid = f.properties?.port_id || 'Unknown';
-
                 try {
                     const dto = await fetchHoverDTO(pid);
                     const cardParams = mapHoverDtoToCardParams(dto);
@@ -550,28 +383,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 } catch (e) {
                     console.error('HOVER API ERROR for', pid, e);
                     const html = `
-      <div class="port-hover-card">
-        <div class="port-hover-card__hd">${pid}</div>
-        <div class="port-hover-card__divider"></div>
-        <div class="port-hover-card__bd">
-          <div class="port-row__val" style="padding:8px 0;">데이터를 불러오지 못했습니다.</div>
-        </div>
-      </div>`;
+                    <div class="port-hover-card">
+                        <div class="port-hover-card__hd">${pid}</div>
+                        <div class="port-hover-card__divider"></div>
+                        <div class="port-hover-card__bd">
+                        <div class="port-row__val" style="padding:8px 0;">데이터를 불러오지 못했습니다.</div>
+                        </div>
+                    </div>`;
                     hoverPopup.setLngLat([lng, lat]).setHTML(html).addTo(map);
                 }
             });
 
             el.addEventListener('mouseleave', () => hoverPopup.remove());
-
             el.addEventListener('click', (ev) => {
                 ev.preventDefault();
                 ev.stopPropagation();
-
                 el.classList.add('bump');
                 setTimeout(() => el.classList.remove('bump'), 180);
-
                 if (!portId) return;
-
                 window.location.assign(`/port/info?port=${encodeURIComponent(portId)}`);
             });
         });
@@ -598,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'line-cap': 'round'
             },
             paint: {
-                'line-color': ['get', 'color'], // GeoJSON feature의 'color' 속성 값을 사용하도록 변경
+                'line-color': ['get', 'color'],
                 'line-width': 4
             }
         });
@@ -616,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
             source: markerSourceId,
             paint: {
                 'circle-radius': 6,
-                'circle-color': '#34495e', // timeline 마커 색상 (짙은 청회색)
+                'circle-color': '#34495e',
                 'circle-stroke-width': 1,
                 'circle-stroke-color': '#fff'
             }
@@ -635,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
             source: lastMarkerSourceId,
             paint: {
                 'circle-radius': 8,
-                'circle-color': '#00bfff', // latest 마커 색상 (짙은 빨간색)
+                'circle-color': '#00bfff',
                 'circle-stroke-width': 2,
                 'circle-stroke-color': '#fff'
             }
@@ -649,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
             color: '#013895',
             size: 28
         });
-        busanEl.dataset.portId = 'KRBUS'; // 부산 마커에도 ID 부여
+        busanEl.dataset.portId = 'KRBUS';
 
         busanEl.addEventListener('mouseenter', () => {
             const html = buildBusanHoverCardHTML();
@@ -660,16 +489,15 @@ document.addEventListener("DOMContentLoaded", () => {
             busanHoverPopup.remove();
         });
 
-        const busanMarker = new mapboxgl.Marker({ // 부산 마커를 배열에 저장
+        const busanMarker = new mapboxgl.Marker({
             element: busanEl,
             anchor: 'bottom'
         })
             .setLngLat([129.040, 35.106])
             .addTo(map);
 
-        allPortMarkers.push(busanMarker); // 부산 마커를 배열에 저장
+        allPortMarkers.push(busanMarker);
 
-        // 마지막 마커에 대한 hover 기능 추가
         let hoverTimeout;
         const marineData = {
             waveHeight: 1.2,
@@ -683,7 +511,6 @@ document.addEventListener("DOMContentLoaded", () => {
         map.on('mouseenter', lastMarkerLayerId, (e) => {
             clearTimeout(hoverTimeout);
             const coordinates = e.features[0].geometry.coordinates.slice();
-            // buildMarinePopupHTML 대신 새로운 buildPopupHTML 함수 사용
             const html = buildPopupHTML(marineData);
             marineHoverPopup.setLngLat(coordinates).setHTML(html).addTo(map);
         });
@@ -692,6 +519,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 marineHoverPopup.remove();
             }, 100);
         });
+
+        const congestionBtn = document.getElementById('congestion-btn');
+        if (congestionBtn) {
+            let isCongestionVisible = false;
+            congestionBtn.addEventListener('click', async () => {
+                isCongestionVisible = !isCongestionVisible;
+                congestionBtn.setAttribute('aria-pressed', isCongestionVisible.toString());
+
+                if (isCongestionVisible) {
+                    const geojson = await fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => r.json());
+                    const congestionData = await fetch('/api/info/all-port-congestion', { cache: 'no-cache' }).then(r => r.json());
+                    await createCongestionMarkers(geojson, congestionData);
+                } else {
+                    congestionMarkers.forEach(marker => marker.remove());
+                    congestionMarkers = [];
+                }
+            });
+        }
     });
 
     window.drawRoutes = function (routes) {
@@ -704,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             properties: {
                 name: route.route_name,
-                color: route.color // portpredict.js에서 넘어온 color 속성을 GeoJSON에 추가
+                color: route.color
             }
         }));
         map.getSource(routeSourceId).setData({
@@ -745,7 +590,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 마커 레이어의 가시성을 제어합니다.
     window.toggleMarkersVisibility = function (isVisible) {
         if (!map || !map.getLayer(markerLayerId) || !map.getLayer(lastMarkerLayerId)) return;
         const visibility = isVisible ? 'visible' : 'none';
@@ -753,10 +597,9 @@ document.addEventListener("DOMContentLoaded", () => {
         map.setLayoutProperty(lastMarkerLayerId, 'visibility', visibility);
     };
 
-    // 활성화된 랭크에 해당하는 항구 마커만 표시
     window.togglePortMarkersByRank = function (ranksToKeep) {
         const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
-        portIdsToKeep.add('KRBUS'); // 부산항은 항상 유지
+        portIdsToKeep.add('KRBUS');
 
         allPortMarkers.forEach(marker => {
             const portId = marker.getElement().dataset.portId;
@@ -768,7 +611,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 모든 항구 마커 숨기기 (부산항 제외)
     window.hideAllPortMarkers = function () {
         allPortMarkers.forEach(marker => {
             const portId = marker.getElement().dataset.portId;
@@ -778,7 +620,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // 모든 항구 마커 다시 표시
     window.showAllPortMarkers = function () {
         allPortMarkers.forEach(marker => {
             marker.getElement().style.display = '';

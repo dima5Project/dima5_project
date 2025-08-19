@@ -11,21 +11,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script defer th:src="@{/js/header.js}"></script>
 
+    <!-- jQuery -->
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- csv 파일 읽기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
     <!-- Mapbox CSS -->
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-    <!-- portpredict CSS -->
-    <link rel="stylesheet" th:href="@{/css/portpredict.css}">
-
     <!-- Mapbox JS -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
-    <!-- jQuery -->
-    <script th:src="@{/js/jquery-3.7.1.js}"></script>
 
     <!-- Chart.js 본체 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <!-- DataLabels 플러그인 -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
     <!-- 플러그인 등록 (Chart v3/v4) -->
     <script>
         if (window.Chart && window.ChartDataLabels) {
@@ -33,19 +36,18 @@
         }
     </script>
 
-    <!-- info2.js는 반드시 그 다음 -->
-    <script defer th:src="@{/js/info2.js}"></script>
-
-
-
     <!-- 지도 map.js -->
     <script defer th:src="@{/js/map.js}"></script>
 
-    <!-- csv 파일 읽기 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- info2.js는 반드시 그 다음 -->
+    <script defer th:src="@{/js/info2.js}"></script>
 
     <!-- 지도 위 본문 내용 js -->
     <script defer th:src="@{/js/portpredict.js}"></script>
+
+    <!-- portpredict CSS -->
+    <link rel="stylesheet" th:href="@{/css/portpredict.css}">
+
 
 </head>
 
@@ -76,6 +78,19 @@
                 <img src="/images/portpredictImages/weather.png" th:src="@{/images/portpredictImages/weather.png}"
                     alt="날씨" />
             </button>
+        </div>
+
+        <div id="congestionGraphModal" class="modal" aria-hidden="true">
+            <div class="modal__bg" data-action="close"></div>
+            <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="congestionGraphTitle">
+                <div class="modal__header">
+                    <h3 id="congestionGraphTitle" class="modal__title">항구 혼잡도</h3>
+                    <button class="modal__close" data-action="close" aria-label="모달 닫기">×</button>
+                </div>
+                <div class="modal__content">
+                    <div id="congestionGraphChart"></div>
+                </div>
+            </div>
         </div>
 
         <!-- 왼쪽 슬라이드 사이드바 -->
