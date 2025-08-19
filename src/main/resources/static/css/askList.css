@@ -85,7 +85,7 @@ main {
 
 /*선택된 버튼 스타일*/
 .filter-btn.active {
-    background-color: #4483EF;
+    background-color: #013895;
     color: #fff;
     border: none;
 }
@@ -119,8 +119,13 @@ main {
     border-radius: 6px;
 }
 
+.qna-search select:focus {
+    border-radius: 0;
+    /* 활성화(포커스)될 때 모서리를 0으로 만듦 */
+}
+
 .search-btn {
-    background-color: #3366cc;
+    background-color: #013895;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -162,7 +167,7 @@ main {
 
 .answered {
     font-weight: bold;
-    color: #0066ff;
+    color: #013895;
     margin-left: 5px;
 }
 
@@ -170,7 +175,7 @@ main {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #4a73c6;
+    color: #333;
     /* 아이콘 색 */
     font-size: 12px;
     /* 필요 시 */
@@ -223,7 +228,7 @@ main {
 }
 
 .check-btn {
-    background-color: #3366cc;
+    background-color: #013895;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -301,7 +306,7 @@ main {
 }
 
 .write-btn {
-    background-color: #3366cc;
+    background-color: #013895;
     color: white;
     padding: 8px 18px;
     border: none;
@@ -340,8 +345,8 @@ main {
 }
 
 .attach a {
-    color: #007bff;
-    /* 파란색 링크 */
+    color: #013895;
+    /* 남색 링크 */
     text-decoration: none;
     /* 밑줄 제거 */
     font-weight: 500;
