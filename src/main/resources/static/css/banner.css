@@ -4,7 +4,7 @@
 html,
 body {
   width: 100%;
-  height: 100%;
+  height: auto;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -13,10 +13,18 @@ body {
   color: #000;
 }
 
+html {
+  overflow-y: auto;
+  /*세로 방향으로 내용이 화면보다 길어졌을 때만 스크롤바 생김*/
+  /* 스크롤은 오직 문서(html)만 담당 */
+}
+
 body {
-  /* min-height: 150vh; */
-  /* 페이지의 최소 높이를 150vh로 설정하여 강제로 스크롤바 생성 */
-  overflow-y: scroll;
+  min-height: 100%;
+  overflow-y: visible;
+  /*body 요소가 자기 안에 있는 콘텐츠를 자르거나 스크롤하지 않음. 
+  만약 콘텐츠가 body 높이를 초과하면, body가 커져서 그대로 html 요소로 밀려 올라갑니다. 
+  따라서 스크롤 책임은 문서 루트(html)가 지게 됨*/
 }
 
 .container {
@@ -24,9 +32,19 @@ body {
   max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
+  /*최소 한 화면은 확보 
+  → 보통 헤더/푸터/다른 섹션들 때문에 실제 문서 높이가 화면보다 조금이라도 커지면서 스크롤이 생김 
+  → window.scrollY가 변해 header.js 확장 로직이 동작한다. */
   overflow: hidden;
   position: relative;
 }
+
+/* 스크롤이 꼭 1px이라도 생기게 (필요 시) */
+/*.container::after {
+  content: "";
+  display: block;
+  height: 2px;
+}*/
 
 /* 히어로 섹션 */
 .hero {
