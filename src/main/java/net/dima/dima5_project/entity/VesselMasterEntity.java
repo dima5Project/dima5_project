@@ -48,6 +48,9 @@ public class VesselMasterEntity {
     @Column(name="vsl_width")
     private Integer vslWidth;
 
+    @Column(name="vsl_img")
+    private String vslImg;
+
     public static VesselMasterEntity toEntity(VesselMasterDTO vesselMasterDTO) {
         return VesselMasterEntity.builder()
                 .vslSeq(vesselMasterDTO.getVslSeq())
@@ -59,6 +62,7 @@ public class VesselMasterEntity {
                 .callSign(vesselMasterDTO.getCallSign())
                 .vslLength(vesselMasterDTO.getVslLength())
                 .vslWidth(vesselMasterDTO.getVslWidth())
+                .vslImg(vesselMasterDTO.getVslImg())
                 .build();
     }
 
