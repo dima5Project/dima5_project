@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +19,7 @@ import net.dima.dima5_project.service.VesselService;
 public class VesselController {
 
     private final VesselService vesselService;
-
+    
     /**
      * 예:
      *  - /api/predict?imo=9121041
@@ -60,4 +61,5 @@ public class VesselController {
 
         return new ResponseEntity<>(result, status);
     }
+
 }

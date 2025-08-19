@@ -106,7 +106,7 @@
                                 <col style="width:40px" /> <!-- 확률 -->
                                 <col style="width:60px" /> <!-- ETA -->
                                 <col style="width:50px" /> <!-- 삭제 버튼 -->
-                                <col style="width:60px" /> <!-- 재검색 버튼 -->
+                                <col style="width:60px"/> <!-- 재검색 버튼 -->
                             </colgroup>
 
                             <thead>
@@ -127,15 +127,15 @@
                                 <tr th:each="save, stat : ${saves.content}">
                                     <td th:text="${stat.index + 1}">1</td>
                                     <td th:text="${save.searchVsl}">112233</td>
-                                    <td th:text="${save.lat}">31.14567</td>
-                                    <td th:text="${save.lon}">127.9872</td>
-                                    <td th:text="${save.top1Port}">VNHPH</td>
-                                    <td th:text="${save.top1Pred + '%'}">88%</td>
-                                    <td th:text="${#temporals.format(save.eta, 'yyyy-MM-dd')}">2025-08-31</td>
+                                    <td th:text="${save.lat == 0 ? '없음' : #numbers.formatDecimal(save.lat,1,6)}">31.14567</td>
+                                    <td th:text="${save.lon == 0 ? '없음' : #numbers.formatDecimal(save.lon,1,6)}">127.9872</td>
+                                    <td th:text="${save.top1Port != null ? save.top1Port : '없음'}">VNHPH</td>
+                                    <td th:text="${save.top1Pred != null ? #numbers.formatDecimal(save.top1Pred * 100,1,2) + '%' : '없음'}">88%</td>
+                                    <td th:text="${save.eta != null ? #temporals.format(save.eta, 'yyyy-MM-dd HH:mm') : '없음'}">2025-08-31</td>
                                     <td><button type="button" class="btn-delete"
                                             th:attr="data-id=${save.saveSeq}">삭제</button></td>
                                     <td><button type="button" class="btn-search-again"
-                                            th:attr="data-id=${save.saveSeq}">재검색</button></td>
+                                            th:attr="data-id=${save.saveSeq}" th:href="@{/predict(idValue=${save.searchVsl})}">재검색</button></td>
                                 </tr>
                                 <!-- 혹여나 안되면 여기 사용 -->
                                 <!-- <tbody>
