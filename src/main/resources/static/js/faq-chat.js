@@ -1,7 +1,7 @@
 // ===== faq-chat.js (최종) =====
 
 // 전역 상태
-let chat = { stomp: null, roomId: null, sub: null };
+let chat = { stomp: null, roomId: null, sub: null, ended: false };
 
 /** 게스트 식별자 (localStorage에 1회 저장) */
 function getGuestId() {
@@ -28,6 +28,22 @@ function sideForUser(m) {
 function scrollToBottom() {
     const body = document.querySelector("#faq-box .faq-body") || document.querySelector(".faq-body");
     if (body) body.scrollTop = body.scrollHeight;
+}
+
+/** (추가) 시스템 안내 말풍선 렌더러 */
+function appendSystemNotice(htmlInner, withTime = true) {
+    const timeText = new Date().toISOString().replace("T", " ").split(".")[0];
+    const html = `
+    <div class="faq-message assistant nav-type">
+      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <div class="faq-bubble-wrapper">
+        <div class="faq-bubble" style="max-width:300px;">${htmlInner}</div>
+        ${withTime ? `<div class="faq-time">${timeText}</div>` : ``}
+      </div>
+    </div>`;
+    const dlg = document.getElementById("faq-dialog");
+    if (dlg) dlg.insertAdjacentHTML("beforeend", html);
+    scrollToBottom();
 }
 
 /** 말풍선 렌더 */
@@ -62,13 +78,12 @@ async function loadHistory(page = 0, size = 50) {
 
 /** STOMP 연결/구독 */
 function connectStomp() {
-    // 의존성 가드
     if (!window.SockJS || !window.Stomp) {
         console.error("[faq-chat] SockJS/STOMP not loaded");
         alert("채팅 라이브러리를 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.");
         return;
     }
-    if (!chat.roomId) return;
+    if (!chat.roomId || chat.ended) return;
 
     // 기존 연결 정리
     try { chat.sub?.unsubscribe(); } catch { }
@@ -83,6 +98,7 @@ function connectStomp() {
     const headers = { "X-Guest-Id": getGuestId() };
 
     chat.stomp.connect(headers, () => {
+        if (chat.ended) return; // 종료 중 재연결 방지
         // 방 토픽 구독
         chat.sub = chat.stomp.subscribe(`/topic/chat.${chat.roomId}`, (frame) => {
             const body = JSON.parse(frame.body || "{}");
@@ -95,8 +111,44 @@ function connectStomp() {
     });
 }
 
+/** (추가) 종료 처리 */
+function endChat() {
+    if (chat.ended) return;
+    chat.ended = true;
+
+    // 입력 막기
+    const input = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("chatSend");
+    if (input) { input.disabled = true; input.placeholder = "대화가 종료되었습니다."; }
+    if (sendBtn) sendBtn.disabled = true;
+
+    // STOMP 정리
+    try { chat.sub?.unsubscribe(); } catch { }
+    chat.sub = null;
+    try { chat.stomp?.disconnect(() => { }); } catch { }
+    chat.stomp = null;
+
+    // 종료 안내
+    appendSystemNotice(`
+    <div class="faq-text">대화가 종료되었습니다. 상담을 더 원하시면 다시 <b>1:1 채팅</b>을 눌러주세요.</div>
+  `);
+}
+
+/** (추가) 안내 + '대화 종료' 버튼 표시 */
+function showWelcomeAndEndButton() {
+    const htmlInner = `
+    <div class="faq-text">상담원 연결 중입니다. 채팅을 남겨주세요.</div>
+    <div class="faq-buttons">
+      <button id="endChatBtn" type="button" class="faq-subquestion-button">대화 종료</button>
+    </div>`;
+    appendSystemNotice(htmlInner);
+    const btn = document.getElementById("endChatBtn");
+    if (btn) btn.onclick = endChat;
+}
+
 /** 메시지 전송 (서버 에코만 렌더 → 중복 방지) */
 function sendChatMessage() {
+    if (chat.ended) return; // 종료 후 전송 금지
     const input = document.getElementById("chatInput");
     const text = (input && input.value || "").trim();
     if (!text || !chat.roomId || !chat.stomp) return;
@@ -131,6 +183,15 @@ function ensureComposer() {
         sendBtn = document.getElementById("chatSend");
     }
 
+    // 종료 상태라면 비활성
+    if (chat.ended) {
+        if (input) { input.disabled = true; input.placeholder = "대화가 종료되었습니다."; }
+        if (sendBtn) sendBtn.disabled = true;
+    } else {
+        if (input) { input.disabled = false; input.placeholder = "상담원에게 메시지를 입력하세요"; }
+        if (sendBtn) sendBtn.disabled = false;
+    }
+
     // 이벤트 중복 방지 후 바인딩
     if (sendBtn) {
         sendBtn.removeEventListener("click", sendChatMessage);
@@ -149,8 +210,9 @@ function ensureComposer() {
     }
 }
 
-/** 방 열기 → roomId 설정 → 입력바 보장 → 이력 로드 → STOMP 연결 */
+/** 방 열기 → roomId 설정 → 입력바 보장 → 이력 로드 → 안내 → STOMP 연결 */
 async function startChat() {
+    chat.ended = false; // 새 세션 시작
     const res = await fetch("/api/chat/room/open", {
         method: "POST",
         headers: { "X-Guest-Id": getGuestId(), "Accept": "application/json" },
@@ -165,6 +227,11 @@ async function startChat() {
 
     ensureComposer();
     await loadHistory(0, 100);
+
+    // 히스토리 아래에 안내 + 종료버튼
+    showWelcomeAndEndButton();
+
+    // 연결
     connectStomp();
 }
 
