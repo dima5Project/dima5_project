@@ -1,3 +1,4 @@
+<!-- templates/fragment/faq.html -->
 <div th:fragment="widget">
     <div id="faq-widget">
         <button id="faq-toggle" aria-label="toggle-faq">?</button>
@@ -9,4 +10,16 @@
             </div>
         </div>
     </div>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/faq.css}" href="/css/faq.css" />
+
+    <!-- SockJS/STOMP (실시간 채팅) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <!-- FAQ UI 동작 -->
+    <script defer th:src="@{/js/faq-ui.js}" src="/js/faq-ui.js"></script>
+    <!-- 1:1 상담 채팅 클라이언트 -->
+    <script defer th:src="@{/js/faq-chat.js}" src="/js/faq-chat.js"></script>
 </div>

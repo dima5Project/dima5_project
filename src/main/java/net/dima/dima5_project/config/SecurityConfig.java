@@ -31,26 +31,29 @@ public class SecurityConfig {
                                 .requestMatchers(
                                                 "/",
                                                 "/api/**",
-                                                "/lang",
                                                 "/main",
-                                                "/intro/**", // 소개
-                                                // "/ask/**", // 문의 - 나중에 삭제
-                                                "/predict/**", // 차항지 예측 - 나중에 삭제
+                                                "/intro/**", 
                                                 "/user/**",
                                                 "/news/**",
-                                                "/api/info/**", // 부가정보 - 나중에 삭제
                                                 "/port/info/**",
-                                                "/info/**", // 부가정보 - 나중에 삭제
+                                                "/info/**",
                                                 "/proxy/met/**", // API 끌어오는 ajax 처리
                                                 "/data/**",
                                                 "/logout",
                                                 "/images/**",
                                                 "/css/**",
                                                 "/js/**",
-                                                "/videos/**"
-
+                                                "/videos/**",
+<<<<<<< HEAD
+                                                "/admin/**",
+                                                "/api/result-save/**"
                                 ).permitAll() // 모든 사람들에게 주어지는 경로
+                                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
+=======
+                                                "/ws-chat/**")
+                                .permitAll() // 모든 사람들에게 주어지는 경로
                                 // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
+>>>>>>> 113ced89f0e6eb09d5559187a5cf1d0326e8e4bf
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 
