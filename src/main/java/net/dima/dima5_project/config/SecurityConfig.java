@@ -9,8 +9,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import lombok.RequiredArgsConstructor;
-import net.dima.dima5_project.handler.CustomLoginFailureHandler;
-import net.dima.dima5_project.handler.CustomLoginSuccessHandler;
 import net.dima.dima5_project.handler.CustomLogoutSuccessHandler;
 
 @Configuration // 이 파일이 설정파일임을 알려주는 어노테이션
@@ -18,8 +16,8 @@ import net.dima.dima5_project.handler.CustomLogoutSuccessHandler;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final CustomLoginSuccessHandler customLoginSuccessHandler;
-        private final CustomLoginFailureHandler customLoginFailureHandler;
+        // private final CustomLoginSuccessHandler customLoginSuccessHandler;
+        // private final CustomLoginFailureHandler customLoginFailureHandler;
         private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
         @Bean // 해당 메소드에서 사용, 반환하는 값을 Bean으로 관리
@@ -32,7 +30,7 @@ public class SecurityConfig {
                                                 "/",
                                                 "/api/**",
                                                 "/main",
-                                                "/intro/**", 
+                                                "/intro/**",
                                                 "/user/**",
                                                 "/news/**",
                                                 "/port/info/**",
@@ -44,16 +42,12 @@ public class SecurityConfig {
                                                 "/css/**",
                                                 "/js/**",
                                                 "/videos/**",
-<<<<<<< HEAD
                                                 "/admin/**",
-                                                "/api/result-save/**"
-                                ).permitAll() // 모든 사람들에게 주어지는 경로
-                                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
-=======
+                                                "/api/result-save/**",
                                                 "/ws-chat/**")
                                 .permitAll() // 모든 사람들에게 주어지는 경로
-                                // .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
->>>>>>> 113ced89f0e6eb09d5559187a5cf1d0326e8e4bf
+                                .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
+
                                 .anyRequest().authenticated() // 기타 다른 경로는 로그인해야 접근 가능
                 );
 

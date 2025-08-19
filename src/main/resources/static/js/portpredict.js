@@ -30,6 +30,7 @@ async function loadPortData() {
             skipEmptyLines: true
         }).data;
         console.log("Port data loaded successfully:", portData.length, "records.");
+        publishSupportedPortIds();
     } catch (error) {
         console.error("Failed to load port data:", error);
     }
@@ -227,7 +228,7 @@ $(function () {
 
             if (resp.note && resp.note.includes("<3h")) {
 
-                alert('출항 후 3시간 미만이므로 예측 모델을 실행하지 않습니다. 현재 위치만 표시합니다.');
+                alert('출항 후 3시간 미만인 선박은 항로 변화가 크지 않아 정확한 예측이 어렵습니다. 잠시 후 다시 조회 해 주세요.');
 
                 // 현재 위치를 지도에 표시하는 로직만 실행하고, 예측 결과는 숨깁니다.
 
@@ -938,6 +939,9 @@ $(function () {
         const modalTitle = saveModal.querySelector('.modal__title');
         const modalActions = saveModal.querySelector('.modal__actions');
 
+        // 이전 포커스 기억
+        saveModal._prevFocus = document.activeElement;
+
         modalTitle.textContent = '결과를 저장할까요?';
         modalActions.innerHTML = `
             <button class="modal__btn primary" data-action="yes">예</button>
@@ -950,19 +954,47 @@ $(function () {
 
         saveModal.classList.add('is-open');
         saveModal.setAttribute('aria-hidden', 'false');
+        saveModal.setAttribute('role', 'dialog');
+        saveModal.setAttribute('aria-modal', 'true');
+
+        // 배경 비활성 (지원 브라우저에서만)
+        try { APP_ROOT.setAttribute('inert', ''); } catch (e) { }
+
+        // 포커스 이동
+        const firstBtn = modalActions.querySelector('button');
+        if (firstBtn) firstBtn.focus();
+
     }
+
 
     function closeSaveModal() {
         const saveModal = document.getElementById('saveModal');
-        saveModal.classList.remove('is-open');
-        saveModal.setAttribute('aria-hidden', 'true');
+
+        // 1) 모달 내부 포커스가 남아 있으면 빼기
+        const active = document.activeElement;
+        if (saveModal.contains(active)) active.blur();
+
+        // 2) 이전 포커스로 돌리기(가능하면)
+        const prev = saveModal._prevFocus;
+        if (prev && typeof prev.focus === 'function') {
+            // 모달 숨기기 전에 혹은 직후에 살짝 지연하여 포커스 복원
+            setTimeout(() => prev.focus(), 0);
+
+            // 3) 모달 숨김
+            saveModal.classList.remove('is-open');
+            saveModal.setAttribute('aria-hidden', 'true');
+
+            // 4) 배경 inert 해제
+            APP_ROOT.removeAttribute('inert');
+
+        }
     }
 
 
     // '예' 버튼 클릭 시 호출될 비동기 함수
     async function handleSaveYesClick() {
-        const saveModal    = document.getElementById('saveModal');
-        const modalTitle   = saveModal.querySelector('.modal__title');
+        const saveModal = document.getElementById('saveModal');
+        const modalTitle = saveModal.querySelector('.modal__title');
         const modalActions = saveModal.querySelector('.modal__actions');
 
         // 로딩 상태
@@ -971,10 +1003,10 @@ $(function () {
 
         // 1) 입력값/Top1 추출
         const typedId = document.querySelector('.sidebar__input')?.value?.trim() || '';
-        const preds   = Array.isArray(window.globalPredictions) ? window.globalPredictions : [];
-        const top1    = preds.find(p => p.rank === 1)
-                        || preds.sort((a,b) => (b?.prob||0) - (a?.prob||0))[0]
-                        || null;
+        const preds = Array.isArray(window.globalPredictions) ? window.globalPredictions : [];
+        const top1 = preds.find(p => p.rank === 1)
+            || preds.sort((a, b) => (b?.prob || 0) - (a?.prob || 0))[0]
+            || null;
 
         // 2) 좌표 (조회 성공 직후 resp.latest.lat/lon을 전역 저장해두세요)
         const lat = (typeof window.currentLat === 'number') ? window.currentLat : 0;
@@ -1013,9 +1045,9 @@ $(function () {
 
         try {
             const response = await fetch('/api/result-save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dtoPayload)
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dtoPayload)
             });
 
             if (response.ok) {
@@ -1028,7 +1060,7 @@ $(function () {
                 modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
             } else {
                 let msg = '알 수 없는 오류';
-                try { const e = await response.json(); msg = e?.message || msg; } catch {}
+                try { const e = await response.json(); msg = e?.message || msg; } catch { }
                 modalTitle.textContent = '저장 실패';
                 modalActions.innerHTML = `
                     <p>오류가 발생했습니다: ${msg}</p>
@@ -1076,9 +1108,9 @@ $(function () {
         closeSaveModal();
     });
 
-    // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
-    $(document).off('click', '#saveModal [data-action="yes"]')
-                .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
+    // // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
+    // $(document).off('click', '#saveModal [data-action="yes"]')
+    //             .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
 
 });
 
