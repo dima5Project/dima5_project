@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dima.dima5_project.entity.ResultSaveEntity;
 
 @Data
 @AllArgsConstructor
@@ -26,18 +27,18 @@ public class ResultSaveDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eta;
 
-    // public static ResultSaveDTO toDTO(ResultSaveEntity resultSaveEntity) {
-    //     return ResultSaveDTO.builder()
-    //             .saveSeq(resultSaveEntity.getSaveSeq())
-    //             .searchVsl(resultSaveEntity.getSearchVsl())
-    //             .userId(resultSaveEntity.getUserId().getUserId())
-    //             .lat(resultSaveEntity.getLat())
-    //             .lon(resultSaveEntity.getLon())
-    //             .top1Port(resultSaveEntity.getTop1Port())
-    //             .top1Pred(resultSaveEntity.getTop1Pred())
-    //             .eta(resultSaveEntity.getEta())
-    //             .build();
-    // }
+    public static ResultSaveDTO toDTO(ResultSaveEntity resultSaveEntity) {
+        return ResultSaveDTO.builder()
+                .saveSeq(resultSaveEntity.getSaveSeq())
+                .searchVsl(resultSaveEntity.getSearchVsl())
+                .userId(resultSaveEntity.getUserId().getUserId())
+                .lat(resultSaveEntity.getLat())
+                .lon(resultSaveEntity.getLon())
+                .top1Port(resultSaveEntity.getTop1Port())
+                .top1Pred(resultSaveEntity.getTop1Pred())
+                .eta(resultSaveEntity.getEta())
+                .build();
+    }
 
     
 }
