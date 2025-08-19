@@ -31,22 +31,23 @@ footer,
     background-color: #0F1035;
     position: relative;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .header_title {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: static;
+    transform: none;
     text-align: center;
+    margin-top: 80px;
 }
 
 .header_title .title {
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     color: #fff;
 }
 
@@ -133,7 +134,7 @@ footer,
     left: var(--x);
     top: var(--y);
     transform: translate(-50%, -50%);
-    width: 130px;
+    width: 135px;
     height: 80px;
     display: flex;
     flex-direction: column;
