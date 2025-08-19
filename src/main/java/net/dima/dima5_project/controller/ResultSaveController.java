@@ -31,16 +31,22 @@ public class ResultSaveController {
                 Model model) {
         String prefillType = null; // MMSI / IMO / null
 
-        if (idValue != null) {
-            String v = idValue.trim();
-            String digits = v.replaceAll("\\D", "");
+    if (idValue != null) {
+        String v = idValue.trim();
+        String digits = v.replaceAll("\\D", ""); // 숫자만 추출
 
-            if (digits.length() == 9) { prefillType = "MMSI"; } 
-            else if (digits.length() == 7) { prefillType = "IMO"; }
-            
-            model.addAttribute("prefillVsl", digits);   // 인풋에 채울 값
-            model.addAttribute("prefillType", prefillType); // 드롭다운 선택값
+        if (digits.length() == 9) { 
+            prefillType = "MMSI"; 
+            model.addAttribute("prefillVsl", digits); 
+        } else if (digits.length() == 7) { 
+            prefillType = "IMO"; 
+            model.addAttribute("prefillVsl", "IMO" + digits); // ★ prefix 붙이기
+        } else {
+            model.addAttribute("prefillVsl", digits);
         }
+
+        model.addAttribute("prefillType", prefillType); // 드롭다운 선택값
+    }
         return "portpredict"; // 템플릿명
     }
 
