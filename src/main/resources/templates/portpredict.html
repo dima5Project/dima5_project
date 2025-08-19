@@ -22,6 +22,22 @@
     <!-- jQuery -->
     <script th:src="@{/js/jquery-3.7.1.js}"></script>
 
+    <!-- Chart.js 본체 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <!-- DataLabels 플러그인 -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <!-- 플러그인 등록 (Chart v3/v4) -->
+    <script>
+        if (window.Chart && window.ChartDataLabels) {
+            Chart.register(ChartDataLabels);
+        }
+    </script>
+
+    <!-- info2.js는 반드시 그 다음 -->
+    <script defer th:src="@{/js/info2.js}"></script>
+
+
+
     <!-- 지도 map.js -->
     <script defer th:src="@{/js/map.js}"></script>
 
@@ -52,7 +68,7 @@
                 <img src="/images/portpredictImages/map.png" th:src="@{/images/portpredictImages/map.png}"
                     alt="지도 스타일" />
             </button>
-            <button id="congestion-btn" class="iconbtn" data-type="congestion" data-tip="혼잡도">
+            <button id="congestion-btn" class="iconbtn" data-type="congestion" data-tip="혼잡도" aria-pressed="false">
                 <img src="/images/portpredictImages/ship_congestion.png"
                     th:src="@{/images/portpredictImages/ship_congestion.png}" alt="혼잡도" />
             </button>
@@ -112,7 +128,8 @@
                     <!-- 입력 + 버튼 -->
                     <div class="sidebar__section">
                         <div class="sidebar__row">
-                            <input id="imo vslInput" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력" th:value="${prefillVsl}"/>
+                            <input id="imo vslInput" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력"
+                                th:value="${prefillVsl}" />
                             <button class="sidebar__btn primary">조회</button>
                             <button class="sidebar__btn">초기화</button>
                         </div>
