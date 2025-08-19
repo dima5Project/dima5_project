@@ -119,7 +119,7 @@ function initEventBindings() {
         }
     });
 
-    $("#portSelect").on("change", function () {
+    $("#searchBtn").on("click", function () {
         // 사용자가 선택한 항구 정보를 가져옴
         let portId = $("#portSelect").val();
         let portNameKr = portIdToName[portId];
@@ -625,7 +625,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
         const map = new mapboxgl.Map({
-            container: 'alt-map-container',
+            container: 'map',
             style: 'mapbox://styles/mapbox/light-v10',
             center: [lng, lat], // 해당 항구 중심으로 설정
             zoom: 12, // 항구 하나만 보이도록 줌 레벨 조정
