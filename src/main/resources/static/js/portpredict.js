@@ -938,6 +938,9 @@ $(function () {
         const modalTitle = saveModal.querySelector('.modal__title');
         const modalActions = saveModal.querySelector('.modal__actions');
 
+        // 이전 포커스 기억
+        saveModal._prevFocus = document.activeElement;
+
         modalTitle.textContent = '결과를 저장할까요?';
         modalActions.innerHTML = `
             <button class="modal__btn primary" data-action="yes">예</button>
@@ -950,12 +953,40 @@ $(function () {
 
         saveModal.classList.add('is-open');
         saveModal.setAttribute('aria-hidden', 'false');
+        saveModal.setAttribute('role', 'dialog');
+        saveModal.setAttribute('aria-modal', 'true');
+
+        // 배경 비활성 (지원 브라우저에서만)
+        try { APP_ROOT.setAttribute('inert', ''); } catch(e) {}
+
+        // 포커스 이동
+        const firstBtn = modalActions.querySelector('button');
+        if (firstBtn) firstBtn.focus();
+
     }
+
 
     function closeSaveModal() {
         const saveModal = document.getElementById('saveModal');
+
+        // 1) 모달 내부 포커스가 남아 있으면 빼기
+        const active = document.activeElement;
+        if (saveModal.contains(active)) active.blur();
+
+        // 2) 이전 포커스로 돌리기(가능하면)
+        const prev = saveModal._prevFocus;
+        if (prev && typeof prev.focus === 'function') {
+            // 모달 숨기기 전에 혹은 직후에 살짝 지연하여 포커스 복원
+            setTimeout(() => prev.focus(), 0);
+        
+        // 3) 모달 숨김
         saveModal.classList.remove('is-open');
         saveModal.setAttribute('aria-hidden', 'true');
+
+        // 4) 배경 inert 해제
+        APP_ROOT.removeAttribute('inert');        
+    
+        }
     }
 
 
@@ -1076,9 +1107,9 @@ $(function () {
         closeSaveModal();
     });
 
-    // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
-    $(document).off('click', '#saveModal [data-action="yes"]')
-                .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
+    // // '예' 버튼에 새로운 로직 연결 (기존 코드는 삭제)
+    // $(document).off('click', '#saveModal [data-action="yes"]')
+    //             .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
 
 });
 
