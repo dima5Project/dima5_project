@@ -338,7 +338,7 @@ def _predict_latest_for_vsl(vsl_id: str) -> Dict[str, Any]:
     }
 
 # =========================
-# 10) 예측 API (저장 X)
+# 10) 예측 API
 # =========================
 @app.get("/predict_map_by_vsl")
 def predict_map_by_vsl(
@@ -380,17 +380,18 @@ def predict_map_by_vsl(
     if latest_tp < 3:
         return {
             "vsl_id": vsl_id,
+            "status": "timepoint less than 3hours",            # NEW: 상태 플래그
             "latest": {
-                "actual_time_point": latest_tp,
+                "used_time_point": None,     # NEW: 스키마 통일
+                "actual_time_point": float(latest_tp),
                 "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
                 "lat": float(row_latest["lat"]),
                 "lon": float(row_latest["lon"]),
                 "cog": float(row_latest["cog"]),
                 "heading": float(row_latest["heading"]),
-                "predictions": []
+                "predictions": []            # 그대로
             },
-            "timeline": [],
-            "tracks_topk": []
+            "note": "tp<3h: only current position returned"  # 선택
         }
 
     # ✅ 모델 시점 결정

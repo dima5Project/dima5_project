@@ -31,6 +31,8 @@ public class SecurityConfig {
                                                 "/api/**",
                                                 "/main",
                                                 "/intro/**",
+                                                // "/predict/init", // 차항지 예측 - 나중에 삭제
+                                                // "/ask",    // 문의 - 나중에 삭제
                                                 "/user/**",
                                                 "/news/**",
                                                 "/port/info/**",

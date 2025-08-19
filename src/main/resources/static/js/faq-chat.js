@@ -38,7 +38,6 @@ function appendSystemNotice(htmlInner, withTime = true) {
       <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble" style="max-width:300px;">${htmlInner}</div>
-        ${withTime ? `<div class="faq-time">${timeText}</div>` : ``}
       </div>
     </div>`;
     const dlg = document.getElementById("faq-dialog");
@@ -57,7 +56,6 @@ function appendMessage(m) {
       ${who === "assistant" ? '<img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />' : ""}
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble" style="max-width:300px;"><div>${esc(m.content || "")}</div></div>
-        <div class="faq-time">${timeText}</div>
       </div>
     </div>`;
     const dlg = document.getElementById("faq-dialog");

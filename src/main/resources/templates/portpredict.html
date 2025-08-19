@@ -124,18 +124,25 @@
 
                     <!-- 선박 고유 번호 select box -->
                     <div class="sidebar__section">
-                        <div class="cselect" data-name="idType">
-                            <button type="button" class="cselect__control" aria-haspopup="listbox"
-                                aria-expanded="false">
-                                <span class="cselect__value" data-value="MMSI">MMSI</span>
+                        <div class="cselect" data-name="idType"
+                            th:attr="data-value=${prefillType != null ? prefillType : 'MMSI'}">
+                            
+                            <button type="button" class="cselect__control" aria-haspopup="listbox"aria-expanded="false">
+                                <span class="cselect__value" 
+                                    data-value="MMSI"
+                                    th:attr="data-value=${prefillType != null ? prefillType : 'MMSI'}"
+                                    th:text="${prefillType != null ? prefillType : 'MMSI'}">MMSI</span>
                                 <span class="cselect__caret" aria-hidden="true"></span>
                             </button>
 
                             <ul class="cselect__menu" role="listbox" tabindex="-1">
-                                <li class="cselect__option" role="option" data-value="MMSI" aria-selected="true">
+                                <li class="cselect__option" role="option" data-value="MMSI" aria-selected="true"
+                                    th:attr="aria-selected=${prefillType == 'MMSI'}">
                                     MMSI
                                 </li>
-                                <li class="cselect__option" role="option" data-value="IMO">IMO</li>
+                                <li class="cselect__option" role="option" data-value="IMO"
+                                    th:attr="aria-selected=${prefillType == 'IMO'}">
+                                    IMO</li>
                             </ul>
                         </div>
                     </div>
@@ -143,8 +150,11 @@
                     <!-- 입력 + 버튼 -->
                     <div class="sidebar__section">
                         <div class="sidebar__row">
-                            <input id="imo vslInput" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력"
-                                th:value="${prefillVsl}" />
+                            <input id="imo vslInput" 
+                                    type="text" 
+                                    class="sidebar__input" 
+                                    placeholder="선박 고유 번호 입력"
+                                    th:value="${prefillVsl}" />
                             <button class="sidebar__btn primary">조회</button>
                             <button class="sidebar__btn">초기화</button>
                         </div>

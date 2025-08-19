@@ -83,7 +83,7 @@ public class ResultSaveService {
     @Transactional(readOnly = true)
     public Page<ResultSaveEntity> getMyPage(String currentUserId, Pageable pageable) {
         // @EntityGraph로 N+1 방지된 메서드 사용
-        return resultSaveRepository.findByUserId_UserIdOrderBySaveSeqDesc(currentUserId, pageable);
+        return resultSaveRepository.findByUserId_UserId(currentUserId, pageable);
     }
 
 }

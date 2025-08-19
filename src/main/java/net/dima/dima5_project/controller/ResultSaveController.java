@@ -26,9 +26,28 @@ public class ResultSaveController {
      * @return
      */
     @GetMapping("/predict")
-    public String predict(@RequestParam(required=false) String vsl, Model model){
-        model.addAttribute("prefillVsl", vsl);
-        return "predict/index";
+    public String predict(
+                @RequestParam(value = "idValue", required = false) String idValue,
+                Model model) {
+        String prefillType = null; // MMSI / IMO / null
+
+    if (idValue != null) {
+        String v = idValue.trim();
+        String digits = v.replaceAll("\\D", ""); // 숫자만 추출
+
+        if (digits.length() == 9) { 
+            prefillType = "MMSI"; 
+            model.addAttribute("prefillVsl", digits); 
+        } else if (digits.length() == 7) { 
+            prefillType = "IMO"; 
+            model.addAttribute("prefillVsl", "IMO" + digits); // ★ prefix 붙이기
+        } else {
+            model.addAttribute("prefillVsl", digits);
+        }
+
+        model.addAttribute("prefillType", prefillType); // 드롭다운 선택값
+    }
+        return "portpredict"; // 템플릿명
     }
 
     /**

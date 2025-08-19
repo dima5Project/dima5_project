@@ -8,9 +8,9 @@ import net.dima.dima5_project.entity.ResultSaveEntity;
 
 public interface ResultSaveRepository extends JpaRepository<ResultSaveEntity, Long> {
 
-    // searchVsl, userId 를 함께 로딩해서 N+1 방지 + 페이징 안전
+    // userId 를 함께 로딩해서 N+1 방지 + 페이징 안전
     @EntityGraph(attributePaths = {"userId"})
-    Page<ResultSaveEntity> findByUserId_UserIdOrderBySaveSeqDesc(String userId, Pageable pageable);
+    Page<ResultSaveEntity> findByUserId_UserId(String userId, Pageable pageable);
 
     boolean existsBySaveSeqAndUserId_UserId(Long saveSeq, String userId);
 }
