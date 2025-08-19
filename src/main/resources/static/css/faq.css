@@ -507,3 +507,12 @@
 #faq-widget #chatSend:active {
     transform: translateY(1px);
 }
+
+#endChatBtn {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+#endChatBtn:hover {
+    filter: brightness(.95);
+}
