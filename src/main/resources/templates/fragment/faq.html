@@ -2,11 +2,20 @@
 <div th:fragment="widget">
     <div id="faq-widget">
         <button id="faq-toggle" aria-label="toggle-faq">?</button>
+
         <div id="faq-box" class="hidden">
             <div class="faq-header"><span>Portcast FAQ</span></div>
-            <div class="faq-body">
-                <div id="faq-dialog"></div>
-                <div class="faq-scroll-padding"></div>
+
+            <!-- 메시지 로그 + 입력영역을 수직으로 배치 -->
+            <div class="faq-panel">
+                <!-- 대화/FAQ 로그 (기존 id 유지) -->
+                <div id="faq-dialog" class="faq-log"></div>
+
+                <!-- 입력창 + 보내기 버튼 (세로 정렬) -->
+                <div class="faq-composer">
+                    <textarea id="chatInput" placeholder="상담원에게 메시지를 입력하세요"></textarea>
+                    <button id="chatSend" type="button">보내기</button>
+                </div>
             </div>
         </div>
     </div>
@@ -14,7 +23,7 @@
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/faq.css}" href="/css/faq.css" />
 
-    <!-- SockJS/STOMP (실시간 채팅) -->
+    <!-- SockJS/STOMP (순서 중요: SockJS 먼저) -->
     <script defer src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
