@@ -13,8 +13,18 @@
     <!-- 대시보드 전용 CSS -->
     <link rel="stylesheet" th:href="@{/css/adminDashboard.css}" href="/css/adminDashboard.css" />
 
+    <!-- SockJS / STOMP (순서 중요: SockJS 먼저) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" crossorigin="anonymous"></script>
+
+    <!-- 관리자 채팅 JS -->
+    <script defer src="/js/admin-chat.js" th:src="@{/js/admin-chat.js}"></script>
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- head 안 어딘가 -->
+    <link rel="stylesheet" href="/css/faq.css">
 </head>
 
 <body class="has-sidebar page-dashboard">
@@ -24,6 +34,8 @@
         <nav class="adm-nav">
             <a href="/admin" class="adm-nav__link" data-match="/admin($|/)"><span>대시보드</span></a>
             <a href="/admin/news" class="adm-nav__link" data-match="/admin/news"><span>뉴스 관리</span></a>
+            <!-- 새로 추가: 상담 채팅 -->
+            <a href="#" id="navChatBtn" class="adm-nav__link" role="button"><span>상담 채팅</span></a>
         </nav>
     </aside>
 
@@ -138,6 +150,41 @@
             });
         })();
     </script>
+
+    <!-- ▼▼▼ 반드시 본문 외곽(보통 body 끝부분)에 드로어로 유지 ▼▼▼ -->
+    <aside id="chatPanel" class="adm-drawer adm-chat" aria-hidden="true" aria-label="상담 채팅 패널" role="dialog">
+        <header class="adm-drawer__hd">
+            <strong>상담 채팅</strong>
+            <div class="adm-chat__tools">
+                <button id="chatRefresh" class="adm-btn adm-btn--ghost" type="button">새로고침</button>
+                <button id="chatClose" class="adm-btn adm-btn--ghost" type="button" aria-label="닫기">닫기</button>
+            </div>
+        </header>
+
+        <div class="adm-chat__body">
+            <!-- 방 리스트 + 미니 제목 -->
+            <div class="adm-room-list" aria-label="채팅방 목록">
+                <input id="roomMiniTitle" class="adm-input adm-room-minititle" value="-" readonly />
+                <div id="roomList"></div>
+            </div>
+
+            <!-- 우측 대화 뷰 -->
+            <div class="adm-room-view">
+                <div class="adm-room-top">
+                    <div id="roomTitle" class="adm-room-title">방을 선택하세요</div>
+                    <div class="adm-room-actions">
+                        <button id="btnCloseRoom" class="adm-btn adm-btn--ghost" type="button" disabled>방 종료</button>
+                    </div>
+                </div>
+                <div class="adm-chatlog" id="chatLog" aria-live="polite"></div>
+                <div class="adm-chat-input">
+                    <textarea id="adminMsg" rows="2" placeholder="메시지를 입력하세요" disabled></textarea>
+                    <button id="adminSend" class="adm-btn" type="button" disabled>보내기</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div id="chatOverlay" class="adm-overlay" aria-hidden="true"></div>
 </body>
 
 </html>

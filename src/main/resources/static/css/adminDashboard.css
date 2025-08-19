@@ -486,3 +486,175 @@ body.no-scroll {
     overflow-x: auto;
     overflow-y: visible;
 }
+
+/* === 상담 채팅 패널 === */
+.adm-chat {
+    width: 980px;
+}
+
+.adm-chat__body {
+    display: flex;
+    height: calc(100% - 56px);
+}
+
+.adm-room-list {
+    width: 340px;
+    border-right: 1px solid #e5e7eb;
+    overflow: auto;
+    padding: 8px;
+    background: #fafafa;
+}
+
+.adm-room-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.adm-room-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.adm-room-title {
+    font-weight: 700;
+}
+
+.adm-room-actions .adm-btn {
+    margin-left: 6px;
+}
+
+.adm-room-item {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+    cursor: pointer;
+}
+
+.adm-room-item.is-active {
+    outline: 2px solid #cfe0ff;
+}
+
+.adm-room-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.adm-room-label {
+    font-weight: 600;
+}
+
+.adm-room-prev {
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adm-room-time {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+}
+
+.adm-room-empty {
+    padding: 14px;
+    color: #666;
+}
+
+.adm-badge {
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 10px;
+    padding: 2px 8px;
+}
+
+.adm-chatlog {
+    flex: 1;
+    overflow: auto;
+    padding: 12px;
+    background: #f7f7f7;
+}
+
+.adm-chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.adm-chat-input textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+/* 기존 FAQ 말풍선 스타일 재활용되도록 최소 폭 조정 */
+.faq-message .faq-bubble {
+    max-width: 360px;
+}
+
+/* === 채팅 말풍선 최소 스타일 (관리자용) === */
+.faq-message {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+    align-items: flex-end;
+}
+
+.faq-message.assistant {
+    justify-content: flex-start;
+}
+
+.faq-message.user {
+    justify-content: flex-end;
+}
+
+.faq-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+.faq-bubble {
+    max-width: 360px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.faq-message.user .faq-bubble {
+    background: #e7f1ff;
+    border-color: #d6e6ff;
+}
+
+.faq-time {
+    font-size: 12px;
+    color: #888;
+    margin: 4px 6px 0;
+}
+
+.adm-room-minititle {
+    width: 100%;
+    margin: 6px 0 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--adm-border);
+    border-radius: 10px;
+    background: #fff;
+}

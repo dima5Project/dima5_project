@@ -12,9 +12,8 @@
   border: 2px solid #0f1035;
   border-radius: 10px;
   width: 100%;
-  max-width: 550px;
-  /* max-height: 570px; */
-  height: auto;
+  max-width: 650px;
+  height: 365px;
   display: flex;
   flex-direction: row;
   align-items: strectch;
@@ -28,29 +27,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  /* 로고와 텍스트 사이 공간 조절 */
   background-color: #0f1035;
   height: 100%;
-  width: 200px;
+  flex-basis: 40%;
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
-  color: white;
+  color: #ffffff;
+  margin: 0;
 }
 
 .logo_icon {
-  width: 35px;
-  height: 35px;
-}
-
-.logo_text {
-  font-family: 'Noto Sans KR', sans-serif;
-  font-weight: 700;
-  /* 텍스트 굵게 */
-  font-size: 24px;
-  color: #ffffff;
-  margin: 0;
-  /* 바깥쪽 여백. 다른 요소와 거리 조절 */
+  width: 170px;
+  height: 170px;
+  /* color: #ffffff;
+  z-index: 2; */
 }
 
 /* 폼 스타일 */
@@ -58,11 +48,20 @@
   display: flex;
   /* 세로 정렬 */
   flex-direction: column;
-  width: 100%;
+  justify-content: center;
+  /* width: 100%;
   max-width: 300px;
-  margin: 10px;
+  margin: 10px; */
   padding: 40px;
   flex-grow: 1;
+}
+
+.form_group,
+.login_button,
+.join_wrap {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 /* 입력 필드 하나의 덩어리를 그룹화 */
@@ -152,7 +151,7 @@
   flex-direction: column;
   align-items: center;
   margin-top: 10px;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* 링크 - 마우스 올리면 밑줄이 생김*/
