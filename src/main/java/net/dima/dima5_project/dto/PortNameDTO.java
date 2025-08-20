@@ -17,8 +17,8 @@ public class PortNameDTO {
     private String portNameKr;
     private String countryNameEn;
     private String portNameEn;
-    private String countryNameJp;
-    private String portNameJp;
+    // private String countryNameJp;
+    // private String portNameJp;
 
     // 위경도 정보 추가
     private double locLat;
@@ -31,8 +31,8 @@ public class PortNameDTO {
                 .portNameKr(portNameEntity.getPortNameKr())
                 .countryNameEn(portNameEntity.getCountryNameEn())
                 .portNameEn(portNameEntity.getPortNameEn())
-                .countryNameJp(portNameEntity.getCountryNameJp())
-                .portNameJp(portNameEntity.getPortNameJp())
+                // .countryNameJp(portNameEntity.getCountryNameJp())
+                // .portNameJp(portNameEntity.getPortNameJp())
                 .build();
     }
 }

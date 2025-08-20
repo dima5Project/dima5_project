@@ -38,11 +38,11 @@ public class PortNameEntity {
     @Column(name = "port_name_en")
     private String portNameEn;
 
-    @Column(name = "country_name_jp")
-    private String countryNameJp;
+    // @Column(name = "country_name_jp")
+    // private String countryNameJp;
 
-    @Column(name = "port_name_jp")
-    private String portNameJp;
+    // @Column(name = "port_name_jp")
+    // private String portNameJp;
 
     // FK 관계를 통해 필요할 때, PortInfoEntity 데이터를 가져올 수 있음
     @OneToOne(fetch = FetchType.LAZY)
@@ -56,8 +56,8 @@ public class PortNameEntity {
                 .countryNameKr(portNameDTO.getCountryNameKr())
                 .portNameEn(portNameDTO.getPortNameEn())
                 .countryNameEn(portNameDTO.getCountryNameEn())
-                .portNameJp(portNameDTO.getPortNameJp())
-                .countryNameJp(portNameDTO.getCountryNameJp())
+                // .portNameJp(portNameDTO.getPortNameJp())
+                // .countryNameJp(portNameDTO.getCountryNameJp())
                 .build();
     }
 
