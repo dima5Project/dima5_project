@@ -199,7 +199,8 @@ img {
 }
 
 /* 사용자가 입력할 텍스트는 왼쪽 정렬로 유지 */
-.search_input:focus {
+.search_input:focus,
+.search_input:not(:placeholder-shown) {
     text-align: left;
     text-indent: 0;
 }
