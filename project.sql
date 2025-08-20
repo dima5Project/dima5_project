@@ -132,66 +132,27 @@ SELECT * FROM port_holiday;
 COMMIT;
 
 -- 9. 선박정보
--- DROP TABLE IF EXISTS vessel_master;
+
+DROP TABLE IF EXISTS vessel_master;
 CREATE TABLE IF NOT EXISTS vessel_master
 (
-	vsl_seq int AUTO_INCREMENT PRIMARY KEY,
-	vsl_id varchar(300) NOT NULL UNIQUE,
-	vsl_name varchar(100) NOT NULL,
-	vsl_mmsi varchar(100) NOT NULL,
-	vsl_imo varchar(100) NOT NULL,
-	ship_type varchar(100) NOT NULL,
-	call_sign varchar(50) NOT NULL,
-	vsl_length int NOT NULL,
-	vsl_width int NOT NULL
-	
+   vsl_seq int AUTO_INCREMENT PRIMARY KEY,
+   vsl_id varchar(300) NOT NULL UNIQUE,
+   vsl_name varchar(100) NOT NULL,
+   vsl_mmsi varchar(100) NOT NULL,
+   vsl_imo varchar(100) NOT NULL,
+   ship_type varchar(100) NOT NULL,
+   call_sign varchar(50) NOT NULL,
+   vsl_length int NOT NULL,
+   vsl_width int NOT NULL,
+   vsl_img varchar(1000)
+   
 );
 
 SELECT * FROM vessel_master;
--- DELETE FROM vessel_master;
+DELETE FROM vessel_master;
 COMMIT;
 
-
--- 10. 전체 ais 데이터 (항로)
-DROP TABLE IF EXISTS ais_all;
-CREATE TABLE IF NOT EXISTS ais_all
-(
-	ais_seq int AUTO_INCREMENT PRIMARY KEY,
-	port_id varchar(10) NOT NULL,
-	vsl_id varchar(300) NOT NULL,
-	time_stamp datetime NOT NULL,
-	lat decimal(15, 10) NOT NULL,
-	lon decimal(15, 10) NOT NULL,
-	cog decimal(15, 10) NOT NULL,
-	heading decimal(15, 10) NOT NULL,
-		FOREIGN KEY (port_id) REFERENCES port_info(port_id),
-		FOREIGN KEY (vsl_id) REFERENCES vessel_master(vsl_id)
-);
-
-SELECT * FROM ais_all;
--- DELETE FROM ais_all;
-COMMIT;
-
-
--- 11. 타임포인트별 ais 데이터
-DROP TABLE IF EXISTS ais_timepoint;
-CREATE TABLE IF NOT EXISTS ais_timepoint
-(
-	ais_seq int AUTO_INCREMENT PRIMARY KEY,
-	port_id varchar(10) NOT NULL,
-	vsl_id varchar(300) NOT NULL,
-	time_stamp datetime NOT NULL,
-	time_point int NOT NULL,
-	lat decimal(15, 10) NOT NULL,
-	lon decimal(15, 10) NOT NULL,
-	cog decimal(15, 10) NOT NULL,
-	heading decimal(15, 10) NOT NULL,
-		FOREIGN KEY (port_id) REFERENCES port_info(port_id),
-		FOREIGN KEY (vsl_id) REFERENCES vessel_master(vsl_id)
-);
-
-SELECT * FROM ais_timepoint;
-COMMIT;
 
 -- 12. 검색 이력 저장
 DROP TABLE IF EXISTS result_save;
@@ -226,3 +187,48 @@ create table if not exists admin_notice(
 );
 
 select * from admin_notice;
+
+-- 14. 실시간 상담원 채팅
+CREATE TABLE chat_room (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id      BIGINT NULL,             -- 회원이면 FK, 비회원이면 NULL
+  guest_id     VARCHAR(64) NULL,        -- 비회원 UUID
+  status       ENUM('OPEN','ASSIGNED','CLOSED') NOT NULL DEFAULT 'OPEN',
+  assignee_id  BIGINT NULL,             -- 담당 관리자(선택)
+  last_msg_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_room_user(user_id),
+  INDEX idx_room_guest(guest_id),
+  INDEX idx_room_status(status),
+  INDEX idx_room_last(last_msg_at)
+);
+select * from chat_room;
+commit;
+-- H2/MySQL 공통
+UPDATE chat_room SET last_msg_at = NOW() WHERE last_msg_at IS NULL;
+
+
+CREATE TABLE chat_message (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  room_id      BIGINT NOT NULL,
+  sender_type  ENUM('USER','ADMIN','SYSTEM') NOT NULL,
+  sender_id    BIGINT NULL,             -- USER/ADMIN id (게스트면 NULL)
+  content      TEXT NOT NULL,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  read_by_admin    TINYINT(1) NOT NULL DEFAULT 0,
+  read_by_user     TINYINT(1) NOT NULL DEFAULT 0,
+  CONSTRAINT fk_msg_room FOREIGN KEY (room_id) REFERENCES chat_room(id) ON DELETE CASCADE,
+  INDEX idx_msg_room_created(room_id, created_at),
+  INDEX idx_msg_unread_admin(room_id, read_by_admin),
+  INDEX idx_msg_unread_user(room_id, read_by_user)
+);
+
+select * from chat_message;
+commit;
+UPDATE chat_message
+SET sender_type='ADMIN'
+WHERE sender='ADMIN' AND sender_type <> 'ADMIN';
+-- sender_id 컬럼을 문자형 sender로 변경
+ALTER TABLE chat_message 
+  CHANGE COLUMN sender_id sender VARCHAR(64) NULL;
