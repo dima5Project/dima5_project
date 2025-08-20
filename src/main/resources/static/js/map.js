@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         attributionControl: false
     });
 
+    map.setProjection('mercator');
+
     const routeSourceId = 'route-source';
     const routeLayerId = 'route-layer';
     const markerSourceId = 'marker-source';

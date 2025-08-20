@@ -78,9 +78,9 @@ main {
     color: #495057;
 }
 
-.tbl tbody tr:hover {
+/*.tbl tbody tr:hover {
     background-color: #e9ecef;
-}
+}*/
 
 .tbl a {
     color: #495057;
@@ -114,7 +114,7 @@ main {
     border-bottom: none;
 }
 
-/* ================== 페이지 하단 링크 스타일 ================== */
+/* ================== 돌아가기 버튼 스타일 ================== */
 .back-link-container {
     max-width: 1040px;
     margin: 20px auto;
@@ -144,4 +144,28 @@ main {
     /* 호버 시 배경색 변경 */
     text-decoration: none;
     /* 호버 시 밑줄 제거 */
+}
+
+/* ================== 테이블 내부 재검색 버튼 ================== */
+.tbl .btn-search-again {
+    display: inline-block;
+    /* a 태그도 버튼처럼 보이게 */
+    padding: 4px 10px;
+    /* 작고 심플하게 */
+    font-size: 12px;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .2s ease;
+    text-decoration: none;
+    /* 밑줄 제거 */
+    line-height: 1.2;
+    /* 텍스트 정렬 안정화 */
+}
+
+.tbl .btn-search-again:hover {
+    background-color: #f5f5f5;
+    text-decoration: none;
 }

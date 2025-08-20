@@ -83,10 +83,10 @@ main {
     color: #495057;
 }
 
-.tbl tbody tr:hover {
+/* 호버 시 배경색 변경 */
+/*.tbl tbody tr:hover {
     background-color: #e9ecef;
-    /* 호버 시 배경색 변경 */
-}
+}*/
 
 .tbl a {
     color: #495057;
@@ -129,7 +129,7 @@ main {
     color: #6c757d;
 }
 
-/* ================== 페이지 하단 링크 스타일 ================== */
+/* ================== 돌아가기 버튼 스타일 ================== */
 .back-link-container {
     max-width: 1040px;
     margin: 20px auto;
