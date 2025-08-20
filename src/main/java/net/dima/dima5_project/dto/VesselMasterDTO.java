@@ -21,6 +21,7 @@ public class VesselMasterDTO {
     private String callSign;
     private Integer vslLength;
     private Integer vslWidth;
+    private String vslImg;
 
     public static VesselMasterDTO toDTO(VesselMasterEntity vesselMasterEntity) {
         return VesselMasterDTO.builder()
@@ -33,6 +34,7 @@ public class VesselMasterDTO {
                 .callSign(vesselMasterEntity.getCallSign())
                 .vslLength(vesselMasterEntity.getVslLength())
                 .vslWidth(vesselMasterEntity.getVslWidth())
+                .vslImg(vesselMasterEntity.getVslImg())
                 .build();
     }
 

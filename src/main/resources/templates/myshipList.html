@@ -59,9 +59,9 @@
                     <td th:text="${ship.top1Pred != null ? #numbers.formatDecimal(ship.top1Pred * 100,1,2) + '%' : '없음'}">88%</td>
                     <td th:text="${ship.eta != null ? #temporals.format(ship.eta, 'yyyy-MM-dd HH:mm:ss') : '없음'}">2025-08-31</td>
                     <td>
-                        <button class="btn-search-again" type="button"
-                            th:attr="data-id=${ship.saveSeq}"
-                            th:href="@{/predict(idValue=${ship.searchVsl})}">재검색</button>
+                        <a  class="btn-search-again"
+                            th:attr="data-id=${ship.saveSeq}" 
+                            th:href="@{/predict(idValue=${ship.searchVsl})}">재검색</a>
                     </td>
                 </tr>
 

@@ -89,11 +89,10 @@
                     <!-- 다음(▶) -->
                     <li>
                         <a class="page_link_arrow" th:if="${!newsList.last}"
-                            th:href="@{/news/main(page=${page+1}, keyword=${keyword})}" aria-label="Next page">
-                            <img th:src="@{/images/newsImages/next_arrow.svg}" alt="Next page arrow">
-                        </a>
+                            th:href="@{/news/main(page=${page+1}, keyword=${keyword})}"
+                            aria-label="Next page">&raquo;</a>
                         <span class="page_link_arrow disabled" th:unless="${!newsList.last}">
-                            <img th:src="@{/images/newsImages/next_arrow.svg}" alt="Next page arrow">
+                            &raquo;
                         </span>
                     </li>
                 </ul>

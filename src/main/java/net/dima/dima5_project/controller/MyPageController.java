@@ -193,6 +193,9 @@ public class MyPageController {
         }
     }
 
+    /**
+     * 마이페이지 - 내 선박 저장
+     */
     @GetMapping("/mypage/ships")
     public String shipList(Model model, Integer page, Integer size) {
         // 저장 선박 데이터 model에 담기
@@ -214,6 +217,9 @@ public class MyPageController {
         return "myshipList";
     }
 
+    /**
+     * 마이페이지 - 문의글 목록
+     */
     @GetMapping("/mypage/asks")
     public String askList(Model model, Integer page, Integer size) {
         // 문의 내역 데이터 model에 담기
@@ -233,10 +239,5 @@ public class MyPageController {
         model.addAttribute("totalAsks", askPage.getTotalElements());
         return "myasks";
     }
-
-
-
-
-
 
 }
