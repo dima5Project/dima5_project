@@ -29,6 +29,12 @@ public class InfoController {
         return portDockingService.getLatestDockingInfo(portId);
     }
 
+    // 1-1. 현진 추가(1번)
+    @GetMapping("/docking/all")
+    public List<PortCongestionSummary> getAllDocking() {
+        return portDockingService.getAllPortCongestions();
+    }
+
     // 2. 날씨 (위경도 직접 받기)
     @GetMapping("/weather/direct")
     public WeatherDTO getWeatherByCoords(@RequestParam double lat, @RequestParam double lon) {
