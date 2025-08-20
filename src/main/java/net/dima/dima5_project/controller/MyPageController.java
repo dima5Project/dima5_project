@@ -197,25 +197,32 @@ public class MyPageController {
      * 마이페이지 - 내 선박 저장
      */
     @GetMapping("/mypage/ships")
-    public String shipList(Model model, Integer page, Integer size) {
-        // 저장 선박 데이터 model에 담기
+    public String shipList(
+        Model model,
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "10") int size) {
+
         var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         String userId = login.getUserId();
 
-        int p = (page == null || page < 0) ? 0 : page;
-        int s = (size == null || size <= 0) ? 10 : size;
-
-        Pageable pageable = PageRequest.of(p, s, Sort.by(Sort.Direction.DESC, "saveSeq"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "saveSeq"));
         Page<ResultSaveDTO> saves = userService.getMySaves(userId, pageable);
 
-        model.addAttribute("user", login); // 상단에 사용자 표시용(원하면 제거)
-        model.addAttribute("shipPage", saves); // 페이징 전부 필요하면 이거 사용
-        model.addAttribute("shipList", saves.getContent()); // HTML에서 간단 반복용
+        model.addAttribute("user", login);
+        model.addAttribute("shipPage", saves);
+        model.addAttribute("shipList", saves.getContent());
         model.addAttribute("totalShips", saves.getTotalElements());
-        
-        return "myshipList";
-    }
+
+        // 더보기 링크용
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("hasNext", saves.hasNext());
+        model.addAttribute("nextPage", page + 1);
+
+    return "myshipList";
+}
+
 
     /**
      * 마이페이지 - 문의글 목록
