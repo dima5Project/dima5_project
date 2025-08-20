@@ -260,7 +260,8 @@ main {
 
 /* 버튼 */
 .btn-search-again {
-    padding: 6px 14px;
+    padding: 5px 12px;
+    /* 내부 여백 → 버튼 크기 조절 */
     font-size: 11px;
     color: #000;
     background-color: #fff;
