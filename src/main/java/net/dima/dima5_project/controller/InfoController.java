@@ -37,7 +37,7 @@ public class InfoController {
     // 2. 날씨 (위경도 직접 받기)
     @GetMapping("/weather/direct")
     public WeatherDTO getWeatherByCoords(@RequestParam("lat") double lat,
-                                        @RequestParam("lon") double lon) {
+            @RequestParam("lon") double lon) {
         return weatherService.getWeatherByCoords(lat, lon);
     }
 
@@ -82,7 +82,8 @@ public class InfoController {
     public PortHoverDTO getHover(@PathVariable("portId") String portId) {
         PortNameDTO base = portInfoService.getPortById(portId);
         var coord = portCoordinates.getByKoName(base.getPortNameKr());
-        if (coord == null) throw new IllegalArgumentException("좌표 없음: " + base.getPortNameKr());
+        if (coord == null)
+            throw new IllegalArgumentException("좌표 없음: " + base.getPortNameKr());
 
         var docking = portDockingService.getLatestDockingInfo(portId);
         var timezone = timeZoneService.getTimezone(base.getCountryNameKr());
@@ -101,5 +102,22 @@ public class InfoController {
         dto.setTodayHoliday(holiday);
         return dto;
     }
-}
 
+    // ⬇️ InfoController.java 맨 아래에 추가
+    @GetMapping("/weather/emoji/{portId}")
+    public Map<String, Object> getWeatherEmojiByPort(@PathVariable String portId) {
+        PortNameDTO base = portInfoService.getPortById(portId);
+        if (base == null) {
+            throw new IllegalArgumentException("존재하지 않는 포트ID: " + portId);
+        }
+        var coord = portCoordinates.getByKoName(base.getPortNameKr());
+        if (coord == null) {
+            throw new IllegalArgumentException("좌표 없음: " + base.getPortNameKr());
+        }
+        WeatherDTO w = weatherService.getWeatherByCoords(coord.lat(), coord.lon());
+        return Map.of(
+                "emoji", w.getWeatherEmoji(),
+                "lat", coord.lat(),
+                "lon", coord.lon());
+    }
+}
