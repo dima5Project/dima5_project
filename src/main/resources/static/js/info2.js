@@ -79,9 +79,7 @@ let map, mapMarker;
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth(); // 0=1월
 let currentHolidayData = [];
-
 const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-
 const daysTag = document.querySelector('.days');
 const currentDateElement = document.querySelector('.current-date');
 const prevNextIcon = document.querySelectorAll('.nav button');
@@ -123,7 +121,6 @@ function stopAutoUpdate() {
         console.log("[auto] stopped");
     }
 }
-
 function startAutoUpdate() {
     if (isUserInteracting) return; // 이미 사용자 상호작용 발생 시 금지
     stopAutoUpdate();
@@ -442,7 +439,6 @@ function drawChart(data) {
     const labels = data.map(d => d.date);
     const actual = data.map(d => d.actual);
     const expect = data.map(d => d.expected);
-
     if (congestionChart) congestionChart.destroy();
 
     congestionChart = new Chart(ctx, {
@@ -603,7 +599,6 @@ function drawChart(data) {
         }
     });
 }
-
 
 // ==========================
 // 9) 달력(현재 HTML 구조용)

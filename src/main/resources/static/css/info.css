@@ -283,11 +283,6 @@ button.material-icons {
     display: block;
 }
 
-.cards-row {
-    display: flex;
-    align-items: stretch;
-}
-
 /* 날씨 */
 #weatherCard {
     grid-area: weather;
@@ -448,12 +443,10 @@ button.material-icons {
 }
 
 .calendar-wrapper {
-    flex: 0 0 auto;
-    height: auto;
-    overflow: visible;
-    min-height: max-content;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    /* 내용이 넘칠 경우 스크롤바 생성 */
 }
 
 .calendarBox {
