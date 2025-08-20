@@ -291,7 +291,7 @@ button.material-icons {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    max-height: 452px;
+    /* max-height: 452px; */
 }
 
 /* 큰 온도 카드 */
@@ -383,7 +383,7 @@ button.material-icons {
 #timezoneCard {
     grid-area: tz;
     min-height: 180px;
-    max-height: 452px;
+    /* max-height: 452px; */
 }
 
 #timezoneCard h3 {
@@ -445,8 +445,9 @@ button.material-icons {
 .calendar-wrapper {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    /* 내용이 넘칠 경우 스크롤바 생성 */
+    overflow: visible;
+    /* ← auto 제거 */
+    max-height: none;
 }
 
 .calendarBox {
@@ -619,20 +620,28 @@ header {
 }
 
 #holidayListContainer {
-    flex-grow: 1;
-    /* 남은 공간을 모두 차지하도록 확장 */
+    margin-top: 16px;
+    border-top: 1px solid #E5E7EB;
+    flex-grow: 0;
     overflow-y: auto;
     /* 내용이 넘치면 스크롤 가능하게 설정 */
-    padding-top: 5px;
+    padding-top: 12px;
     /* 달력과의 간격 */
 }
 
+#holidayListContainer h4 {
+    margin: 0 0 10px;
+    /* 아래쪽만 간격 */
+    font-weight: 400;
+}
+
 #holidayListContainer ul {
+    margin: 0;
     line-height: 1.5;
     padding-left: 20px;
     list-style-type: disc;
 }
 
 #holidayListContainer ul li {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
