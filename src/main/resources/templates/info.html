@@ -28,7 +28,7 @@
 
 </head>
 
-<body>
+<body class="info-page">
     <div sec:authorize="isAnonymous()">
         <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
     </div>
@@ -59,7 +59,7 @@
         <div class="extra-info-container">
 
             <div class="map-box">
-                <div id="map"></div>
+                <div id="infoMap"></div>
             </div>
 
             <div class="info-card" id="dockingCard">
