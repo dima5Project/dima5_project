@@ -41,9 +41,11 @@
         </div>
 
         <!-- 로그인 실패 시 표시 -->
-        <p class="login_error_message" th:if="${param.error != null}">
-          아이디 또는 비밀번호가 올바르지 않습니다.
-        </p>
+        <div class="error-message-container">
+          <p class="login_error_message" th:if="${param.error != null}">
+            아이디 또는 비밀번호가 올바르지 않습니다.
+          </p>
+        </div>
 
         <button type="submit" class="login_button">로그인</button> <!-- 로그인 버튼 -->
 

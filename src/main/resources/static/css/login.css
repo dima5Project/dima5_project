@@ -118,7 +118,6 @@
   line-height: 15px;
   margin: 0 0 10px 0;
   min-height: 15px;
-  /* 자리를 항상 확보해두기 위해 min-height 설정 */
   display: none;
 }
 
@@ -251,11 +250,22 @@ body {
   background-color: #ffffff;
 }
 
+/* 아이디 또는 비밀번호가 올바르지 않습니다. */
+.error-message-container {
+  height: 22px;
+  /* 에러 메시지가 차지할 공간을 미리 확보 (폰트 크기 + margin) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  /* 버튼과의 간격 유지 */
+}
+
 .login_error_message {
   color: red;
   font-size: 14px;
-  margin-bottom: 8px;
-  /* 버튼과 간격 */
   text-align: center;
   /* 가운데 정렬 */
+  margin: 0;
+  /* 컨테이너에 마진을 주었으므로 이 요소 자체의 마진은 0으로 */
 }
