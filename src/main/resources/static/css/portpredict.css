@@ -132,6 +132,7 @@ html {
 .iconwrap.is-active {
     background-color: #a0a0a0;
     /* 진한 회색 배경색 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
 }
 
 /* 실제 아이콘 이미지 */
@@ -159,7 +160,7 @@ html {
     content: attr(data-tip);
     position: absolute;
     bottom: 100%;
-    left: 50%;
+    left: 10%;
     transform: translate(-50%, -2px);
     /* 툴팁을 아이콘 중앙에 위치시킴 */
     background: #fff;
@@ -176,6 +177,19 @@ html {
     transition: opacity .15s ease, transform .15s ease;
     z-index: 10050;
 }
+
+.iconwrap.port[data-tip]::after {
+    left: 8%;
+    transform: translate(-50%, -2px);
+    /* 툴팁을 아이콘 중앙에 위치시킴 */
+}
+
+.iconwrap.time[data-tip]::after {
+    left: 20%;
+    transform: translate(-50%, -2px);
+    /* 툴팁을 아이콘 중앙에 위치시킴 */
+}
+
 
 /* hover 시 표시 */
 .iconwrap[data-tip]:hover::after {
@@ -266,8 +280,6 @@ html {
     }
 }
 
-/* 기존 스타일 그대로 두고 아래만 추가 */
-
 /* 툴팁 기본 숨김 */
 .map-icon-ctrl .iconbtn[data-tip] {
     position: relative;
@@ -301,7 +313,7 @@ html {
     transform: translateY(-50%) translateX(-10px);
 }
 
-/* ───────── 패널(슬라이드 내용) ───────── */
+/* ========= 패널(슬라이드 내용) ========= */
 /* 모든 패널은 같은 크기/레이아웃을 갖고, 활성만 보이기 */
 .panel[hidden] {
     display: none !important;
@@ -1420,8 +1432,6 @@ html {
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .25));
     user-select: none;
 }
-
-
 
 
 /* map +/- btn 적용, 맨 아래 권장 */
