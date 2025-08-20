@@ -30,7 +30,7 @@ async function loadPortData() {
             skipEmptyLines: true
         }).data;
         console.log("Port data loaded successfully:", portData.length, "records.");
-        publishSupportedPortIds();
+        // publishSupportedPortIds();
     } catch (error) {
         console.error("Failed to load port data:", error);
     }
