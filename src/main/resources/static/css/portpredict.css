@@ -559,8 +559,7 @@ html {
 
 /* 조회 버튼 전, 고정영역만 보이는 경우 */
 .is-hidden {
-    visibility: hidden;
-    pointer-events: none;
+    display: none !important;
 }
 
 /* 조회 후 입력창 완전 잠금 */
@@ -738,15 +737,14 @@ html {
     /* ← cqw를 쓰기 위한 선언 */
 }
 
-/* 영문 항구 표시 */
+/* 영문 항구 표시 2개 */
 .route b {
     display: block;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 18px;
-    /* 가장 작은 크기, 권장 값, 최댓값*/
-    font-weight: 550;
+    font-size: 20px;
+    font-weight: 650;
+    margin-bottom: 4px;
 }
 
 /* KRBUS */
@@ -762,23 +760,23 @@ html {
 /* 화살표 스타일 */
 .arrow {
     grid-column: 2;
-    align-self: center;
+    align-self: start;
     /* 크기는 유지하되 위치만 중앙 고정 */
     font-size: clamp(18px, 6vw, 34px);
     color: #6e767e;
     line-height: 1;
 }
 
-/* 한국 / 부산 */
+/* 한국 / 부산 + 목적항 한국어 */
 .route .sub {
-    margin-top: 6px;
-    font-weight: 500;
+    font-weight: 450;
     color: #6c757d;
     white-space: nowrap;
 }
 
+/* 한국 / 부산 만 */
 .route .sub:not(.dest) {
-    font-size: 14px;
+    font-size: 12px;
     /* 원하는 고정값 */
     overflow: hidden;
     /* 혹시 몰라서 안전장치 */
@@ -787,7 +785,7 @@ html {
 
 .route .sub.dest {
     /* 컨테이너 너비에 맞춰 글자 크기 자동 조절, 줄바꿈/생략 없음 */
-    font-size: clamp(10px, 4.5cqw, 15px);
+    font-size: clamp(10px, 17cqw, 13px);
 }
 
 /* ETA 라인 */
@@ -826,6 +824,7 @@ html {
     box-sizing: border-box;
     flex: 0 0 auto;
     justify-content: flex-end;
+    margin-top: auto;
 }
 
 /* 결과 저장 btn */
@@ -1468,6 +1467,44 @@ html {
 .mapboxgl-ctrl-attrib button:focus {
     outline: none !important;
     box-shadow: none !important;
+}
+
+/* ===== 로딩 스피너 ===== */
+#loading-spinner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    text-align: center;
+    gap: 15px;
+}
+
+#loading-spinner .spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #f3f3f3;
+    /* Light grey */
+    border-top: 5px solid #013895;
+    /* Blue */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-spinner p {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== 반응형: 좁은 화면에선 패널을 조금 더 넓게 ===== */
