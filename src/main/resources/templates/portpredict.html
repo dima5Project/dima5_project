@@ -126,10 +126,10 @@
                     <div class="sidebar__section">
                         <div class="cselect" data-name="idType"
                             th:attr="data-value=${prefillType != null ? prefillType : 'MMSI'}">
-                            
-                            <button type="button" class="cselect__control" aria-haspopup="listbox"aria-expanded="false">
-                                <span class="cselect__value" 
-                                    data-value="MMSI"
+
+                            <button type="button" class="cselect__control" aria-haspopup="listbox"
+                                aria-expanded="false">
+                                <span class="cselect__value" data-value="MMSI"
                                     th:attr="data-value=${prefillType != null ? prefillType : 'MMSI'}"
                                     th:text="${prefillType != null ? prefillType : 'MMSI'}">MMSI</span>
                                 <span class="cselect__caret" aria-hidden="true"></span>
@@ -150,11 +150,8 @@
                     <!-- 입력 + 버튼 -->
                     <div class="sidebar__section">
                         <div class="sidebar__row">
-                            <input id="imo vslInput" 
-                                    type="text" 
-                                    class="sidebar__input" 
-                                    placeholder="선박 고유 번호 입력"
-                                    th:value="${prefillVsl}" />
+                            <input id="imo vslInput" type="text" class="sidebar__input" placeholder="선박 고유 번호 입력"
+                                th:value="${prefillVsl}" />
                             <button class="sidebar__btn primary">조회</button>
                             <button class="sidebar__btn">초기화</button>
                         </div>
@@ -283,6 +280,9 @@
             </div>
         </div>
     </div>
+
+    <script src="/js/env-api.js"></script> <!-- Open-Meteo util -->
+    <script src="/js/vessel-map.js"></script> <!-- 선박/팝업 -->
 </body>
 
 </html>
