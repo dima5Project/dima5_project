@@ -548,26 +548,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 마지막 마커에 대한 hover 기능 추가
         let hoverTimeout;
-        const marineData = {
-            waveHeight: 1.2,
-            waveDirection: 210,
-            seaSurfaceTemp: 27.5,
-            currentVelocity: 0.4,
-            currentDirection: 90,
-            visibilityKm: 10.0,
-            weatherText: "맑음"
-        };
-        map.on('mouseenter', lastMarkerLayerId, (e) => {
+        map.on('mouseenter', lastMarkerLayerId, async (e) => {
             clearTimeout(hoverTimeout);
-            const coordinates = e.features[0].geometry.coordinates.slice();
-            // buildMarinePopupHTML 대신 새로운 buildPopupHTML 함수 사용
-            const html = buildPopupHTML(marineData);
-            marineHoverPopup.setLngLat(coordinates).setHTML(html).addTo(map);
+            const f = e.features && e.features[0];
+            if (!f) return;
+            const [lon, lat] = f.geometry.coordinates;
+
+            // 기준 시각: 응답에서 저장해둔 latest.ts가 있으면 그걸, 없으면 지금
+            const targetISO = (typeof window.lastVesselTsISO === 'string' && window.lastVesselTsISO)
+                ? window.lastVesselTsISO
+                : new Date().toISOString();
+
+            try {
+                const env = await window.ajaxEnvAt(lat, lon, targetISO);  // Open‑Meteo 호출
+                const html = window.buildEnvPopupHTML(env);               // 카드 HTML
+                marineHoverPopup
+                    .setLngLat([lon, lat])
+                    .setHTML(html)
+                    .addTo(map);
+            } catch (err) {
+                console.error('hover env fail', err);
+            }
         });
+
         map.on('mouseleave', lastMarkerLayerId, () => {
-            hoverTimeout = setTimeout(() => {
-                marineHoverPopup.remove();
-            }, 100);
+            hoverTimeout = setTimeout(() => marineHoverPopup.remove(), 120);
         });
     });
 
