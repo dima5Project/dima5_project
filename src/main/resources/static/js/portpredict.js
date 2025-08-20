@@ -105,349 +105,189 @@ $(function () {
     // 조회 버튼: 클릭 이벤트
 
     $(document).on('click', '.sidebar__btn.primary', async function () {
-
         const idType = $('input[name="idType"]').val(); // 숨겨진 input에서 정확한 값 가져오기
-
         const idValue = $('.sidebar__input').val().trim();
 
-
-
         if (!idValue) {
-
             alert('선박 고유 번호를 입력해주세요.');
-
             return;
-
         }
 
-
+        // 로딩 시작: 스피너 보이고, 결과 숨기기
+        $('#predict-content').addClass('is-hidden');
+        $('#loading-spinner').removeClass('is-hidden');
 
         // 선박 정보를 찾고 해당 vsl_id를 가져옴
-
         const vslIdToFetch = updateVesselInfo(idType, idValue);
 
-
-
         if (!vslIdToFetch) {
-
             // updateVesselInfo에서 이미 경고창을 띄웠으므로 여기서는 추가 작업 없이 종료
-
+            $('#loading-spinner').addClass('is-hidden'); // 로딩 종료
             return;
-
         }
 
-
-
         // API 호출 로직
-
         try {
-
             const response = await fetch(`http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=${vslIdToFetch}`);
 
-
-
             // 응답 Content-Type 확인
-
             const contentType = response.headers.get("content-type");
-
             const isJson = contentType && contentType.includes("application/json");
 
-
-
             // HTTP 상태 코드에 따른 분기 처리
-
             if (!response.ok) {
-
                 let errorData = null;
-
                 if (isJson) {
-
                     errorData = await response.json();
-
                 } else {
-
                     // JSON이 아닌 경우 (대부분 HTML 오류 페이지)
-
                     console.error("서버에서 JSON이 아닌 응답을 받았습니다. 상태 코드:", response.status);
-
                     alert(`데이터를 불러오는 중 오류가 발생했습니다. (상태 코드: ${response.status})`);
-
-                    return;
-
                 }
 
-
-
-                // JSON 응답일 경우
-
-                if (response.status === 404) {
-
-                    alert(`오류: 일치하는 선박 정보가 없습니다. (vsl_id: ${vslIdToFetch})`);
-
-                } else if (response.status === 409) {
-
-                    alert(`알림: 선박이 이미 도착했습니다. (도착 항구: ${errorData.detail.port_id})`);
-
-                } else {
-
-                    alert(`데이터를 불러오는 중 오류가 발생했습니다. (오류 메시지: ${errorData.detail?.message || '알 수 없음'})`);
-
+                if (errorData) {
+                    // JSON 응답일 경우
+                    if (response.status === 404) {
+                        alert(`오류: 일치하는 선박 정보가 없습니다. (vsl_id: ${vslIdToFetch})`);
+                    } else if (response.status === 409) {
+                        alert(`알림: 선박이 이미 도착했습니다. (도착 항구: ${errorData.detail.port_id})`);
+                    } else {
+                        alert(`데이터를 불러오는 중 오류가 발생했습니다. (오류 메시지: ${errorData.detail?.message || '알 수 없음'})`);
+                    }
                 }
-
                 // 이 시점에서 throw new Error 대신 함수를 종료
-
+                $('#loading-spinner').addClass('is-hidden'); // 로딩 종료
                 return;
-
             }
-
-
 
             // 응답이 성공적이고, Content-Type이 JSON인 경우에만 파싱
-
             if (!isJson) {
-
                 console.error("성공적인 응답이지만 JSON 형식이 아닙니다.");
-
                 alert("데이터 형식에 문제가 발생했습니다.");
-
+                $('#loading-spinner').addClass('is-hidden'); // 로딩 종료
                 return;
-
             }
-
             const resp = await response.json();
-
             console.log("API로부터 받은 데이터:", resp); // 디버깅
             // ★ 저장용 전역 값 세팅 (이 3줄을 꼭 추가)
             window.currentLat = Number(resp?.latest?.lat ?? 0);
             window.currentLon = Number(resp?.latest?.lon ?? 0);
             window.globalPredictions = Array.isArray(resp?.latest?.predictions) ? resp.latest.predictions : [];
 
-
-
             // 3시간 미만일 경우 처리
-
             if (resp.note && resp.note.includes("<3h")) {
-
                 alert('출항 후 3시간 미만인 선박은 항로 변화가 크지 않아 정확한 예측이 어렵습니다. 잠시 후 다시 조회 해 주세요.');
-
                 // 현재 위치를 지도에 표시하는 로직만 실행하고, 예측 결과는 숨깁니다.
-
                 $('.box').removeClass('is-active');
-
-                $('.sidebar__content').addClass('is-hidden');
-
+                $('#loading-spinner').addClass('is-hidden'); // 로딩 종료
                 // ... 현재 위치 마커만 그리는 로직 추가
-
                 return;
-
             }
-
-
 
             const departurePort = { "id": "KRBUS", "country": "한국", "city": "부산", "lat": 35.0999, "lon": 129.111 };
 
-
-
             // 화면 UI 업데이트 (슬라이드에 데이터 반영)
-
             displayPredictionResults(resp.latest.predictions, departurePort);
-
             displayTimelineResults(resp.timeline, resp.latest);
 
-
-
             // 나머지 기존 조회 로직은 여기에 그대로 두시면 됩니다.
-
             if (resp.latest && resp.latest.predictions) {
-
                 const predictions = resp.latest.predictions;
-
                 const rank1Eta = predictions.find(p => p.rank === 1)?.eta || '정보 없음';
-
                 const rank2Eta = predictions.find(p => p.rank === 2)?.eta || '정보 없음';
-
                 const rank3Eta = predictions.find(p => p.rank === 3)?.eta || '정보 없음';
 
-
-
                 $('.box.one .eta__time').html('<span class="pill">ETA</span> ' + rank1Eta);
-
                 $('.box.two .eta__time').html('<span class="pill">ETA</span> ' + rank2Eta);
-
                 $('.box.three .eta__time').html('<span class="pill">ETA</span> ' + rank3Eta);
-
             }
 
-
-
             // 맵 데이터 관련 기존 로직 유지
-
             const routesData = resp.tracks_topk.filter(trackObj => trackObj.rank >= 1 && trackObj.rank <= 3);
 
-
-
             const routes = [];
-
             let top1RouteData = null;
 
-
-
             routesData.forEach(topRouteData => {
-
                 const trackPoints = topRouteData.track || [];
-
                 if (trackPoints.length > 0) {
-
                     const coordinates = trackPoints.map(point => [point.lon, point.lat]);
-
                     if (departurePort) {
-
                         coordinates.unshift([departurePort.lon, departurePort.lat]);
-
                     }
-
                     let color = '#007cbf';
-
                     if (topRouteData.rank === 2) {
-
                         color = '#A9A9A9';
-
                     } else if (topRouteData.rank === 3) {
-
                         color = '#A9A9A9';
-
                     }
-
                     const name = `예상 항로 (Top ${topRouteData.rank})`;
-
                     routes.push({
-
                         route_name: name,
-
                         coordinates: coordinates,
-
                         color: color,
-
                         rank: topRouteData.rank
-
                     });
 
-
-
                     if (topRouteData.rank === 1) {
-
                         top1RouteData = topRouteData;
-
                     }
-
                 }
-
             });
 
-
-
             globalRoutesData = routes;
-
             globalPredictions = resp.latest.predictions;
-
-
 
             $('.box').addClass('is-active');
 
-
-
             const validMarkers = [];
 
-
-
             if (top1RouteData && top1RouteData.track && top1RouteData.track.length > 0) {
-
                 const firstPoint = top1RouteData.track[0];
-
                 validMarkers.push({
-
                     coordinates: [firstPoint.lon, firstPoint.lat],
-
                     description: `예상 항로 시작점 (Time 0)`
-
                 });
-
             }
-
-
 
             if (resp.timeline && resp.timeline.length > 0) {
-
                 resp.timeline.forEach(timeData => {
-
                     if (timeData.lat && timeData.lon) {
-
                         validMarkers.push({
-
                             coordinates: [timeData.lon, timeData.lat],
-
                             description: `예측 시점: ${timeData.time_point}h`
-
                         });
-
                     }
-
                 });
-
             }
-
-
 
             if (resp.latest && resp.latest.lat && resp.latest.lon) {
-
                 lastMarker = {
-
                     coordinates: [resp.latest.lon, resp.latest.lat],
-
                     description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`
-
                 };
-
             }
-
-
 
             if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
-
                 window.drawRoutes(routes);
-
                 window.drawMarkers(validMarkers, lastMarker);
-
                 window.togglePortMarkersByRank([1, 2, 3]);
-
                 window.toggleMarkersVisibility(true);
-
             } else {
-
                 console.error("Map functions are not available.");
-
             }
 
-
-
-            $('.sidebar__content').removeClass('is-hidden');
-
+            // 로딩 종료 및 결과 표시
+            $('#loading-spinner').addClass('is-hidden');
+            $('#predict-content').removeClass('is-hidden');
             $('.sidebar__input').blur().prop('disabled', true).attr('aria-disabled', 'true').addClass('is-locked');
-
             $('.cselect__control').prop('disabled', true);
 
-
-
         } catch (error) {
-
             console.error('API 호출 중 오류 발생:', error);
-
-            // 오류 경고창은 이미 위에서 처리했으므로 여기서는 추가로 띄우지 않아도 됩니다.
-
+            $('#loading-spinner').addClass('is-hidden'); // 로딩 종료
             alert('네트워크 또는 서버 문제로 데이터를 불러올 수 없습니다. 서버 로그를 확인해주세요.');
-
         }
-
     });
 
 
@@ -1175,8 +1015,6 @@ function updateVesselInfo(type, value) {
         $('.sidebar__vesselinfo .kv strong:eq(2)').text(foundVessel.vsl_length ? foundVessel.vsl_length + ' m' : '정보 없음');
 
         $('.sidebar__vesselinfo .kv strong:eq(3)').text(foundVessel.vsl_width ? foundVessel.vsl_width + ' m' : '정보 없음');
-
-        $('#predict-content').removeClass('is-hidden');
 
         return foundVessel.vsl_id; // 찾은 선박의 vsl_id 반환
 
