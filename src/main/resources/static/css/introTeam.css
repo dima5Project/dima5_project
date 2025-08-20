@@ -37,6 +37,14 @@
     transform: none;
     text-align: center;
     margin-top: 80px;
+    display: flex;
+
+    /* 서브타이틀이랑 간격 주려고 추가한 코드 */
+    /* 세로 스택 */
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    /* ← 제목-부제 간격을 정확히 20px */
 }
 
 .header_title .title {
@@ -49,6 +57,7 @@
 .header_title .sub_title {
     font-size: 18px;
     font-weight: 500;
+    margin: 0;
     color: #fff;
 }
 
@@ -56,7 +65,8 @@
 .main_container {
     display: flex;
     flex-grow: 1;
-    padding: 60px;
+    padding: 60px 200px;
+    /* 전체 여백 상하, 좌우 조정 */
     gap: 20px;
 }
 
@@ -151,22 +161,16 @@
 
 /* 6) 설명 그룹: 이름 바로 아래로 일정 간격 */
 .intro_wrap .text_group {
-    margin-top: 20px;
+    margin-top: 15px;
     /* 이름과 설명 간격 */
     width: 100%;
     /* 부모 너비 상속 */
 }
 
 .intro_wrap .text_group p {
-    font-size: clamp(11px, 1.2vw, 16px);
+    white-space: normal;
     color: #222222;
-    line-height: 1.2;
-    white-space: normal;
-}
-
-.intro_wrap .text_group p {
-    white-space: normal;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.4;
 }
 

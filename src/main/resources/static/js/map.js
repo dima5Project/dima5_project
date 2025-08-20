@@ -17,10 +17,69 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastMarkerSourceId = 'last-marker-source';
     const lastMarkerLayerId = 'last-marker-layer';
     let allPortMarkers = []; // 모든 항구 마커를 저장할 배열
-    // [ADD] 날씨 이모지 전역
-    let weatherMarker = null;    // 이모지 마커 인스턴스
-    let weatherEmojiOn = false;  // 토글 상태
-    let lastFocusedPort = null;         // { portId, lng, lat }
+
+    // ===== 날씨 이모지 전역(항구별) =====
+    let weatherVisible = false;               // 이모지 표시 토글
+    const portCoordsById = new Map();         // { portId -> { lng, lat } }
+    let lastFocusedPort = null; // { portId, lng, lat }
+
+    // 항구 마커 DOM 안에 이모지 span 보장
+    function ensureEmojiEl(markerEl) {
+        let span = markerEl.querySelector('.weather-emoji');
+        if (!span) {
+            span = document.createElement('span');
+            span.className = 'weather-emoji';
+            span.style.position = 'absolute';
+            span.style.left = '-22px'; // 마커 왼쪽
+            span.style.top = '-4px';
+            span.style.userSelect = 'none';
+            span.style.filter = 'drop-shadow(0 1px 2px rgba(0,0,0,.25))';
+            span.style.display = weatherVisible ? '' : 'none';
+            markerEl.appendChild(span);
+        }
+        return span;
+    }
+
+    // 서버 벌크 API(있으면 빠름)
+    async function fetchAllWeatherEmojisBulk() {
+        const r = await fetch('/api/info/weather/bulk', { cache: 'no-cache' });
+        if (!r.ok) throw new Error('bulk weather api 없음/실패');
+        return r.json(); // [{ portId, emoji }]
+    }
+
+    // 전체 항구 이모지 갱신
+    async function updateWeatherEmojis() {
+        try {
+            let list;
+            try {
+                // 1순위: 서버 벌크
+                list = await fetchAllWeatherEmojisBulk();
+            } catch {
+                // 2순위: 클라 폴백(좌표별 direct)
+                const entries = Array.from(portCoordsById.entries());
+                list = await Promise.all(entries.map(async ([portId, { lng, lat }]) => {
+                    try {
+                        const r = await fetch(`/api/info/weather/direct?lat=${lat}&lon=${lng}`);
+                        const j = r.ok ? await r.json() : null;
+                        return { portId, emoji: (j?.weatherEmoji ?? '🌫️') };
+                    } catch {
+                        return { portId, emoji: '🌫️' };
+                    }
+                }));
+            }
+
+            // DOM 반영
+            list.forEach(({ portId, emoji }) => {
+                const el = markerElByPortId.get(portId);
+                if (!el) return;
+                const span = ensureEmojiEl(el);
+                span.textContent = emoji || '🌫️';
+            });
+        } catch (e) {
+            console.error('updateWeatherEmojis fail', e);
+        }
+    }
+
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -288,6 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         wrapper.style.height = `${size}px`;
         wrapper.style.lineHeight = 0;
         wrapper.style.cursor = 'pointer';
+        wrapper.style.position = 'relative';
 
         wrapper.innerHTML = svgText;
         const svgEl = wrapper.querySelector('svg');
@@ -357,37 +417,21 @@ document.addEventListener("DOMContentLoaded", () => {
         // 켤 때 즉시 최신 데이터로 갱신(원하면 주석 처리 가능)
         if (congestionVisible) updateCongestion().catch(console.error);
     });
+
+
     // [ADD] 날씨 버튼 토글 (#weather-btn)
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('#weather-btn');
         if (!btn) return;
-        weatherEmojiOn = !weatherEmojiOn;
-        btn.classList.toggle('is-on', weatherEmojiOn);
-
-        if (!weatherEmojiOn) { removeWeatherEmojiMarker(); return; }
-
-        // 우선순위: 마지막 포커스 항구 -> 지도 중심
-        if (lastFocusedPort && lastFocusedPort.portId) {
-            try {
-                const r = await fetch(`/api/info/weather/emoji/${encodeURIComponent(lastFocusedPort.portId)}`);
-                const j = r.ok ? await r.json() : null;
-                const lng = (j?.lon ?? lastFocusedPort.lng);
-                const lat = (j?.lat ?? lastFocusedPort.lat);
-                const emoji = (j?.emoji ?? '🌫️');
-                showWeatherEmojiMarker([lng, lat], emoji);
-            } catch {
-                showWeatherEmojiMarker([lastFocusedPort.lng, lastFocusedPort.lat], '🌫️');
-            }
-        } else {
-            const c = map.getCenter();
-            try {
-                const r = await fetch(`/api/info/weather/direct?lat=${c.lat}&lon=${c.lng}`);
-                const j = r.ok ? await r.json() : null;
-                showWeatherEmojiMarker([c.lng, c.lat], j?.weatherEmoji ?? '🌫️');
-            } catch {
-                showWeatherEmojiMarker([c.lng, c.lat], '🌫️');
-            }
+        weatherVisible = !weatherVisible;
+        btn.classList.toggle('is-on', weatherVisible);
+        if (weatherVisible) {
+            await updateWeatherEmojis();
         }
+        markerElByPortId.forEach(el => {
+            const s = el.querySelector('.weather-emoji');
+            if (s) s.style.display = weatherVisible ? '' : 'none';
+        });
     });
 
     async function addPortMarkers() {
@@ -421,6 +465,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // [ADD] 포트ID → 마커 DOM 매핑 저장
             markerElByPortId.set(portId, el);
+
+            // [FIX] 이 줄이 있어야 폴백이 작동함
+            portCoordsById.set(portId, { lng, lat });
 
             el.addEventListener('click', () => {
                 el.classList.add('bump');
@@ -581,6 +628,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         allPortMarkers.push(busanMarker); // 부산 마커를 배열에 저장
 
+        // [FIX] 부산도 이모지/혼잡 대상에 포함
+        markerElByPortId.set('KRBUS', busanEl);
+        portCoordsById.set('KRBUS', { lng: 129.040, lat: 35.106 });
+
         // 마지막 마커에 대한 hover 기능 추가
         let hoverTimeout;
         map.on('mouseenter', lastMarkerLayerId, async (e) => {
@@ -713,35 +764,6 @@ document.addEventListener("DOMContentLoaded", () => {
         map.getSource(lastMarkerSourceId).setData(emptyGeojson);
         window.toggleMarkersVisibility(false);
     };
-
-    async function fetchWeatherEmoji(lat, lon) {
-        const res = await fetch(`/api/info/weather/direct?lat=${lat}&lon=${lon}`);
-        if (!res.ok) return "🌫️";
-        const data = await res.json();
-        return data.weatherEmoji || "🌫️";
-    }
-
-    function showWeatherEmojiMarker([lng, lat], emoji) {
-        removeWeatherEmojiMarker(); // 기존 것 제거
-        const el = document.createElement("div");
-        el.className = "weather-emoji";
-        el.textContent = emoji;
-
-        weatherMarker = new mapboxgl.Marker({
-            element: el,
-            anchor: "right",
-            offset: [-22, 0]  // ← 기본 마커 왼쪽에 배치
-        })
-            .setLngLat([lng, lat])
-            .addTo(map);
-    }
-
-    function removeWeatherEmojiMarker() {
-        if (weatherMarker) {
-            weatherMarker.remove();
-            weatherMarker = null;
-        }
-    }
 
 });
 
