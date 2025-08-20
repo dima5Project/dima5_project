@@ -1374,6 +1374,46 @@ html {
     left: 10px;
 }
 
+/* 마커 래퍼는 map.js의 makeSvgMarker()가 .port-marker 로 생성됨 */
+.port-marker {
+    position: relative;
+}
+
+/* 공통 링 */
+.port-marker .cong-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 42px;
+    height: 42px;
+    /* 아이콘(28px)보다 크게 */
+    margin-left: -21px;
+    margin-top: -36px;
+    /* 앵커가 바닥이라 Y축 살짝 위로 보정 */
+    border-radius: 999px;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 3px solid;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .15));
+}
+
+/* 수준별 색상 */
+.port-marker .cong-ring.cong--high {
+    border-color: #ef4444;
+}
+
+/* 매우 혼잡 (빨강) */
+.port-marker .cong-ring.cong--mid {
+    border-color: #f59e0b;
+}
+
+/* 혼잡   (주황) */
+.port-marker .cong-ring.cong--low {
+    border-color: #10b981;
+}
+
+/* 원활   (초록) */
+
 
 /* map +/- btn 적용, 맨 아래 권장 */
 .mapboxgl-ctrl-bottom-right {
