@@ -17,7 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastMarkerSourceId = 'last-marker-source';
     const lastMarkerLayerId = 'last-marker-layer';
     let allPortMarkers = []; // 모든 항구 마커를 저장할 배열
-
+    // [ADD] 날씨 이모지 전역
+    let weatherMarker = null;    // 이모지 마커 인스턴스
+    let weatherEmojiOn = false;  // 토글 상태
+    let lastFocusedPort = null;         // { portId, lng, lat }
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -354,7 +357,38 @@ document.addEventListener("DOMContentLoaded", () => {
         // 켤 때 즉시 최신 데이터로 갱신(원하면 주석 처리 가능)
         if (congestionVisible) updateCongestion().catch(console.error);
     });
+    // [ADD] 날씨 버튼 토글 (#weather-btn)
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('#weather-btn');
+        if (!btn) return;
+        weatherEmojiOn = !weatherEmojiOn;
+        btn.classList.toggle('is-on', weatherEmojiOn);
 
+        if (!weatherEmojiOn) { removeWeatherEmojiMarker(); return; }
+
+        // 우선순위: 마지막 포커스 항구 -> 지도 중심
+        if (lastFocusedPort && lastFocusedPort.portId) {
+            try {
+                const r = await fetch(`/api/info/weather/emoji/${encodeURIComponent(lastFocusedPort.portId)}`);
+                const j = r.ok ? await r.json() : null;
+                const lng = (j?.lon ?? lastFocusedPort.lng);
+                const lat = (j?.lat ?? lastFocusedPort.lat);
+                const emoji = (j?.emoji ?? '🌫️');
+                showWeatherEmojiMarker([lng, lat], emoji);
+            } catch {
+                showWeatherEmojiMarker([lastFocusedPort.lng, lastFocusedPort.lat], '🌫️');
+            }
+        } else {
+            const c = map.getCenter();
+            try {
+                const r = await fetch(`/api/info/weather/direct?lat=${c.lat}&lon=${c.lng}`);
+                const j = r.ok ? await r.json() : null;
+                showWeatherEmojiMarker([c.lng, c.lat], j?.weatherEmoji ?? '🌫️');
+            } catch {
+                showWeatherEmojiMarker([c.lng, c.lat], '🌫️');
+            }
+        }
+    });
 
     async function addPortMarkers() {
         const SVG_URL = '/images/portpredictImages/port_icon.svg';
@@ -414,6 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
             allPortMarkers.push(marker); // 마커를 배열에 저장
 
             el.addEventListener('mouseenter', async () => {
+                lastFocusedPort = { portId, lng, lat }; // ★ 마지막 포커스 갱신
                 const pid = f.properties?.port_id || 'Unknown';
 
                 try {
@@ -440,7 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
             el.addEventListener('click', (ev) => {
                 ev.preventDefault();
                 ev.stopPropagation();
-
+                lastFocusedPort = { portId, lng, lat }; // ★ 클릭 시도 갱신
                 el.classList.add('bump');
                 setTimeout(() => el.classList.remove('bump'), 180);
 
@@ -678,4 +713,35 @@ document.addEventListener("DOMContentLoaded", () => {
         map.getSource(lastMarkerSourceId).setData(emptyGeojson);
         window.toggleMarkersVisibility(false);
     };
+
+    async function fetchWeatherEmoji(lat, lon) {
+        const res = await fetch(`/api/info/weather/direct?lat=${lat}&lon=${lon}`);
+        if (!res.ok) return "🌫️";
+        const data = await res.json();
+        return data.weatherEmoji || "🌫️";
+    }
+
+    function showWeatherEmojiMarker([lng, lat], emoji) {
+        removeWeatherEmojiMarker(); // 기존 것 제거
+        const el = document.createElement("div");
+        el.className = "weather-emoji";
+        el.textContent = emoji;
+
+        weatherMarker = new mapboxgl.Marker({
+            element: el,
+            anchor: "right",
+            offset: [-22, 0]  // ← 기본 마커 왼쪽에 배치
+        })
+            .setLngLat([lng, lat])
+            .addTo(map);
+    }
+
+    function removeWeatherEmojiMarker() {
+        if (weatherMarker) {
+            weatherMarker.remove();
+            weatherMarker = null;
+        }
+    }
+
 });
+
