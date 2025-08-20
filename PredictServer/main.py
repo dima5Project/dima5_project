@@ -498,3 +498,5 @@ def health_db():
 # cd C:\dima5_project\PredictServer
 # python -m uvicorn main:app --reload
 # http://127.0.0.1:8000/docs
+# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=193342ef-09db-3821-b67f-c4c0fa27418e
+# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=${vslIdToFetch}
