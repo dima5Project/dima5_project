@@ -111,7 +111,7 @@ const getQueryPortFromURL = () => {
 
 function toggleSearchBtn() {
     const ok = !!($("#countrySelect").val() && $("#portSelect").val());
-    $("#searchBtn").prop("disabled", !ok).attr("aria-disabled", String(!ok));
+    $("#searchBtn").prop("disabled", !ok);
 }
 
 function stopAutoUpdate() {
@@ -187,15 +187,17 @@ function initEventBindings() {
 
         const country = $(this).val();
         loadPorts(country).done(() => {
-            $("#portSelect").val("");
+            $("#portSelect").val("");    // 새 국가 선택 시 항구 placeholder로 리셋
             toggleSearchBtn();
         });
     });
 
-    $("#portSelect").on("change", function () {
-        isUserInteracting = true; stopAutoUpdate();
-        toggleSearchBtn();
-    });
+    $("#portSelect").on("change", toggleSearchBtn);
+
+    // $("#portSelect").on("change", function () {
+    //     isUserInteracting = true; stopAutoUpdate();
+    //     toggleSearchBtn();
+    // });
 
     $("#searchBtn").on("click", function () {
         // 반드시 버튼을 눌러야만 포트별 정보 로드되도록!
@@ -269,18 +271,24 @@ function loadInitialData() {
 // 5) 데이터 로더
 // ==========================
 function loadCountries() {
-    return $.get("/api/info/countries", function (data) {
-        const $sel = $("#countrySelect");
-        $sel.empty().append(`<option disabled selected>국가 선택</option>`);
-        data.forEach(c => $sel.append(`<option value="${c}">${c}</option>`));
+    const $c = $("#countrySelect");
+    $c.prop("disabled", true)
+        .html('<option value="" disabled selected hidden>국가 선택</option>');
+
+    return $.get("/api/info/countries", function (list) {
+        list.forEach(name => $c.append(`<option value="${name}">${name}</option>`));
+        $c.prop("disabled", false).val("");   // <-- placeholder 상태 유지
     });
 }
 
 function loadPorts(country) {
-    return $.get(`/api/info/ports/${country}`, function (data) {
-        const $sel = $("#portSelect");
-        $sel.empty().append(`<option disabled selected>항구 선택</option>`);
-        data.forEach(p => $sel.append(`<option value="${p.portId}">${p.portNameKr}</option>`));
+    const $p = $("#portSelect");
+    $p.prop("disabled", true)
+        .html('<option value="" disabled selected hidden>항구 선택</option>');
+
+    return $.get(`/api/info/ports/${encodeURIComponent(country)}`, function (list) {
+        list.forEach(port => $p.append(`<option value="${port.portId}">${port.portNameKr}</option>`));
+        $p.prop("disabled", false).val("");   // <-- placeholder 상태 유지
     });
 }
 

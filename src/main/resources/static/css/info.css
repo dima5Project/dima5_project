@@ -103,8 +103,18 @@ button.material-icons {
 }
 
 .search-container button:hover {
-    background-color: #2b2e53;
+    background-color: #013895;
     transform: translateY(-2px);
+}
+
+#countrySelect:invalid,
+#portSelect:invalid {
+    color: #9ca3af;
+}
+
+#countrySelect option,
+#portSelect option {
+    color: #0F172A;
 }
 
 /* ===== 3열 그리드 레이아웃 ===== */
@@ -120,6 +130,7 @@ button.material-icons {
         "weather tz    holiday";
     min-width: 0;
     box-sizing: border-box;
+    align-items: stretch;
 }
 
 .extra-info-container>* {
@@ -620,7 +631,7 @@ header {
 }
 
 #holidayListContainer {
-    margin-top: 16px;
+    margin-top: 0;
     border-top: 1px solid #E5E7EB;
     flex-grow: 0;
     overflow-y: auto;
