@@ -101,6 +101,13 @@ const legendGapPlugin = {
 };
 Chart.register(legendGapPlugin);
 
+// 지도 토큰
+mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
+
+const MAP_DEFAULT_ZOOM = 3;
+const MAP_FOCUS_ZOOM = window.matchMedia('(max-width: 768px)').matches ? 8 : 9;
+
+
 // ==========================
 // 2) 유틸
 // ==========================
@@ -401,42 +408,51 @@ function updateInfoCardsAndGraphs(countryNameKr, portId, portNameKr) {
     loadHoliday(countryNameKr);
 
     // 지도
-    updateMapByPortId(portId);
+    updateMapByPortId(portId, portNameKr);
 }
 
 // ==========================
 // 7) 지도(Mapbox)
 // ==========================
-async function updateMapByPortId(portId) {
+function ensureMap(center = [127, 37.5], zoom = MAP_DEFAULT_ZOOM) {
+    if (map) return;
+    map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center, zoom,
+        attributionControl: false
+    });
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+    map.on('load', () => map.resize());
+
+    // 커스텀 마커 생성
+    const el = document.createElement('div');
+    el.className = 'port-marker';           // CSS로 모양 지정
+    mapMarker = new mapboxgl.Marker({ element: el, anchor: 'bottom' });
+}
+
+async function updateMapByPortId(portId, portNameKr) {
+    ensureMap();
+
+    let lat = null, lng = null;
     try {
         const res = await fetch(`/api/info/hover/${encodeURIComponent(portId)}`);
-        if (!res.ok) throw new Error('hover API 실패');
-        const info = await res.json();
-        const lat = info.latitude;
-        const lng = info.longitude;
-        if (lat == null || lng == null) return;
-
-        mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
-
-        if (!map) {
-            map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/light-v10',
-                center: [lng, lat],
-                zoom: 12,
-                attributionControl: false
-            });
-            map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
-            mapMarker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
-        } else {
-            map.setCenter([lng, lat]);
-            map.setZoom(12);
-            if (!mapMarker) mapMarker = new mapboxgl.Marker().addTo(map);
-            mapMarker.setLngLat([lng, lat]);
+        if (res.ok) {
+            const info = await res.json();
+            lat = parseFloat(info.latitude);
+            lng = parseFloat(info.longitude);
         }
-    } catch (e) {
-        console.error("지도 업데이트 실패:", e);
+    } catch (e) { console.error('hover API 실패:', e); }
+
+    // 좌표 폴백
+    if ((isNaN(lat) || isNaN(lng)) && portCoordinates[portNameKr]) {
+        lat = portCoordinates[portNameKr].lat;
+        lng = portCoordinates[portNameKr].lon;
     }
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    mapMarker.setLngLat([lng, lat]).addTo(map);
+    map.easeTo({ center: [lng, lat], zoom: MAP_FOCUS_ZOOM, duration: 800 });
 }
 
 // ==========================
