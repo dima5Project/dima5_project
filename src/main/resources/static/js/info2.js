@@ -397,6 +397,7 @@
 
     function loadDockingGraph(portId) {
         $.get(`/api/info/dock-graph/${portId}`, function (data) {
+            if (!Array.isArray(data) || data.length === 0) { console.warn("dock-graph empty"); return; }
             drawChart(data);
         });
     }
@@ -465,12 +466,43 @@
     // ==========================
     function drawChart(data) {
         const ctx = document.getElementById("graphCanvas").getContext("2d");
-        const labels = data.map(d => d.date);
-        const actual = data.map(d => d.actual);
-        const expect = data.map(d => d.expected);
-        if (congestionChart) congestionChart.destroy();
 
-        congestionChart = new Chart(ctx, {
+        // TS → "MM/DD HH:mm" 통합 포맷터 (ISO, epoch(ms|sec), "YYYY-MM-DD HH:mm[:ss]" 모두 커버)
+        const fmtTS = (v) => {
+            if (v == null) return null;
+            let d;
+            if (typeof v === "number") {
+                d = new Date(v > 1e12 ? v : v * 1000); // sec → ms
+            } else {
+                const s = String(v).trim();
+                // "YYYY-MM-DD HH:mm:ss" → "YYYY-MM-DDTHH:mm:ss"
+                d = new Date(s.includes(" ") && !s.includes("T") ? s.replace(" ", "T") : s);
+                if (isNaN(d)) return null;
+            }
+            // 로컬타임으로 표기 (원하면 timeZone 옵션 지정)
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            const hh = String(d.getHours()).padStart(2, "0");
+            const mi = String(d.getMinutes()).padStart(2, "0");
+            return `${mm}/${dd} ${hh}:${mi}`;
+        };
+
+        // 라벨: timestamp 우선 사용, 없으면 date 폴백
+        const labels = data.map(d => {
+            const ts = d.timeStamp ?? d.time_stamp ?? d.timestamp ?? d.time ?? null;
+            return fmtTS(ts) ?? (d.date ?? "—");
+        });
+
+        const toNum = (v) => {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : 0;
+        };
+        const actual = data.map(d => toNum(d.actual ?? d.currentShips ?? d.current_ships ?? d.current));
+        const expect = data.map(d => toNum(d.expected ?? d.expectedShips ?? d.expected_ ?? d.exp));
+
+        if (window.congestionChart) window.congestionChart.destroy();
+
+        window.congestionChart = new Chart(ctx, {
             type: 'bar', // 차트의 기본 타입을 막대 차트로 지정
             data: { // 차트에 표시할 데이터 정의
                 labels: labels, // x축에 표시될 레이블(날짜)을 위에서 준비한 labels 배열로 지정.
