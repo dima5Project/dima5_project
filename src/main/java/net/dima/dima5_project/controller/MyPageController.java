@@ -64,7 +64,9 @@ public class MyPageController {
     }
 
     @GetMapping("/mypage")
-    public String redirectMyPage() { return "redirect:/mypage/main"; }
+    public String redirectMyPage() {
+        return "redirect:/mypage/main";
+    }
 
     private boolean isVerified(HttpSession session) {
         return Boolean.TRUE.equals(session.getAttribute(EDIT_VERIFIED_KEY));
@@ -165,8 +167,25 @@ public class MyPageController {
      * @return
      */
     @GetMapping("/mypage/verify")
-    public String verifyForm() {
-        return "checkPassword"; // 비밀번호 한 칸 폼
+    public String verifyForm(Model model) {
+        System.out.println("[DEBUG] verifyForm hit");
+        var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // 유저 프로필
+        PredictUserDTO user = userService.selectOne(login.getUserId());
+        model.addAttribute("user", user);
+
+        // 카운트도 넣어줌
+        Pageable one = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "saveSeq"));
+        long saveCount = userService.getMySaves(login.getUserId(), one).getTotalElements();
+        Pageable one2 = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createDate"));
+        long askCount = userService.getMyAsks(login.getUserId(), one2).getTotalElements();
+
+        model.addAttribute("saveCount", saveCount);
+        model.addAttribute("askCount", askCount);
+
+        return "checkPassword"; // 비밀번호 확인 폼
     }
 
     /**
@@ -179,10 +198,10 @@ public class MyPageController {
      */
     @PostMapping("/mypage/verify")
     public String verifyProc(@RequestParam("password") String password,
-                            HttpSession session,
-                            RedirectAttributes ra) {
+            HttpSession session,
+            RedirectAttributes ra) {
         var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
-                        .getAuthentication().getPrincipal();
+                .getAuthentication().getPrincipal();
 
         if (userService.verifyPassword(login.getUserId(), password)) {
             session.setAttribute("editVerified", true);
@@ -198,9 +217,9 @@ public class MyPageController {
      */
     @GetMapping("/mypage/ships")
     public String shipList(
-        Model model,
-        @RequestParam(name = "page", defaultValue = "0") int page,
-        @RequestParam(name = "size", defaultValue = "10") int size) {
+            Model model,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size) {
 
         var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -220,17 +239,16 @@ public class MyPageController {
         model.addAttribute("hasNext", saves.hasNext());
         model.addAttribute("nextPage", page + 1);
 
-    return "myshipList";
-}
-
+        return "myshipList";
+    }
 
     /**
      * 마이페이지 - 문의글 목록
      */
     @GetMapping("/mypage/asks")
     public String askList(Model model,
-                        @RequestParam(value = "page", required = false) Integer page,
-                        @RequestParam(value = "size", required = false) Integer size) {
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size) {
         // 문의 내역 데이터 model에 담기
         var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
