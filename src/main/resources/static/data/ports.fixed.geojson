@@ -1,0 +1,575 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.61,
+          31.37
+        ]
+      },
+      "properties": {
+        "port_id": "CNSHA",
+        "loc_lon": 121.61,
+        "loc_lat": 31.37
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          131.89,
+          43.09
+        ]
+      },
+      "properties": {
+        "port_id": "RUVVO",
+        "loc_lon": 131.89,
+        "loc_lat": 43.09
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133.53,
+          34
+        ]
+      },
+      "properties": {
+        "port_id": "JPMKX",
+        "loc_lon": 133.53,
+        "loc_lat": 34
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.54,
+          29.87
+        ]
+      },
+      "properties": {
+        "port_id": "CNNGB",
+        "loc_lon": 121.54,
+        "loc_lat": 29.87
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.62,
+          34.95
+        ]
+      },
+      "properties": {
+        "port_id": "JPYKK",
+        "loc_lon": 136.62,
+        "loc_lat": 34.95
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          132.42,
+          34.35
+        ]
+      },
+      "properties": {
+        "port_id": "JPHIJ",
+        "loc_lon": 132.42,
+        "loc_lat": 34.35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          135.17,
+          34.23
+        ]
+      },
+      "properties": {
+        "port_id": "JPWAK",
+        "loc_lon": 135.17,
+        "loc_lat": 34.23
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          126.84,
+          36.96
+        ]
+      },
+      "properties": {
+        "port_id": "KRPTK",
+        "loc_lon": 126.84,
+        "loc_lat": 36.96
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.32,
+          36.07
+        ]
+      },
+      "properties": {
+        "port_id": "CNQDG",
+        "loc_lon": 120.32,
+        "loc_lat": 36.07
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          127.66,
+          34.76
+        ]
+      },
+      "properties": {
+        "port_id": "KRYOS",
+        "loc_lon": 127.66,
+        "loc_lat": 34.76
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.32,
+          22.55
+        ]
+      },
+      "properties": {
+        "port_id": "TWKHH",
+        "loc_lon": 120.32,
+        "loc_lat": 22.55
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2001,
+          37.9432
+        ]
+      },
+      "properties": {
+        "port_id": "JPKIJ",
+        "loc_lon": 139.2001,
+        "loc_lat": 37.9432
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.19,
+          31.63
+        ]
+      },
+      "properties": {
+        "port_id": "CNTAC",
+        "loc_lon": 121.19,
+        "loc_lat": 31.63
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          129.88,
+          33.26
+        ]
+      },
+      "properties": {
+        "port_id": "JPIMI",
+        "loc_lon": 129.88,
+        "loc_lat": 33.26
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.97,
+          14.57
+        ]
+      },
+      "properties": {
+        "port_id": "PHMNL",
+        "loc_lon": 120.97,
+        "loc_lat": 14.57
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          130.4,
+          33.6
+        ]
+      },
+      "properties": {
+        "port_id": "JPHKT",
+        "loc_lon": 130.4,
+        "loc_lat": 33.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.5,
+          35
+        ]
+      },
+      "properties": {
+        "port_id": "JPSMZ",
+        "loc_lon": 138.5,
+        "loc_lat": 35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.62,
+          35.42
+        ]
+      },
+      "properties": {
+        "port_id": "JPYOK",
+        "loc_lon": 139.62,
+        "loc_lat": 35.42
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.53,
+          35.36
+        ]
+      },
+      "properties": {
+        "port_id": "CNRZH",
+        "loc_lon": 119.53,
+        "loc_lat": 35.36
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          133,
+          34.07
+        ]
+      },
+      "properties": {
+        "port_id": "JPIMB",
+        "loc_lon": 133,
+        "loc_lat": 34.07
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.22,
+          34.6
+        ]
+      },
+      "properties": {
+        "port_id": "CNLYG",
+        "loc_lon": 119.22,
+        "loc_lat": 34.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          135.18,
+          34.67
+        ]
+      },
+      "properties": {
+        "port_id": "JPUKB",
+        "loc_lon": 135.18,
+        "loc_lat": 34.67
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          130.96,
+          33.94
+        ]
+      },
+      "properties": {
+        "port_id": "JPMOJ",
+        "loc_lon": 130.96,
+        "loc_lat": 33.94
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.74,
+          38.98
+        ]
+      },
+      "properties": {
+        "port_id": "CNTXG",
+        "loc_lon": 117.74,
+        "loc_lat": 38.98
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.7,
+          20.85
+        ]
+      },
+      "properties": {
+        "port_id": "VNHPH",
+        "loc_lon": 106.7,
+        "loc_lat": 20.85
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.5142,
+          23.0612
+        ]
+      },
+      "properties": {
+        "port_id": "CNHUA",
+        "loc_lon": 113.5142,
+        "loc_lat": 23.0612
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.79,
+          38.98
+        ]
+      },
+      "properties": {
+        "port_id": "CNDAG",
+        "loc_lon": 121.79,
+        "loc_lat": 38.98
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.74,
+          25.13
+        ]
+      },
+      "properties": {
+        "port_id": "TWKEL",
+        "loc_lon": 121.74,
+        "loc_lat": 25.13
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.78,
+          35.58
+        ]
+      },
+      "properties": {
+        "port_id": "JPTYO",
+        "loc_lon": 139.78,
+        "loc_lat": 35.58
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          126.68,
+          37.45
+        ]
+      },
+      "properties": {
+        "port_id": "KRINC",
+        "loc_lon": 126.68,
+        "loc_lat": 37.45
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          127.7,
+          34.94
+        ]
+      },
+      "properties": {
+        "port_id": "KRKAN",
+        "loc_lon": 127.7,
+        "loc_lat": 34.94
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          136.872277,
+          35.10909491
+        ]
+      },
+      "properties": {
+        "port_id": "JPNGO",
+        "loc_lon": 136.872277,
+        "loc_lat": 35.10909491
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.061,
+          32.192
+        ]
+      },
+      "properties": {
+        "port_id": "CNNJI",
+        "loc_lon": 119.061,
+        "loc_lat": 32.192
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          129.88,
+          32.75
+        ]
+      },
+      "properties": {
+        "port_id": "JPNGS",
+        "loc_lon": 129.88,
+        "loc_lat": 32.75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          132.92,
+          42.84
+        ]
+      },
+      "properties": {
+        "port_id": "RUNJK",
+        "loc_lon": 132.92,
+        "loc_lat": 42.84
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          135.48,
+          34.66
+        ]
+      },
+      "properties": {
+        "port_id": "JPOSA",
+        "loc_lon": 135.48,
+        "loc_lat": 34.66
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.93,
+          22.35
+        ]
+      },
+      "properties": {
+        "port_id": "HKHKG",
+        "loc_lon": 113.93,
+        "loc_lat": 22.35
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          129.4,
+          36.02
+        ]
+      },
+      "properties": {
+        "port_id": "KRKPO",
+        "loc_lon": 129.4,
+        "loc_lat": 36.02
+      }
+    }
+  ]
+}
