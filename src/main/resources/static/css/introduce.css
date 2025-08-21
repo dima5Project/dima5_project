@@ -28,8 +28,9 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1240px;
     /* 섹션 내부 컨테이너 폭 */
+    /*1280*/
     margin: 0 auto;
     padding: 0 40px;
     /* 좌우 내부 여백 */
@@ -127,7 +128,8 @@ img {
 .main_layout {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 40px;
+    /*사이드메뉴와 메인콘텐츠 사이 간격 조정*/
     padding-top: 115px;
     padding-bottom: 120px;
     max-width: 1280px;
@@ -226,7 +228,8 @@ img {
 .content_body_flex {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 35px;
+    /*이미지와 텍스트 사이 간격*/
 }
 
 .content_image {
@@ -383,7 +386,7 @@ img {
     text-align: right;
     font-size: 14px;
     line-height: 1.5;
-    margin-top: 60px;
+    margin-top: 80px;
 }
 
 @media (max-width: 768px) {

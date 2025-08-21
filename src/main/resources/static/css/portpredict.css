@@ -14,7 +14,6 @@ html {
     position: relative;
     width: 100%;
     height: 100%;
-    /* 이게 없어서 줄어든 거임 */
 }
 
 /* 지도 크기 */
@@ -57,7 +56,7 @@ html {
     /* 남는 높이를 전부 차지 */
     overflow-y: auto;
     /* 세로 스크롤만 */
-    padding: 10px 16px 10px 16px;
+    padding: 13px 16px;
     box-sizing: border-box;
 }
 
@@ -132,6 +131,7 @@ html {
 .iconwrap.is-active {
     background-color: #a0a0a0;
     /* 진한 회색 배경색 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
 }
 
 /* 실제 아이콘 이미지 */
@@ -159,7 +159,7 @@ html {
     content: attr(data-tip);
     position: absolute;
     bottom: 100%;
-    left: 50%;
+    left: 10%;
     transform: translate(-50%, -2px);
     /* 툴팁을 아이콘 중앙에 위치시킴 */
     background: #fff;
@@ -176,6 +176,19 @@ html {
     transition: opacity .15s ease, transform .15s ease;
     z-index: 10050;
 }
+
+.iconwrap.port[data-tip]::after {
+    left: 8%;
+    transform: translate(-50%, -2px);
+    /* 툴팁을 아이콘 중앙에 위치시킴 */
+}
+
+.iconwrap.time[data-tip]::after {
+    left: 20%;
+    transform: translate(-50%, -2px);
+    /* 툴팁을 아이콘 중앙에 위치시킴 */
+}
+
 
 /* hover 시 표시 */
 .iconwrap[data-tip]:hover::after {
@@ -266,8 +279,6 @@ html {
     }
 }
 
-/* 기존 스타일 그대로 두고 아래만 추가 */
-
 /* 툴팁 기본 숨김 */
 .map-icon-ctrl .iconbtn[data-tip] {
     position: relative;
@@ -301,18 +312,20 @@ html {
     transform: translateY(-50%) translateX(-10px);
 }
 
-/* ───────── 패널(슬라이드 내용) ───────── */
-/* 모든 패널은 같은 크기/레이아웃을 갖고, 활성만 보이기 */
+/* ========= 슬라이드 내용 ========= */
+/*[hidden] 속성을 부여한 패널은 완전히 숨김*/
 .panel[hidden] {
     display: none !important;
 }
 
+/* 1번 + 2번 슬라이드 공통 모든 패널의 기본 상태: 보이지 않음. */
 .panel {
     display: none;
     flex: 1 1 auto;
     overflow: hidden;
 }
 
+/* 1번 + 2번 슬라이드 클릭 */
 .panel.is-active {
     display: flex;
     flex-direction: column;
@@ -323,12 +336,16 @@ html {
     overflow-y: auto;
 }
 
-/* 로그 패널은 보이게 */
-.panel--map:not(.is-active) .sidebar__content {
+/* 로그 패널 비활성화 시 숨김 */
+.panel.panel--log:not(.is-active) {
     display: none;
 }
 
-/* 맵 패널만 필요시 숨김 */
+/* 로그 패널 활성화 시 표시 */
+.panel.panel--log.is-active {
+    display: flex;
+    flex-direction: column;
+}
 
 .panel--log .sidebar__bottombox,
 .panel--map .sidebar__bottombox {
@@ -337,15 +354,15 @@ html {
 
 /* title 문구(차항지 예측) */
 .sidebar__title {
-    margin: 10px 16px;
+    margin: 13px 16px;
     font-size: 15px;
     font-weight: 600;
 }
 
 /* select + input */
 .sidebar__section {
-    margin: 10px 16px;
-    --w: 140px;
+    margin: 10px 20px;
+    --w: 142px;
     --h: 30px;
     --px: 12px;
     /* 좌우 패딩 */
@@ -513,6 +530,7 @@ html {
     /* 비어있을 때 placeholder 중앙 정렬 */
     text-align: center;
     margin-bottom: 3px;
+    margin-right: 3px;
 }
 
 /* placeholder 스타일 */
@@ -541,8 +559,7 @@ html {
 
 /* 조회 버튼 전, 고정영역만 보이는 경우 */
 .is-hidden {
-    visibility: hidden;
-    pointer-events: none;
+    display: none !important;
 }
 
 /* 조회 후 입력창 완전 잠금 */
@@ -596,7 +613,7 @@ html {
 .vessel_image {
     display: block;
     /* inline → block으로 */
-    margin: 10px auto 0;
+    margin: 12px auto 2px;
     max-width: 260px;
     width: 100%;
     aspect-ratio: 98 / 55;
@@ -642,7 +659,7 @@ html {
     border-radius: 10px;
     position: relative;
     padding: var(--pad);
-    margin: 10px auto 0;
+    margin: 12px auto 0;
     width: 260px;
     box-sizing: border-box;
     /* 패딩 포함해서 238px 유지 */
@@ -701,58 +718,74 @@ html {
 
 /* 출발 >> 도착 줄 */
 .route {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    /* 좌/화살표/우 */
     align-items: center;
-    justify-content: center;
-    gap: 17px;
-    /* 간격 살짝 축소 */
+    /* 세로 중앙 정렬 */
+    column-gap: 14px;
+    /* 기존 17px → 여유 확보 */
     margin: 0;
     color: #524F4F;
     min-width: 0;
-    /* flex 환경에서 자식이 줄어들 수 있도록 */
 }
 
 .route>div {
     text-align: center;
     min-width: 0;
+    container-type: inline-size;
+    /* ← cqw를 쓰기 위한 선언 */
 }
 
-/* 항구 코드 타이포 */
+/* 영문 항구 표시 2개 */
 .route b {
-    font-size: clamp(18px, 6vw, 22px);
-    /* 화면/박스 크기에 맞춰 줄어듦 */
-    font-weight: 600;
-    line-height: 1.1;
-    color: inherit;
+    display: block;
     white-space: nowrap;
-    /* 코드 자체는 줄바꿈 방지 */
+    overflow: hidden;
+    font-size: 20px;
+    font-weight: 650;
+    margin-bottom: 4px;
 }
 
+/* KRBUS */
 .route b:first-child {
     color: #000;
 }
 
+/* 영문 목적항 */
 .route b.last {
     color: #0f3c9a;
 }
 
 /* 화살표 스타일 */
 .arrow {
+    grid-column: 2;
+    align-self: start;
+    /* 크기는 유지하되 위치만 중앙 고정 */
     font-size: clamp(18px, 6vw, 34px);
     color: #6e767e;
     line-height: 1;
-    display: inline-block;
-    transform: translateY(2px);
 }
 
-/* 서브 라벨 */
+/* 한국 / 부산 + 목적항 한국어 */
 .route .sub {
-    margin-top: 6px;
-    font-size: clamp(12px, 4vw, 14px);
-    font-weight: 500;
+    font-weight: 450;
     color: #6c757d;
-    white-space: normal;
-    /* 부 라벨은 줄바꿈 가능 */
+    white-space: nowrap;
+}
+
+/* 한국 / 부산 만 */
+.route .sub:not(.dest) {
+    font-size: 12px;
+    /* 원하는 고정값 */
+    overflow: hidden;
+    /* 혹시 몰라서 안전장치 */
+    text-overflow: ellipsis;
+}
+
+.route .sub.dest {
+    /* 컨테이너 너비에 맞춰 글자 크기 자동 조절, 줄바꿈/생략 없음 */
+    font-size: clamp(10px, 17cqw, 13px);
 }
 
 /* ETA 라인 */
@@ -791,6 +824,7 @@ html {
     box-sizing: border-box;
     flex: 0 0 auto;
     justify-content: flex-end;
+    margin-top: auto;
 }
 
 /* 결과 저장 btn */
@@ -807,26 +841,18 @@ html {
 
 /* ===== 2) 슬라이드_시점별 타임라인 (왼쪽 고정 컬럼 + 점선 + 원형) ===== */
 
-/* 로그 패널의 헤더만 고정 */
-.logpanel .sidebar__header {
+/* 로그 패널 헤더 고정 */
+.panel.panel--log .sidebar__header {
     position: sticky;
     top: 0;
     z-index: 10;
     background-color: #ffffff;
-    /* 헤더 뒤로 콘텐츠가 비치지 않도록 흰색 배경 추가 */
-    padding: 20px 0 16px 0;
     width: 100%;
 }
 
-/* 로그 패널의 내용 컨테이너 상단 패딩 제거 */
-.logpanel.sidebar__content {
-    /* 기존 padding: 10px 16px 10px 16px; */
-    padding: 0 16px 10px 16px;
-}
-
+/* 로그 패널 제목 */
 .sidebar__secondtitle {
-    /* 기존 margin: 20px 16px 20px 16px; */
-    margin: 0;
+    margin: 20px 0 20px 16px;
     font-size: 15px;
     font-weight: 600;
 }
@@ -836,7 +862,13 @@ html {
     width: 100%;
 }
 
-.logpanel {
+/* 로그 패널 콘텐츠 */
+.panel.panel--log .sidebar__content {
+    padding: 0 16px 10px 16px;
+}
+
+
+.panel.panel--log {
     --node: 45px;
     --ring: 7px;
     --gutter: 100px;
@@ -1048,7 +1080,7 @@ html {
     position: fixed;
     inset: 0;
     display: none;
-    z-index: 9999;
+    z-index: 10040;
 }
 
 .modal.is-open {
@@ -1422,8 +1454,6 @@ html {
 }
 
 
-
-
 /* map +/- btn 적용, 맨 아래 권장 */
 .mapboxgl-ctrl-bottom-right {
     margin: 0 10px 5px 0;
@@ -1437,6 +1467,44 @@ html {
 .mapboxgl-ctrl-attrib button:focus {
     outline: none !important;
     box-shadow: none !important;
+}
+
+/* ===== 로딩 스피너 ===== */
+#loading-spinner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    text-align: center;
+    gap: 15px;
+}
+
+#loading-spinner .spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #f3f3f3;
+    /* Light grey */
+    border-top: 5px solid #013895;
+    /* Blue */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-spinner p {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== 반응형: 좁은 화면에선 패널을 조금 더 넓게 ===== */

@@ -1,39 +1,39 @@
 port_id,country_name_kr,port_name_kr,country_name_en,port_name_en
-CNDAG,Áß±¹,´Ù°­,China,Dagang
-CNHUA,Áß±¹,È²È­,China,Huanghua
-CNLYG,Áß±¹,·ËÀ©°­,China,Lianyungang
-CNNGB,Áß±¹,´×º¸,China,Ningbo
-CNNJI,Áß±¹,³­Â¡,China,Nanjing
-CNQDG,Áß±¹,Äª´Ù¿À,China,Qingdao
-CNRZH,Áß±¹,¸£ÀÚ¿À,China,Rizhao
-CNSHA,Áß±¹,»óÇÏÀÌ,China,Shanghai
-CNTAC,Áß±¹,ÅãÁø,China,Tianjin
-CNTXG,Áß±¹,ÅÁ±¸½Ì°­,China,Tanggu Xingang
-HKHKG,È«Äá,È«Äá,Hong Kong,Hong Kong
-JPHIJ,ÀÏº»,È÷·Î½Ã¸¶,Japan,Hiroshima
-JPHKT,ÀÏº»,ÇÏÄ«Å¸,Japan,Hakata
-JPIMB,ÀÏº»,ÀÌ¸¶¹Ù¸®,Japan,Imabari
-JPIMI,ÀÏº»,ÀÌ¸¶¸®,Japan,Imari
-JPKIJ,ÀÏº»,´Ï°¡Å¸,Japan,Kagoshima
-JPMKX,ÀÏº»,¸¶¾²¾ß¸¶,Japan,Matsuyama
-JPMOJ,ÀÏº»,¸ğÁö,Japan,Moji
-JPNGO,ÀÏº»,³ª°í¾ß,Japan,Nagoya
-JPNGS,ÀÏº»,³ª°¡»çÅ°,Japan,Nagasu
-JPOSA,ÀÏº»,¿À»çÄ«,Japan,Osaka
-JPSMZ,ÀÏº»,½Ã¹ÌÁî,Japan,Shimizu
-JPTYO,ÀÏº»,µµÄì,Japan,Tokyo
-JPUKB,ÀÏº»,°íº£,Japan,Ukibuchi
-JPWAK,ÀÏº»,¿ÍÄ«¾ß¸¶,Japan,Wakayama
-JPYKK,ÀÏº»,¿êÄ«ÀÌÄ¡,Japan,Yokkaichi
-JPYOK,ÀÏº»,¿äÄÚÇÏ¸¶,Japan,Yokohama
-KRINC,ÇÑ±¹,ÀÎÃµ,Korea,Incheon
-KRKAN,ÇÑ±¹,±º»ê,Korea,Gunsan
-KRKPO,ÇÑ±¹,Æ÷Ç×,Korea,Pohang
-KRPTK,ÇÑ±¹,ÆòÅÃ,Korea,Pyeongtaek
-KRYOS,ÇÑ±¹,¿©¼ö,Korea,Yeosu
-PHMNL,ÇÊ¸®ÇÉ,¸¶´Ò¶ó,Philippines,Manila
-RUNJK,·¯½Ã¾Æ,³ªÈªÄ«,Russia,Nakhodka
-RUVVO,·¯½Ã¾Æ,ºí¶óµğº¸½ºÅäÅ©,Russia,Vladivostok
-TWKEL,´ë¸¸,±â¸¢,Taiwan,Keelung
-TWKHH,´ë¸¸,°¡¿À½¹,Taiwan,Kaohsiung
-VNHPH,º£Æ®³²,ÇÏÀÌÆş,Vietnam,Haiphong
+CNDAG,ì¤‘êµ­,ë‹¤ê°•,China,Dagang
+CNHUA,ì¤‘êµ­,í™©í™”,China,Huanghua
+CNLYG,ì¤‘êµ­,ë¡„ìœˆê°•,China,Lianyungang
+CNNGB,ì¤‘êµ­,ë‹ë³´,China,Ningbo
+CNNJI,ì¤‘êµ­,ë‚œì§•,China,Nanjing
+CNQDG,ì¤‘êµ­,ì¹­ë‹¤ì˜¤,China,Qingdao
+CNRZH,ì¤‘êµ­,ë¥´ìì˜¤,China,Rizhao
+CNSHA,ì¤‘êµ­,ìƒí•˜ì´,China,Shanghai
+CNTAC,ì¤‘êµ­,í†ˆì§„,China,Tianjin
+CNTXG,ì¤‘êµ­,íƒ•êµ¬ì‹ ê°•,China,Tanggu Xingang
+HKHKG,í™ì½©,í™ì½©,Hong Kong,Hong Kong
+JPHIJ,ì¼ë³¸,íˆë¡œì‹œë§ˆ,Japan,Hiroshima
+JPHKT,ì¼ë³¸,í•˜ì¹´íƒ€,Japan,Hakata
+JPIMB,ì¼ë³¸,ì´ë§ˆë°”ë¦¬,Japan,Imabari
+JPIMI,ì¼ë³¸,ì´ë§ˆë¦¬,Japan,Imari
+JPKIJ,ì¼ë³¸,ê°€ê³ ì‹œë§ˆ,Japan,Kagoshima
+JPMKX,ì¼ë³¸,ë§ˆì“°ì•¼ë§ˆ,Japan,Matsuyama
+JPMOJ,ì¼ë³¸,ëª¨ì§€,Japan,Moji
+JPNGO,ì¼ë³¸,ë‚˜ê³ ì•¼,Japan,Nagoya
+JPNGS,ì¼ë³¸,ë‚˜ê°€ìŠ¤,Japan,Nagasu
+JPOSA,ì¼ë³¸,ì˜¤ì‚¬ì¹´,Japan,Osaka
+JPSMZ,ì¼ë³¸,ì‹œë¯¸ì¦ˆ,Japan,Shimizu
+JPTYO,ì¼ë³¸,ë„ì¿„,Japan,Tokyo
+JPUKB,ì¼ë³¸,ìš°í‚¤ë¶€ì¹˜,Japan,Ukibuchi
+JPWAK,ì¼ë³¸,ì™€ì¹´ì•¼ë§ˆ,Japan,Wakayama
+JPYKK,ì¼ë³¸,ìš§ì¹´ì´ì¹˜,Japan,Yokkaichi
+JPYOK,ì¼ë³¸,ìš”ì½”í•˜ë§ˆ,Japan,Yokohama
+KRINC,í•œêµ­,ì¸ì²œ,Korea,Incheon
+KRKAN,í•œêµ­,êµ°ì‚°,Korea,Gunsan
+KRKPO,í•œêµ­,í¬í•­,Korea,Pohang
+KRPTK,í•œêµ­,í‰íƒ,Korea,Pyeongtaek
+KRYOS,í•œêµ­,ì—¬ìˆ˜,Korea,Yeosu
+PHMNL,í•„ë¦¬í•€,ë§ˆë‹ë¼,Philippines,Manila
+RUNJK,ëŸ¬ì‹œì•„,ë‚˜í™‹ì¹´,Russia,Nakhodka
+RUVVO,ëŸ¬ì‹œì•„,ë¸”ë¼ë””ë³´ìŠ¤í† í¬,Russia,Vladivostok
+TWKEL,ëŒ€ë§Œ,ì§€ë£½,Taiwan,Keelung
+TWKHH,ëŒ€ë§Œ,ê°€ì˜¤ìŠ,Taiwan,Kaohsiung
+VNHPH,ë² íŠ¸ë‚¨,í•˜ì´í,Vietnam,Haiphong
