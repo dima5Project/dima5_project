@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
         map.addLayer({
             id: routeLayerId_rank3, type: 'line', source: routeSourceId_rank3,
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] }
         });
 
         // Rank 2 (middle layer)
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
         map.addLayer({
             id: routeLayerId_rank2, type: 'line', source: routeSourceId_rank2,
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] }
         });
 
         // Rank 1 (top layer)
@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
         map.addLayer({
             id: routeLayerId_rank1, type: 'line', source: routeSourceId_rank1,
             layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] }
         });
 
         map.addSource(markerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 marineHoverPopup.setLngLat([lon, lat]).setHTML(html).addTo(map);
             } catch (err) { console.error('hover env fail', err); }
         });
-        map.on('mouseleave', lastMarkerLayerId, () => { hoverTimeout = setTimeout(() => marineHoverPopup.remove(), 120); });
+        map.on('mouseleave', lastMarkerLayerId, () => { marineHoverPopup.remove(); });
     });
 
     // ===== 외부 API =====

@@ -624,6 +624,11 @@ $(function () {
 
         const type = btn.dataset.type;
 
+        // congestion, weather 버튼은 map.js에서 별도 처리하므로 제외
+        if (type === 'congestion' || type === 'weather') {
+            return;
+        }
+
         const on = !btn.classList.contains('is-on');
 
         btn.classList.toggle('is-on', on);
@@ -896,8 +901,10 @@ $(function () {
                 await response.json().catch(() => ({}));
                 modalTitle.textContent = '저장되었습니다.';
                 modalActions.innerHTML = `
-                    <p>마이페이지 &gt; 내 선박 정보에서 확인해주세요.</p>
-                    <button class="modal__btn primary" data-action="close">확인</button>`;
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 15px;">
+                        <p style="margin: 0;">"마이페이지 &gt; 내 선박 정보" 에서 확인해주세요.</p>
+                        <button class="modal__btn primary" data-action="close">확인</button>
+                    </div>`;
                 modalActions.querySelector('[data-action="close"]').addEventListener('click', closeSaveModal);
             } else {
                 let msg = '알 수 없는 오류';
