@@ -35,7 +35,7 @@ function appendSystemNotice(htmlInner, withTime = true) {
     const timeText = new Date().toISOString().replace("T", " ").split(".")[0];
     const html = `
     <div class="faq-message assistant nav-type">
-      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble" style="max-width:300px;">${htmlInner}</div>
       </div>
@@ -53,7 +53,7 @@ function appendMessage(m) {
         String(s ?? "").replace(/[&<>"']/g, t => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[t]));
     const html = `
     <div class="faq-message ${who}">
-      ${who === "assistant" ? '<img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />' : ""}
+      ${who === "assistant" ? '<img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />' : ""}
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble" style="max-width:300px;"><div>${esc(m.content || "")}</div></div>
       </div>
