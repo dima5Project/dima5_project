@@ -1412,17 +1412,16 @@ html {
     position: relative;
 }
 
-/* 공통 링 */
+/* (기존 margin-left/-top로 억지 보정하던 것 전부 제거) */
 .port-marker .cong-ring {
     position: absolute;
     left: 50%;
-    top: 50%;
+    bottom: 0;
+    /* 핀 끝(=anchor: bottom) 기준 */
     width: 42px;
     height: 42px;
-    /* 아이콘(28px)보다 크게 */
-    margin-left: -21px;
-    margin-top: -36px;
-    /* 앵커가 바닥이라 Y축 살짝 위로 보정 */
+    transform: translate(-50%, -85%);
+    /* 핀 끝에서 위로 띄우기 */
     border-radius: 999px;
     box-sizing: border-box;
     pointer-events: none;
@@ -1445,14 +1444,21 @@ html {
     border-color: #10b981;
 }
 
-/* 날씨 */
+/* 날씨 이모지: 핀 왼쪽에 고정 */
 .weather-emoji {
+    position: absolute;
+    left: 0%;
+    /* 핀 요소의 왼쪽 끝 기준 */
+    bottom: 0;
+    /* 핀 끝 기준 */
+    transform: translate(-80%, -50%);
+    /* -X: 더 왼쪽으로 빼기(-80% ~ -100% 사이 조정 가능)
+     -Y: 핀 중심 정도로 맞추기 */
     font-size: 22px;
     line-height: 1;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .25));
     user-select: none;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .25));
 }
-
 
 /* map +/- btn 적용, 맨 아래 권장 */
 .mapboxgl-ctrl-bottom-right {
@@ -1521,4 +1527,11 @@ html {
         left: 8px;
         bottom: 8px;
     }
+}
+
+/* 클릭 팝 애니메이션은 마커 전체가 아니라 svg에만 줘서 위치 흔들림 방지 */
+.port-marker.bump svg {
+    transform: scale(1.06);
+    transform-origin: 50% 100%;
+    /* 핀 끝을 기준 */
 }
