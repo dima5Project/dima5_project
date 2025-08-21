@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 날씨/혼잡 토글
     let weatherVisible = false;
     let congestionVisible = false;
+    let weatherBulkAvailable = true; // ★ 추가
 
     // 팝업
     const hoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '340px', offset: 35 });
@@ -51,8 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
             span = document.createElement('span');
             span.className = 'weather-emoji';
             span.style.position = 'absolute';
-            span.style.left = '-22px';
-            span.style.top = '-4px';
             span.style.userSelect = 'none';
             span.style.filter = 'drop-shadow(0 1px 2px rgba(0,0,0,.25))';
             span.style.display = weatherVisible ? '' : 'none';
@@ -63,20 +62,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 날씨 벌크/폴백
     async function fetchAllWeatherEmojisBulk() {
+        if (!weatherBulkAvailable) return null; // ★ 이미 불가면 아예 호출 안 함
         const r = await fetch('/api/info/weather/bulk', { cache: 'no-cache' });
-        if (!r.ok) throw new Error('bulk weather api 없음/실패');
+        if (r.status === 404) {
+            weatherBulkAvailable = false; // ★ 한 번 404면 이후로 계속 폴백만
+            return null;
+        }
+        if (!r.ok) throw new Error('bulk weather api 실패');
         return r.json();
     }
     async function updateWeatherEmojis() {
         try {
-            let list;
-            try {
-                list = await fetchAllWeatherEmojisBulk();
-            } catch {
+            let list = await fetchAllWeatherEmojisBulk(); // null이면 폴백
+            if (!list) {
                 const entries = Array.from(portCoordsById.entries());
                 list = await Promise.all(entries.map(async ([portId, { lng, lat }]) => {
                     try {
-                        const r = await fetch(`/api/info/weather/direct?lat=${lat}&lon=${lng}`);
+                        const r = await fetch(`/api/info/weather/direct?lat=${lat}&lon=${lng}`, { cache: 'no-cache' });
                         const j = r.ok ? await r.json() : null;
                         return { portId, emoji: (j?.weatherEmoji ?? '🌫️') };
                     } catch {
@@ -89,8 +91,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!el) return;
                 const span = ensureEmojiEl(el);
                 span.textContent = emoji || '🌫️';
+                span.style.display = weatherVisible ? '' : 'none';
             });
-        } catch (e) { console.error('updateWeatherEmojis fail', e); }
+        } catch (e) {
+            // 지나치게 시끄럽지 않게 warn으로 낮춤
+            console.warn('updateWeatherEmojis fallback warn:', e?.message || e);
+        }
     }
 
     // 혼잡 링
@@ -164,6 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
         //         return r.json();
         //     })
         // ]);
+        const dataUrl = new URL('/data/ports.fixed.geojson', location.origin).toString();
+        console.log('[ports] fetching:', dataUrl);
+        const res = await fetch(dataUrl, { cache: 'no-cache' });
+
+
         const [svgText, geojson] = await Promise.all([
             loadSvgText(SVG_URL),
             fetch('/data/ports.fixed.geojson?v=' + Date.now(), { cache: 'no-cache' }).then(r => {
