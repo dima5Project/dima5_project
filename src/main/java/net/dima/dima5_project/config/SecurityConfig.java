@@ -46,7 +46,8 @@ public class SecurityConfig {
                                                 "/videos/**",
                                                 "/admin/**",
                                                 "/api/result-save/**",
-                                                "/ws-chat/**")
+                                                "/ws-chat/**",
+                                                "/json/**")
                                 .permitAll() // 모든 사람들에게 주어지는 경로
                                 .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만
 

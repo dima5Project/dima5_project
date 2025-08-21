@@ -179,16 +179,16 @@ public class MyPageController {
      */
     @PostMapping("/mypage/verify")
     public String verifyProc(@RequestParam("password") String password,
-            HttpSession session,
-            Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        LoginUserDetailsDTO login = (LoginUserDetailsDTO) auth.getPrincipal();
+                            HttpSession session,
+                            RedirectAttributes ra) {
+        var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
+                        .getAuthentication().getPrincipal();
 
         if (userService.verifyPassword(login.getUserId(), password)) {
-            session.setAttribute(EDIT_VERIFIED_KEY, true); // 시간제한 없음
+            session.setAttribute("editVerified", true);
             return "redirect:/mypage/update";
         } else {
-            model.addAttribute("error", "비밀번호가 올바르지 않습니다.");
+            ra.addFlashAttribute("error", "비밀번호가 올바르지 않습니다.");
             return "redirect:/mypage/verify";
         }
     }
@@ -228,7 +228,9 @@ public class MyPageController {
      * 마이페이지 - 문의글 목록
      */
     @GetMapping("/mypage/asks")
-    public String askList(Model model, Integer page, Integer size) {
+    public String askList(Model model,
+                        @RequestParam(value = "page", required = false) Integer page,
+                        @RequestParam(value = "size", required = false) Integer size) {
         // 문의 내역 데이터 model에 담기
         var login = (LoginUserDetailsDTO) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
