@@ -117,6 +117,18 @@ $(function () {
         $('#predict-content').addClass('is-hidden');
         $('#loading-spinner').removeClass('is-hidden');
 
+        // 이미지 로드 완료를 기다리는 Promise 생성
+        const $vesselImage = $('.vessel_image');
+        const imageLoadPromise = new Promise((resolve, reject) => {
+            // 이미지가 이미 로드되었는지 확인 (캐시 등)
+            if ($vesselImage[0].complete && $vesselImage[0].naturalWidth !== 0) {
+                resolve();
+            } else {
+                $vesselImage.one('load', resolve); // .one()을 사용하여 한 번만 실행되도록
+                $vesselImage.one('error', reject); // 이미지 로드 실패 시
+            }
+        });
+
         // 선박 정보를 찾고 해당 vsl_id를 가져옴
         const vslIdToFetch = updateVesselInfo(idType, idValue);
 
@@ -150,7 +162,41 @@ $(function () {
                     if (response.status === 404) {
                         alert(`오류: 일치하는 선박 정보가 없습니다. (vsl_id: ${vslIdToFetch})`);
                     } else if (response.status === 409) {
-                        alert(`알림: 선박이 이미 도착했습니다. (도착 항구: ${errorData.detail.port_id})`);
+                        const detail = errorData.detail;
+
+                        // 예측 결과 영역 숨기고, 도착 메시지 표시
+                        $('#predict-content').removeClass('is-hidden');
+                        $('.sidebar__predict').hide();
+                        const portInfo = getPortInfo(detail.port_id);
+                        const arrivedMessage = `<div class="arrived-message" style="color: green; font-weight: 600; margin: 30px 0; text-align: center; font-size: 15px">해당 선박은 이미 ${portInfo.port_name_kr || detail.port_id}항에 도착했습니다.</div>`;
+                        $('.sidebar__vesselinfo').after(arrivedMessage);
+
+                        // 지도에 항로와 마커 표시
+                        if (detail.track && detail.track.length > 0) {
+                            const departurePort = { id: "KRPUS", lon: 129.040, lat: 35.106 };
+                            const coordinates = detail.track.map(p => [p.lon, p.lat]);
+                            coordinates.unshift([departurePort.lon, departurePort.lat]);
+                            const route = {
+                                route_name: '도착 항로',
+                                coordinates: coordinates,
+                                color: '#007cbf',
+                                rank: 1
+                            };
+                            window.drawRoutes([route]);
+                        }
+                        if (typeof window.showSpecificPortMarkers === 'function') {
+                            window.showSpecificPortMarkers(['KRPUS', detail.port_id]);
+                        }
+
+                        // 저장 버튼 비활성화
+                        $('.sidebar__btn.save').off('click').on('click', function (e) {
+                            e.stopPropagation(); // 다른 이벤트 핸들러의 실행을 막습니다.
+                            alert('해당 선박은 예측 결과가 나오지 않아 저장할 수 없습니다');
+                        });
+
+                        // UI 최종 상태 설정
+                        $('.sidebar__input').blur().prop('disabled', true).attr('aria-disabled', 'true').addClass('is-locked');
+                        $('.cselect__control').prop('disabled', true);
                     } else {
                         alert(`데이터를 불러오는 중 오류가 발생했습니다. (오류 메시지: ${errorData.detail?.message || '알 수 없음'})`);
                     }
@@ -184,7 +230,7 @@ $(function () {
                 return;
             }
 
-            const departurePort = { "id": "KRBUS", "country": "한국", "city": "부산", "lat": 35.0999, "lon": 129.111 };
+            const departurePort = { "id": "KRPUS", "country": "한국", "city": "부산", "lat": 35.0999, "lon": 129.111 };
 
             // 화면 UI 업데이트 (슬라이드에 데이터 반영)
             displayPredictionResults(resp.latest.predictions, departurePort);
@@ -217,7 +263,7 @@ $(function () {
                     }
                     let color = '#007cbf';
                     if (topRouteData.rank === 2) {
-                        color = '#A9A9A9';
+                        color = '#4F6F52';
                     } else if (topRouteData.rank === 3) {
                         color = '#A9A9A9';
                     }
@@ -238,7 +284,8 @@ $(function () {
             globalRoutesData = routes;
             globalPredictions = resp.latest.predictions;
 
-            $('.box').addClass('is-active');
+            $('.box.one').addClass('is-active');
+            $('.box.two, .box.three').removeClass('is-active');
 
             const validMarkers = [];
 
@@ -269,9 +316,9 @@ $(function () {
             }
 
             if (typeof window.drawRoutes === 'function' && typeof window.drawMarkers === 'function') {
-                window.drawRoutes(routes);
+                window.drawRoutes(routes.filter(r => r.rank === 1));
                 window.drawMarkers(validMarkers, lastMarker);
-                window.togglePortMarkersByRank([1, 2, 3]);
+                window.togglePortMarkersByRank([1]);
                 window.toggleMarkersVisibility(true);
             } else {
                 console.error("Map functions are not available.");
@@ -379,6 +426,8 @@ $(function () {
         updateIdType('MMSI');
 
         $('#predict-content').addClass('is-hidden');
+        $('.sidebar__predict').show();
+        $('.arrived-message').remove();
 
         $('.box').removeClass('is-active');
 
@@ -395,6 +444,9 @@ $(function () {
         $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
 
         $('.cselect__control').prop('disabled', false);
+
+        // 도착 상태일 때 추가했던 저장 버튼의 클릭 이벤트를 제거하여 원래의 저장 로직이 동작하도록 함
+        $('.sidebar__btn.save').off('click');
 
     });
 
@@ -586,7 +638,7 @@ $(function () {
 
 
 
-    // ───────── JSON 데이터를 화면에 표시 ─────────
+    // ───────── JSON 데이터를 로그 슬라이드에 표시 ─────────
 
     function displayTimelineResults(timeline, latest) {
 
@@ -598,40 +650,20 @@ $(function () {
 
         }
 
-
-
         const $startItem = $('<li class="voy-item"></li>');
-
-        const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false">
-
-                            <img src="/images/portpredictImages/vessel_Icon.png" th:src="@{/images/portpredictImages/vessel_Icon.png}"
-
-                                   alt="출발항 아이콘" />
-
-                        </button>`);
-
+        //출발항 버튼
+        const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/vessel_Icon.png" th:src="@{/images/portpredictImages/vessel_Icon.png}"alt="출발항 아이콘" /></button>`);
+        // 출발항의 컨테이너
         const $startRows = $('<div class="voy-rows"></div>');
-
-        $startRows.append(`<div class="voy-label">KRBUS</div>`);
-
-        const $startRow = $(`<div class="voy-row">
-
-                            <div class="depart_pillbtn">ATD</div>
-
-                            <div class="voy-chip">${latest.departure_time}</div>
-
-                        </div>`);
-
+        // 출발항 명
+        $startRows.append(`<div class="voy-label">KRPUS</div>`);                                              // 수정해라
+        const $startRow = $(`<div class="voy-row"><div class="depart_pillbtn">ATD</div><div class="voy-chip">${latest.departure_time}</div></div>`);
         $startRows.append($startRow);
-
         $startItem.append($startNode);
-
         $startItem.append($startRows);
-
         $('.voy-timeline').append($startItem);
 
-
-
+        // 중간 예측 시점 정보 추가(각 시간별 예측 데이터)
         timeline.forEach(timeData => {
 
             const timePoint = timeData.time_point;
@@ -642,13 +674,7 @@ $(function () {
 
             const $timelineItem = $('<li class="voy-item"></li>');
 
-            const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false">
-
-                                <img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"
-
-                                       alt="마커 아이콘" />
-
-                                 </button>`);
+            const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"alt="마커 아이콘" /></button>`);
 
             $timelineItem.append($voyNode);
 
@@ -662,17 +688,7 @@ $(function () {
 
                 predictions.forEach(prediction => {
 
-                    const $predictionRow = $(`
-
-                <div class="voy-row">
-
-                    <button class="pillbtn" type="button">Top-${prediction.rank}</button>
-
-                    <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
-
-                </div>
-
-                `);
+                    const $predictionRow = $(`<div class="voy-row"><button class="pillbtn" type="button">Top-${prediction.rank}</button><div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div></div>`);
 
                     $voyRows.append($predictionRow);
 
@@ -688,23 +704,16 @@ $(function () {
 
 
 
-        if (latest && latest.time_point !== undefined && latest.predictions) {
+        if (latest && latest.actual_time_point !== undefined && latest.predictions) {
 
             const $latestItem = $('<li class="voy-item"></li>');
 
-            const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false">
-
-                                    <img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"
-
-                                           alt="마커 아이콘" />
-
-                                   </button>`);
-
+            const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"alt="마커 아이콘" /></button>`);
             $latestItem.append($latestNode);
 
             const $latestRows = $('<div class="voy-rows"></div>');
 
-            $latestRows.append(`<div class="voy-label">현재 시점 (출항 후 ${latest.time_point}시간)</div>`);
+            $latestRows.append(`<div class="voy-label">현재 시점 (출항 후 ${Math.floor(latest.actual_time_point)}시간)</div>`);
 
 
 
@@ -712,25 +721,17 @@ $(function () {
 
                 latest.predictions.forEach(prediction => {
 
-                    const $predictionRow = $(`
-
-                <div class="voy-row">
-
-                    <button class="pillbtn" type="button">Top-${prediction.rank}</button>
-
-                    <div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div>
-
-                </div>
-
-                `);
+                    const $predictionRow = $(`<div class="voy-row"><button class="pillbtn" type="button">Top-${prediction.rank}</button><div class="voy-chip">${prediction.port_id} · ${(prediction.prob * 100).toFixed(2)}%</div></div>`);
 
                     $latestRows.append($predictionRow);
-
                 });
 
+                const rank1Prediction = latest.predictions.find(p => p.rank === 1);
+                if (rank1Prediction && rank1Prediction.eta) {
+                    const $etaRow = $(`<div class="voy-row"><div class="now_pillbtn">ETA</div><div class="voy-chip">${rank1Prediction.eta}</div></div>`);
+                    $latestRows.append($etaRow);
+                }
             }
-
-            $latestRows.append(`<div class="voy-row"></div>`);
 
             $latestItem.append($latestRows);
 
@@ -1005,27 +1006,16 @@ function updateVesselInfo(type, value) {
     });
 
 
-
     if (foundVessel) {
-
         $('.sidebar__vesselinfo .kv strong:eq(0)').text(foundVessel.call_sign || '정보 없음');
-
         $('.sidebar__vesselinfo .kv strong:eq(1)').text(foundVessel.ship_type || '정보 없음');
-
         $('.sidebar__vesselinfo .kv strong:eq(2)').text(foundVessel.vsl_length ? foundVessel.vsl_length + ' m' : '정보 없음');
-
         $('.sidebar__vesselinfo .kv strong:eq(3)').text(foundVessel.vsl_width ? foundVessel.vsl_width + ' m' : '정보 없음');
-
+        $('.vessel_image').attr('src', foundVessel.vsl_img || '/images/portpredictImages/vessel.jpg');
         return foundVessel.vsl_id; // 찾은 선박의 vsl_id 반환
-
     } else {
-
         alert('일치하는 선박 정보가 없습니다.');
-
         $('#predict-content').addClass('is-hidden');
-
         return null; // 선박이 없는 경우 null 반환
-
     }
-
 }

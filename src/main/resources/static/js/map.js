@@ -13,8 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
     map.setProjection('mercator');
 
     // ── 소스/레이어 id
-    const routeSourceId = 'route-source';
-    const routeLayerId = 'route-layer';
+    const routeSourceId_rank1 = 'route-source-rank1';
+    const routeLayerId_rank1 = 'route-layer-rank1';
+    const routeSourceId_rank2 = 'route-source-rank2';
+    const routeLayerId_rank2 = 'route-layer-rank2';
+    const routeSourceId_rank3 = 'route-source-rank3';
+    const routeLayerId_rank3 = 'route-layer-rank3';
     const markerSourceId = 'marker-source';
     const markerLayerId = 'marker-layer';
     const lastMarkerSourceId = 'last-marker-source';
@@ -143,7 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
         wrap.style.height = `${size}px`;
         wrap.style.lineHeight = 0;
         wrap.style.cursor = 'pointer';
-        wrap.style.position = 'relative';
 
         wrap.innerHTML = svgText;
         const svg = wrap.querySelector('svg');
@@ -163,22 +166,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // 항구 DOM 마커 생성 (★ 여기서 safeLngLat 사용)
     async function addPortMarkers() {
         const SVG_URL = '/images/portpredictImages/port_icon.svg';
-        // const [svgText, geojson] = await Promise.all([
-        //     loadSvgText(SVG_URL),
-        //     fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => {
-        //         if (!r.ok) throw new Error('ports.geojson 로드 실패');
-        //         return r.json();
-        //     })
-        // ]);
-        const dataUrl = new URL('/data/ports.fixed.geojson', location.origin).toString();
-        console.log('[ports] fetching:', dataUrl);
-        const res = await fetch(dataUrl, { cache: 'no-cache' });
-
-
         const [svgText, geojson] = await Promise.all([
             loadSvgText(SVG_URL),
-            fetch('/data/ports.fixed.geojson?v=' + Date.now(), { cache: 'no-cache' }).then(r => {
-                if (!r.ok) throw new Error('ports.fixed.geojson 로드 실패');
+            fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => {
+                if (!r.ok) throw new Error('ports.geojson 로드 실패');
                 return r.json();
             })
         ]);
@@ -190,12 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const portId = f.properties?.port_id || '';
             const color = f.properties?.color || '#013895';
-            const size = f.properties?.size || 28;
+            const size = (f.properties?.size || 28) * 0.90;
 
             const el = makeSvgMarker(svgText, { color, size });
             el.dataset.portId = portId;
 
             // 매핑/좌표 저장 (날씨 폴백/토글용)
+
             markerElByPortId.set(portId, el);
             portCoordsById.set(portId, { lng, lat });
 
@@ -278,30 +270,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // ───────────── 지도 로드
     map.on('load', async () => {
 
-        map.addSource('debug-port-src', {
-            type: 'geojson',
-            data: { type: 'FeatureCollection', features: [] }
-        });
-        map.addLayer({
-            id: 'debug-port-layer',
-            type: 'circle',
-            source: 'debug-port-src',
-            paint: {
-                'circle-color': '#ff3b30',
-                'circle-radius': 3,
-                'circle-stroke-width': 1,
-                'circle-stroke-color': '#fff'
-            }
-        });
+
         // 불필요 라벨 숨김
         map.getStyle().layers
             .filter(l => l.type === 'symbol' && (l.id.includes('poi-label') || l.id.includes('harbor-label')))
             .forEach(l => map.setLayoutProperty(l.id, 'visibility', 'none'));
 
         // 경로/타임라인/최신점 소스·레이어
-        map.addSource(routeSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        // Rank 3 (bottom layer)
+        map.addSource(routeSourceId_rank3, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({
-            id: routeLayerId, type: 'line', source: routeSourceId,
+            id: routeLayerId_rank3, type: 'line', source: routeSourceId_rank3,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+        });
+
+        // Rank 2 (middle layer)
+        map.addSource(routeSourceId_rank2, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({
+            id: routeLayerId_rank2, type: 'line', source: routeSourceId_rank2,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+        });
+
+        // Rank 1 (top layer)
+        map.addSource(routeSourceId_rank1, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({
+            id: routeLayerId_rank1, type: 'line', source: routeSourceId_rank1,
             layout: { 'line-join': 'round', 'line-cap': 'round' },
             paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
         });
@@ -321,36 +316,22 @@ document.addEventListener("DOMContentLoaded", () => {
         // 항구 마커 DOM으로 추가(★ 제자리 고정)
         await addPortMarkers().catch(console.error);
 
-        try {
-            const feats = [];
-            markerElByPortId.forEach((_, pid) => {
-                const c = portCoordsById.get(pid);
-                if (c) feats.push({
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [c.lng, c.lat] },
-                    properties: { id: pid }
-                });
-            });
-            const debugSrc = map.getSource('debug-port-src');
-            if (debugSrc) debugSrc.setData({ type: 'FeatureCollection', features: feats });
-        } catch (e) {
-            console.error('debug fill fail', e);
-        }
+
 
         // 최초 혼잡 데이터 준비(표시는 토글로)
         try { await updateCongestion(); } catch (e) { console.error(e); }
 
         // 부산 고정 마커(동일 DOM 방식)
         const svgText = await loadSvgText('/images/portpredictImages/port_icon.svg');
-        const busanEl = makeSvgMarker(svgText, { color: '#013895', size: 28 });
-        busanEl.dataset.portId = 'KRBUS';
+        const busanEl = makeSvgMarker(svgText, { color: ' #013895', size: 25.2 });
+        busanEl.dataset.portId = 'KRPUS';
         const busanMarker = new mapboxgl.Marker({ element: busanEl, anchor: 'bottom', offset: [0, 0] })
             .setLngLat([129.040, 35.106]).addTo(map);
         allPortMarkers.push(busanMarker);
-        markerElByPortId.set('KRBUS', busanEl);
-        portCoordsById.set('KRBUS', { lng: 129.040, lat: 35.106 });
+        markerElByPortId.set('KRPUS', busanEl);
+        portCoordsById.set('KRPUS', { lng: 129.040, lat: 35.106 });
         busanEl.addEventListener('mouseenter', () => {
-            busanHoverPopup.setLngLat([129.040, 35.106]).setHTML(`<div class="port-hover-card busan-hover-card"><div class="port-hover-card__hd">KRBUS</div></div>`).addTo(map);
+            busanHoverPopup.setLngLat([129.040, 35.106]).setHTML(`<div class="port-hover-card busan-hover-card"><div class="port-hover-card__hd">부산</div></div>`).addTo(map);
         });
         busanEl.addEventListener('mouseleave', () => busanHoverPopup.remove());
 
@@ -373,13 +354,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ===== 외부 API =====
     window.drawRoutes = function (routes) {
-        if (!map || !map.getSource(routeSourceId)) return;
-        const features = routes.map(r => ({
-            type: 'Feature',
-            geometry: { type: 'LineString', coordinates: r.coordinates },
-            properties: { name: r.route_name, color: r.color }
-        }));
-        map.getSource(routeSourceId).setData({ type: 'FeatureCollection', features });
+        if (!map) return;
+
+        // Prepare features for each rank
+        const featuresRank1 = [];
+        const featuresRank2 = [];
+        const featuresRank3 = [];
+
+        routes.forEach(r => {
+            const feature = {
+                type: 'Feature',
+                geometry: { type: 'LineString', coordinates: r.coordinates },
+                properties: { name: r.route_name, color: r.color }
+            };
+            if (r.rank === 1) {
+                featuresRank1.push(feature);
+            } else if (r.rank === 2) {
+                featuresRank2.push(feature);
+            } else if (r.rank === 3) {
+                featuresRank3.push(feature);
+            }
+        });
+
+        // Update sources for each rank
+        if (map.getSource(routeSourceId_rank1)) {
+            map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1 });
+        }
+        if (map.getSource(routeSourceId_rank2)) {
+            map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
+        }
+        if (map.getSource(routeSourceId_rank3)) {
+            map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
+        }
     };
 
     window.drawMarkers = function (markers, lastMarker) {
@@ -410,15 +416,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // 랭크 필터 (부산은 항상 표시)
     window.togglePortMarkersByRank = function (ranksToKeep) {
         const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
-        portIdsToKeep.add('KRBUS');
+        portIdsToKeep.add('KRPUS');
         allPortMarkers.forEach(m => {
             const id = m.getElement().dataset.portId;
             m.getElement().style.display = portIdsToKeep.has(id) ? '' : 'none';
         });
     };
+
+    window.showSpecificPortMarkers = function (portIdsToShow) {
+        const idSet = new Set(portIdsToShow);
+        allPortMarkers.forEach(m => {
+            const id = m.getElement().dataset.portId;
+            if (id) {
+                m.getElement().style.display = idSet.has(id) ? '' : 'none';
+            }
+        });
+    };
+
     window.hideAllPortMarkers = function () {
         allPortMarkers.forEach(m => {
-            if (m.getElement().dataset.portId !== 'KRBUS') m.getElement().style.display = 'none';
+            if (m.getElement().dataset.portId !== 'KRPUS') m.getElement().style.display = 'none';
         });
     };
     window.showAllPortMarkers = function () {
@@ -429,7 +446,9 @@ document.addEventListener("DOMContentLoaded", () => {
     window.clearRoutesAndMarkers = function () {
         if (!map) return;
         const empty = { type: 'FeatureCollection', features: [] };
-        if (map.getSource(routeSourceId)) map.getSource(routeSourceId).setData(empty);
+        if (map.getSource(routeSourceId_rank1)) map.getSource(routeSourceId_rank1).setData(empty);
+        if (map.getSource(routeSourceId_rank2)) map.getSource(routeSourceId_rank2).setData(empty);
+        if (map.getSource(routeSourceId_rank3)) map.getSource(routeSourceId_rank3).setData(empty);
         if (map.getSource(markerSourceId)) map.getSource(markerSourceId).setData(empty);
         if (map.getSource(lastMarkerSourceId)) map.getSource(lastMarkerSourceId).setData(empty);
         // 가시성은 필요 시만 토글

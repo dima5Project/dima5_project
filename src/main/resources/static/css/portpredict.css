@@ -701,6 +701,40 @@ html {
     text-align: center;
 }
 
+.box.one .head__label,
+.box.one .route b.last {
+    color: #0f3c9a;
+    /* 파란색 유지 */
+}
+
+.box.one .route__bg {
+    background: rgba(230, 243, 243, 0.5);
+    /* 기존 연한 하늘색 */
+}
+
+/* === Top2 (연두색 + 초록색 글씨) === */
+.box.two .head__label,
+.box.two .route b.last {
+    color: #4F6F52;
+    /* 진한 초록 */
+}
+
+.box.two .route__bg {
+    background: #E3F2E1;
+    /* 연한 연두색 */
+}
+
+.box.three .route__bg {
+    background: #F2F2F2;
+}
+
+.box.three .head__label,
+.box.three .route b.last {
+    color: #708090;
+}
+
+
+
 /* ── 가운데 연두색 밴드 ── */
 .route__bg {
     position: relative;
@@ -709,7 +743,6 @@ html {
     width: calc(100% + (var(--pad) * 2));
     /* 패딩 당긴 만큼 폭 확장 */
     padding: 8px 12px;
-    background: rgba(230, 243, 243, 0.5);
     box-sizing: border-box;
     align-self: stretch;
     /* flex 줄임 방지 */
@@ -723,7 +756,7 @@ html {
     /* 좌/화살표/우 */
     align-items: center;
     /* 세로 중앙 정렬 */
-    column-gap: 14px;
+    column-gap: 4px;
     /* 기존 17px → 여유 확보 */
     margin: 0;
     color: #524F4F;
@@ -752,19 +785,17 @@ html {
     color: #000;
 }
 
-/* 영문 목적항 */
-.route b.last {
-    color: #0f3c9a;
-}
-
-/* 화살표 스타일 */
-.arrow {
+.route .arrow {
     grid-column: 2;
+    justify-self: start;
+    /* ★ 이 줄을 추가합니다. */
     align-self: start;
-    /* 크기는 유지하되 위치만 중앙 고정 */
+    text-align: left;
     font-size: clamp(18px, 6vw, 34px);
     color: #6e767e;
     line-height: 1;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 /* 한국 / 부산 + 목적항 한국어 */
@@ -785,7 +816,7 @@ html {
 
 .route .sub.dest {
     /* 컨테이너 너비에 맞춰 글자 크기 자동 조절, 줄바꿈/생략 없음 */
-    font-size: clamp(10px, 17cqw, 13px);
+    font-size: clamp(5px, 16cqw, 12px);
 }
 
 /* ETA 라인 */
@@ -841,13 +872,15 @@ html {
 
 /* ===== 2) 슬라이드_시점별 타임라인 (왼쪽 고정 컬럼 + 점선 + 원형) ===== */
 
-/* 로그 패널 헤더 고정 */
+/* 로그 패널 헤더 */
 .panel.panel--log .sidebar__header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: relative;
+    /* sticky는 flexbox 레이아웃과 충돌하여 제거 */
+    z-index: 1;
+    /* 다른 요소와 겹침 방지 */
     background-color: #ffffff;
-    width: 100%;
+    flex-shrink: 0;
+    /* 헤더 크기 고정 */
 }
 
 /* 로그 패널 제목 */
@@ -864,7 +897,9 @@ html {
 
 /* 로그 패널 콘텐츠 */
 .panel.panel--log .sidebar__content {
-    padding: 0 16px 10px 16px;
+    padding: 10px 16px;
+    /* 헤더와의 간격을 위해 패딩 조정 */
+    /* flex: 1; 와 overflow-y: auto; 는 .sidebar__content 기본 스타일에서 상속받아 스크롤 기능이 유지됩니다. */
 }
 
 
@@ -951,19 +986,17 @@ html {
 
 /* 아이콘 크기 */
 .voy-node img {
-    width: calc(var(--node));
-    height: calc(var(--node));
-    display: block;
-    /* 인라인 여백 제거 */
-    object-fit: contain;
-    /* 비율 유지 */
-    margin: 0;
-    /* 혹시 모를 여백 제거 */
+    width: 35px;
+    height: 35px;
 }
 
 .voy-node img[alt="출발항 아이콘"] {
-    width: calc(var(--node) * 0.72);
-    height: calc(var(--node) * 0.72);
+    width: 30px;
+    height: 30px;
+    display: block;
+    object-fit: contain;
+    /* 비율 유지 */
+    margin: 0;
 }
 
 .voy-node span {
@@ -995,26 +1028,22 @@ html {
     }
 }
 
-
+/* 시점별 예측 타임라인 */
 .voy-rows,
 .voy-row {
     width: 100%;
 }
 
 .voy-rows {
-    margin: 15px 0 25px 11px;
+    margin: 5px 0 10px 11px;
 }
 
 /* 한 줄(버튼 + 값칩) : 콘텐츠는 왼쪽 패딩 이후부터 배치 */
 .voy-row {
+    position: relative;
+    height: 48px;
     display: flex;
-    /* pillbtn과 voy-chip을 양쪽 끝으로 배치 */
-    justify-content: space-between;
-    /* 요소들을 수직 중앙 정렬 */
-    align-items: center;
-    /* 두 요소 사이의 간격 */
-    gap: 8px;
-    margin-bottom: 6px;
+    height: 36px;
 }
 
 /* 마지막 아이템 아래 여백 제거(점선 더 짧게) */
@@ -1024,23 +1053,22 @@ html {
 
 /* 소제목 */
 .voy-label {
-    margin-bottom: 10px;
+    margin: 10px 0;
     color: #2b2f3a;
     font-weight: 700;
     font-size: calc(var(--font) + 2px);
-
 }
 
-/* 값칩(텍스트) */
+/* 항구명 + % */
 .voy-chip {
+    margin-left: 10px;
     height: var(--pill-h);
-    width: 143px;
-    /* 너비를 143px로 고정 */
+    width: 130px;
     text-align: left;
     /* 텍스트를 왼쪽 정렬 */
-    border-radius: 8px;
+    border-radius: 6px;
     background: #eef3f7;
-    padding: 0 10px;
+    padding: 0 8px;
     display: inline-flex;
     align-items: center;
     font-size: var(--font);
@@ -1052,8 +1080,11 @@ html {
     /* max-width는 width가 고정되므로 삭제합니다. */
 }
 
+/* top- 1*/
 .pillbtn,
-.depart_pillbtn {
+.depart_pillbtn,
+.now_pillbtn {
+    /* Added .now_pillbtn here */
     height: var(--pill-h);
     width: 53px;
     /* 너비를 53px로 고정 */
@@ -1065,13 +1096,19 @@ html {
     border: 1.5px solid #cfd8e3;
     background: #fff;
     color: #3a4a5b;
-    font-weight: 800;
+    font-weight: 700;
     font-size: var(--font);
     letter-spacing: .3px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
+}
+
+.voy-timeline .voy-item:not(:first-child) .voy-rows .voy-row:nth-of-type(2) .pillbtn,
+.voy-timeline .voy-item:not(:first-child) .voy-rows .voy-row:nth-of-type(2) .voy-chip {
+    color: #013895;
+    font-size: calc(var(--font) + 1px);
 }
 
 /* (Top 버튼은 색 토글 안 씀 — 그대로 유지) */
@@ -1408,9 +1445,7 @@ html {
 }
 
 /* 마커 래퍼는 map.js의 makeSvgMarker()가 .port-marker 로 생성됨 */
-.port-marker {
-    position: relative;
-}
+.port-marker {}
 
 /* (기존 margin-left/-top로 억지 보정하던 것 전부 제거) */
 .port-marker .cong-ring {
