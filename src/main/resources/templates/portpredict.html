@@ -156,6 +156,11 @@
                     <hr class="sidebar__divider" />
                 </div>
 
+                <!-- 스피너/로딩 상태 표시 -->
+                <div id="loading-spinner" class="is-hidden">
+                    <div class="spinner"></div>
+                    <p>데이터를 불러오는 중입니다...</p>
+                </div>
                 <!-- 가운데만 스크롤 되는 영역 -->
                 <div id="predict-content" class="sidebar__content is-hidden">
                     <!-- 선박 정보 -->
@@ -250,15 +255,16 @@
                     <button class="sidebar__btn save">결과 저장</button>
                 </div>
             </div>
-
+            <!--  로그 슬라이드 바!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
             <!-- 2) 로그 슬라이드 바 -->
-            <div id="log-content" class="sidebar__content logpanel">
+            <div class="panel panel--log">
                 <div class="sidebar__header">
                     <h2 class="sidebar__secondtitle">시점별 예측 타임라인</h2>
                     <hr class="secondtitle_hr">
                 </div>
-                <ol class="voy-timeline">
-                </ol>
+                <div id="log-content" class="sidebar__content">
+                    <ol class="voy-timeline"></ol>
+                </div>
             </div>
             <!-- 로그 슬라이드 바 끝-->
 
