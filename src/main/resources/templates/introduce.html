@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -15,6 +14,10 @@
     <link rel="stylesheet" th:href="@{/css/introduce.css}">
     <link rel="stylesheet" th:href="@{/css/faq.css}">
     <script defer th:src="@{/js/faq.js}"></script>
+
+    <script defer th:src="@{/js/lottie.min.js}"></script>
+    <script defer th:src="@{/js/introduce.js}"></script>
+
     <title>소개 페이지</title>
 </head>
 
@@ -39,21 +42,23 @@
     </section>
 
     <div class="main_layout">
-        <aside class="sidebar">
-            <h2 class="sidebar_title">소개페이지</h2>
-            <nav class="sidebar_nav">
-                <a th:href="@{/intro/service}" class="sidebar_link active"><!-- 소개 섹션(사이드바 내비, 본문) -->
-                    <span>서비스 소개</span>
-                    <img src="/images/introduceImages/move_arrow.png" th:src="@{/images/introduceImages/move_arrow.png}"
-                        alt="arrow icon">
-                </a>
-                <a th:href="@{/intro/team}" class="sidebar_link">
-                    <span>팀 소개</span>
-                    <img src="/images/introduceImages/move_arrow.png" th:src="@{/images/introduceImages/move_arrow.png}"
-                        alt="arrow icon">
-                </a>
-            </nav>
-        </aside>
+        <div class="sidebar_container">
+            <aside class="sidebar">
+                <h2 class="sidebar_title">소개페이지</h2>
+                <nav class="sidebar_nav">
+                    <a th:href="@{/intro/service}" class="sidebar_link active"><!-- 소개 섹션(사이드바 내비, 본문) -->
+                        <span>서비스 소개</span>
+                        <img src="/images/introduceImages/move_arrow.png"
+                            th:src="@{/images/introduceImages/move_arrow.png}" alt="arrow icon">
+                    </a>
+                    <a th:href="@{/intro/team}" class="sidebar_link">
+                        <span>팀 소개</span>
+                        <img src="/images/introduceImages/move_arrow.png"
+                            th:src="@{/images/introduceImages/move_arrow.png}" alt="arrow icon">
+                    </a>
+                </nav>
+            </aside>
+        </div>
 
         <div class="content_Wrapper">
             <section id="about" class="about_section">
@@ -98,9 +103,15 @@
 
                             <!-- 애니메이션 -->
                             <div class="portcast_visual_container">
-                                <img class="earth_svg" src="/images/introduceImages/ship_move.svg"
-                                    th:src="@{/images/introduceImages/ship_move.svg}" alt="earth">
+                                <!-- Lottie가 그려질 컨테이너 (data-path 추가) -->
+                                <div id="lottie-ship" class="lottie_box" aria-hidden="true"
+                                    th:data-path="@{/json/shipping.json}"></div>
+
+                                <!-- JS 실패 시 보이는 이미지(폴백) -->
+                                <img class="earth_svg fallback" src="/images/introduceImages/ship_move.svg"
+                                    th:src="@{/images/introduceImages/ship_move.svg}" alt="">
                             </div>
+
                         </div>
                     </article>
                 </main>
@@ -108,7 +119,7 @@
 
             <section class="ais_section">
                 <div class="ais_background">
-                    <img src="images/introduceImages/ais_image.png" th:src="@{/images/introduceImages/ais_image.png}"
+                    <img src="/images/introduceImages/ais_image.png" th:src="@{/images/introduceImages/ais_image.png}"
                         alt="AIS data visualization" class="ais_bg_image">
 
                     <div class="ais_overlay"></div>
@@ -140,9 +151,14 @@
                     </header>
                     <div class="methodology_steps">
                         <div class="step">
-                            <img src="/images/introduceImages/map_total_group.svg"
-                                th:src="@{/images/introduceImages/map_total_group.svg}"
-                                alt="Map showing port clustering" class="step_image">
+                            <div class="map_group_wrap">
+                                <div id="map-group" class="step_image" role="img"
+                                    aria-label="Map showing port clustering"
+                                    th:data-src="@{/images/introduceImages/map_total_group.svg}"
+                                    data-src="/images/introduceImages/map_total_group.svg">
+                                </div>
+                            </div>
+
                             <div class="step_description">
                                 <h4>항구 군집화 & 1차 예측</h4>
                                 <p>① 38개 항구를 거리 기반으로<span class="bold"> K-means 군집화</span><br>
@@ -155,17 +171,19 @@
                             alt="arrow" class="step_arrow">
 
                         <div class="step">
-                            <div class="merged_image_container"
-                                style="position: relative; width: 460px; height: 486.59px;">
-                                <img src="/images/introduceImages/map_total_wrap2.svg"
-                                    th:src="@{/images/introduceImages/map_total_wrap2.svg}" alt="Map with predictions"
-                                    style="position: absolute; top: 0px; left: 0px;">
+                            <div class="merged_image_container">
+                                <div id="map-wrap2" class="step_image" role="img" aria-label="Map with predictions"
+                                    th:data-src="@{/images/introduceImages/map_total_wrap2.svg}"
+                                    data-src="/images/introduceImages/map_total_wrap2.svg">
+                                </div>
                             </div>
-                            <div class="step_description">
+
+                            <div class="step_description step2">
                                 <h4>군집별 정밀 예측 & TOP3 도출</h4>
                                 <p>① 각 군집에 최적화된 2차 분류 모델 학습<br>
                                     ② 1차 예측 결과 중 상위 2개 군집에 대해 정밀 예측 수행<br>
-                                    ③ Joint 확률을 계산해 <span class="bold">도착 가능성이 높은 항구 3곳의 확률 제공</span></p>
+                                    ③ Joint 확률을 계산해 <span class="bold">도착 가능성이 높은 <span class="bg_color">항구 3곳</span>의
+                                        확률 제공</span></p>
                             </div>
                         </div>
                     </div>
@@ -176,6 +194,7 @@
                     </p>
                 </div>
             </section>
+
         </div>
     </div>
 
