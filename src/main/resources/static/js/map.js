@@ -277,6 +277,14 @@ document.addEventListener("DOMContentLoaded", () => {
             .forEach(l => map.setLayoutProperty(l.id, 'visibility', 'none'));
 
         // 경로/타임라인/최신점 소스·레이어
+        // Arrived Route (solid line)
+        map.addSource('arrived-route-source', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({
+            id: 'arrived-route-layer', type: 'line', source: 'arrived-route-source',
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+        });
+
         // Rank 3 (bottom layer)
         map.addSource(routeSourceId_rank3, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({
@@ -362,6 +370,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // 1. 소스 및 레이어 다시 추가
+        // Arrived Route
+        map.addSource('arrived-route-source', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: 'arrived-route-layer', type: 'line', source: 'arrived-route-source', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4 } });
         // Rank 3
         map.addSource(routeSourceId_rank3, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: routeLayerId_rank3, type: 'line', source: routeSourceId_rank3, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
@@ -424,6 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const featuresRank1 = [];
         const featuresRank2 = [];
         const featuresRank3 = [];
+        const featuresArrived = [];
 
         routes.forEach(r => {
             const feature = {
@@ -431,7 +443,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 geometry: { type: 'LineString', coordinates: r.coordinates },
                 properties: { name: r.route_name, color: r.color }
             };
-            if (r.rank === 1) {
+            if (r.route_name === '도착 항로') {
+                featuresArrived.push(feature);
+            } else if (r.rank === 1) {
                 featuresRank1.push(feature);
             } else if (r.rank === 2) {
                 featuresRank2.push(feature);
@@ -441,6 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Update sources for each rank
+        map.getSource('arrived-route-source').setData({ type: 'FeatureCollection', features: featuresArrived });
         map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1 });
         map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
         map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
@@ -506,6 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.clearRoutesAndMarkers = function () {
         if (!map) return;
         const empty = { type: 'FeatureCollection', features: [] };
+        if (map.getSource('arrived-route-source')) map.getSource('arrived-route-source').setData(empty);
         if (map.getSource(routeSourceId_rank1)) map.getSource(routeSourceId_rank1).setData(empty);
         if (map.getSource(routeSourceId_rank2)) map.getSource(routeSourceId_rank2).setData(empty);
         if (map.getSource(routeSourceId_rank3)) map.getSource(routeSourceId_rank3).setData(empty);
