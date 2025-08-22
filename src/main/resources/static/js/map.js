@@ -1,6 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     mapboxgl.accessToken = 'pk.eyJ1IjoiaGoxMTA1IiwiYSI6ImNtZGw4MGx6djEzMzcybHByM3V4OHg3ZmEifQ.X56trJZj050V3ln_ijcwcQ';
 
+    // ▼ [추가] 지도 스타일 변경 후 복원을 위한 데이터 저장 변수
+    let lastDrawnRoutes = null;
+    let lastDrawnMarkers = null;
+    let lastDrawnLastMarker = null;
+    let isInitialStyleLoad = true; // [추가] 초기 로드 확인용 플래그
+
     const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
@@ -248,6 +254,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+
+    // [추가] 지도 스타일 버튼 독립 핸들러
+    const mapStyleBtn = document.getElementById('map-style-btn');
+    if (mapStyleBtn) {
+        let isAltStyle = false;
+        mapStyleBtn.addEventListener('click', () => {
+            isAltStyle = !isAltStyle;
+            mapStyleBtn.classList.toggle('is-on', isAltStyle);
+            const newStyle = isAltStyle ? 'mapbox://styles/mapbox/outdoors-v12' : 'mapbox://styles/mapbox/light-v10';
+            map.setStyle(newStyle);
+        });
+    }
+
     // ───────────── 지도 로드
     map.on('load', async () => {
 
@@ -330,11 +349,76 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (err) { console.error('hover env fail', err); }
         });
         map.on('mouseleave', lastMarkerLayerId, () => { marineHoverPopup.remove(); });
+
+        // ▼ [추가] 초기 로드가 완료되었음을 플래그로 표시
+        isInitialStyleLoad = false;
+    });
+
+    // ▼ [수정] 지도 스타일이 변경된 후 실행될 이벤트 핸들러
+    map.on('style.load', () => {
+        // ▼ [추가] 초기 로드 시에는 이 핸들러가 실행되지 않도록 방지
+        if (isInitialStyleLoad) {
+            return;
+        }
+
+        // 1. 소스 및 레이어 다시 추가
+        // Rank 3
+        map.addSource(routeSourceId_rank3, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: routeLayerId_rank3, type: 'line', source: routeSourceId_rank3, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
+        // Rank 2
+        map.addSource(routeSourceId_rank2, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: routeLayerId_rank2, type: 'line', source: routeSourceId_rank2, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
+        // Rank 1
+        map.addSource(routeSourceId_rank1, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: routeLayerId_rank1, type: 'line', source: routeSourceId_rank1, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
+        // Markers
+        map.addSource(markerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: markerLayerId, type: 'circle', source: markerSourceId, paint: { 'circle-radius': 10, 'circle-color': '#e6ebf0', 'circle-stroke-width': 1.5, 'circle-stroke-color': '#e6ebf0' } });
+        // Last Marker
+        map.addSource(lastMarkerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: lastMarkerLayerId, type: 'circle', source: lastMarkerSourceId, paint: { 'circle-radius': 8, 'circle-color': '#00bfff', 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } });
+
+        // 2. DOM 마커들 다시 추가
+        allPortMarkers.forEach(marker => marker.addTo(map));
+
+        // 3. 저장된 데이터가 있으면 다시 그리기
+        if (lastDrawnRoutes) {
+            window.drawRoutes(lastDrawnRoutes);
+        }
+        if (lastDrawnMarkers && lastDrawnLastMarker) {
+            window.drawMarkers(lastDrawnMarkers, lastDrawnLastMarker);
+        }
+
+        // 4. 혼잡도/날씨 오버레이 상태 복원
+        markerElByPortId.forEach(el => {
+            const ring = el.querySelector('.cong-ring');
+            if (ring) ring.style.display = congestionVisible ? '' : 'none';
+            const emoji = el.querySelector('.weather-emoji');
+            if (emoji) emoji.style.display = weatherVisible ? '' : 'none';
+        });
+
+        // 5. 기타 설정 및 이벤트 리스너 복원
+        map.setProjection('mercator');
+        map.getStyle().layers.filter(l => l.type === 'symbol' && (l.id.includes('poi-label') || l.id.includes('harbor-label'))).forEach(l => map.setLayoutProperty(l.id, 'visibility', 'none'));
+        map.on('mouseenter', lastMarkerLayerId, async (e) => {
+            clearTimeout(hoverTimeout);
+            const f = e.features && e.features[0];
+            if (!f) return;
+            const [lon, lat] = f.geometry.coordinates;
+            const targetISO = (typeof window.lastVesselTsISO === 'string' && window.lastVesselTsISO) ? window.lastVesselTsISO : new Date().toISOString();
+            try {
+                const env = await window.ajaxEnvAt(lat, lon, targetISO);
+                const html = window.buildEnvPopupHTML(env);
+                marineHoverPopup.setLngLat([lon, lat]).setHTML(html).addTo(map);
+            } catch (err) { console.error('hover env fail', err); }
+        });
+        map.on('mouseleave', lastMarkerLayerId, () => { marineHoverPopup.remove(); });
     });
 
     // ===== 외부 API =====
     window.drawRoutes = function (routes) {
         if (!map) return;
+        lastDrawnRoutes = routes; // [추가]
 
         // Prepare features for each rank
         const featuresRank1 = [];
@@ -357,19 +441,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Update sources for each rank
-        if (map.getSource(routeSourceId_rank1)) {
-            map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1 });
-        }
-        if (map.getSource(routeSourceId_rank2)) {
-            map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
-        }
-        if (map.getSource(routeSourceId_rank3)) {
-            map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
-        }
+        map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1 });
+        map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
+        map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
     };
 
     window.drawMarkers = function (markers, lastMarker) {
-        if (!map || !map.getSource(markerSourceId) || !map.getSource(lastMarkerSourceId)) return;
+        if (!map) return;
+        lastDrawnMarkers = markers; // [추가]
+        lastDrawnLastMarker = lastMarker; // [추가]
         const feats = markers.map(m => ({
             type: 'Feature',
             geometry: { type: 'Point', coordinates: m.coordinates },
@@ -431,9 +511,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (map.getSource(routeSourceId_rank3)) map.getSource(routeSourceId_rank3).setData(empty);
         if (map.getSource(markerSourceId)) map.getSource(markerSourceId).setData(empty);
         if (map.getSource(lastMarkerSourceId)) map.getSource(lastMarkerSourceId).setData(empty);
-        // 가시성은 필요 시만 토글
-        // map.setLayoutProperty(markerLayerId,'visibility','none');
-        // map.setLayoutProperty(lastMarkerLayerId,'visibility','none');
+
+        // [추가] 저장된 데이터도 초기화
+        lastDrawnRoutes = null;
+        lastDrawnMarkers = null;
+        lastDrawnLastMarker = null;
     };
 
     // 조회 버튼 클릭 시 상위 1, 2, 3위 항구에 맞춰 뷰 조정
