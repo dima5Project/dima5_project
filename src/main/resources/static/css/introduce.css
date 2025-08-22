@@ -255,13 +255,6 @@ img {
     line-height: 1.5;
 }
 
-.merged_image_container {
-    flex-shrink: 0;
-    position: relative;
-    width: 299.05px;
-    height: 269.25px;
-}
-
 /* 애니메이션 효과 */
 .portcast_visual_container {
     position: relative;
@@ -358,106 +351,117 @@ img {
 
 /* CSS for section section:methodology */
 .methodology_section .content_header {
-    margin-bottom: 40px;
     margin-top: 120px;
+    margin-bottom: 40px;
 }
 
+/* 스텝 전체는 세로로 쌓고 가운데 정렬 */
 .methodology_steps {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* 자식(그림/설명/화살표) 가운데 정렬 */
     gap: 40px;
+    /* 스텝/화살표 사이 간격 */
 }
 
+/* 각 스텝: 그림 ↓ 설명 (둘 다 중앙) */
 .step {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    /* 내부 요소 가운데 정렬 */
+    gap: 18px;
     text-align: center;
+    /* 설명 텍스트 중앙 정렬 */
+    width: 100%;
 }
 
+/* 그림 박스(두 SVG 컨테이너 공통) */
 .map_group_wrap,
 .merged_image_container {
     width: 461px;
+    /* 원본 비율 기준 가로 */
     max-width: 100%;
+    margin: 0 auto;
+    /* 중앙 정렬 */
 }
 
-.map_group_wrap>.step_image,
-.merged_image_container>.step_image {
-    display: block;
+/* 1) 1번째 SVG: 461x445 */
+.map_group_wrap>.step_image {
+    position: relative;
     width: 100%;
-    height: auto;
-    aspect-ratio: 461/445;
-    flex: 0 0 auto;
-    border: none;
+    height: 0;
+    padding-top: calc(445 / 461 * 100%);
+    aspect-ratio: auto !important;
 }
 
-/* 본문 폭 제한 */
+/* 2) 2번째 SVG: 460x486.59  (※ 파일이 461x486.59면 그 값으로 바꾸세요) */
+.merged_image_container>.step_image {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: calc(486.59 / 460 * 100%);
+    aspect-ratio: auto !important;
+}
+
+.map_group_wrap>.step_image>svg,
+.merged_image_container>.step_image>svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* 설명(그림 아래) */
 .step_description {
-    max-width: 510px;
+    position: static;
+    /* 혹시 모를 position 설정 제거 */
+    max-width: 640px;
+    margin: 18px auto 0;
+    /* 그림 밑 중앙 정렬 */
+    text-align: center;
 }
 
-.step2 {}
-
-.step_description h4 {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.step_description p {
-    font-size: 18px;
-    line-height: 1.6;
-}
-
-
+/* 가운데 화살표 이미지 */
 .step_arrow {
-    width: 50px;
+    display: block;
+    width: 56px;
+    /* 필요 시 크기 조정 */
+    margin: 4px auto;
+    /* 항상 중앙 */
 }
 
-
+/* 정확도 문구: 중앙 컬럼 폭에 맞춰 놓고 텍스트만 오른쪽 정렬 */
 .accuracy_note {
+    max-width: 640px;
+    /* 위의 step_description과 폭을 맞춤 */
+    width: 100%;
+    margin: 32px auto 0;
+    /* 중앙 컬럼 아래쪽에 배치 */
     text-align: right;
-    font-size: 14px;
+    /* 텍스트만 오른쪽 정렬 */
     line-height: 1.5;
-    margin-top: 80px;
+    font-size: 14px;
 }
 
+/* 반응형(필요시 소폭 여백 조정) */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-}
-
-@media (max-width: 768px) {
-    .hero_title {
-        font-size: 24px;
+    .methodology_steps {
+        gap: 32px;
     }
 
-    .hero_subtitle {
-        font-size: 18px;
-        padding: 0 10px;
-    }
-}
-
-@media (max-width: 1024px) {
-    .about_layout {
-        flex-direction: column;
-        align-items: center;
+    .step {
+        gap: 16px;
     }
 
-    .sidebar {
-        width: 100%;
-        max-width: 400px;
+    .step_arrow {
+        width: 44px;
     }
 
-    .content_area {
-        width: 100%;
-    }
-
-    .content_body_flex {
-        flex-direction: column;
-        text-align: center;
+    .step_description,
+    .accuracy_note {
+        max-width: 90%;
     }
 }
