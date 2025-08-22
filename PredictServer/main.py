@@ -310,12 +310,17 @@ def _predict_latest_for_vsl(vsl_id: str) -> Dict[str, Any]:
     latest_tp = float(row_latest["time_point"])
     now_ts = datetime.now()
 
+    # ATD = 입력시간(현재시간) - actual_time_point
+    atd_dt = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
+
     if int(latest_tp) == 999:
         raise HTTPException(409, detail={"code": "arrived_ship", "port_id": _normalize_port_id(row_latest["port_id"])})
 
     if latest_tp < 3:
         return {
             "time_point": latest_tp,
+            "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
+            "atd": atd_dt,
             "lat": float(row_latest["lat"]),
             "lon": float(row_latest["lon"]),
             "predictions": []  # 저장 불가(모델 미실행)
@@ -331,6 +336,8 @@ def _predict_latest_for_vsl(vsl_id: str) -> Dict[str, Any]:
 
     return {
         "time_point": latest_tp,
+        "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
+        "atd": atd_dt,
         "lat": lat_c,
         "lon": lon_c,
         "used_time_point": used_current,
@@ -378,6 +385,8 @@ def predict_map_by_vsl(
 
     # ✅ < 3h (예측 안 하고 위치만)
     if latest_tp < 3:
+        # ATD = 입력시간(현재시간) - actual_time_point
+        atd_dt = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
         return {
             "vsl_id": vsl_id,
             "status": "timepoint less than 3hours",            # NEW: 상태 플래그
@@ -385,6 +394,7 @@ def predict_map_by_vsl(
                 "used_time_point": None,     # NEW: 스키마 통일
                 "actual_time_point": float(latest_tp),
                 "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
+                "atd": atd_dt,
                 "lat": float(row_latest["lat"]),
                 "lon": float(row_latest["lon"]),
                 "cog": float(row_latest["cog"]),
@@ -405,12 +415,16 @@ def predict_map_by_vsl(
     preds = [{"rank": i+1, "port_id": pid, "prob": _round_prob(p)} for i,(pid,p) in enumerate(top3_current)]
     preds = _attach_eta_to_preds(preds, actual_tp=latest_tp, now_ts=now_ts)
 
+    # ATD = 입력시간(현재시간) - actual_time_point
+    atd_dt_latest = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
+
     response: Dict[str, Any] = {
         "vsl_id": vsl_id,
         "latest": {
             "used_time_point": used_current,
             "actual_time_point": latest_tp,
             "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
+            "atd": atd_dt_latest,
             "lat": lat_c, "lon": lon_c, "cog": cog_c, "heading": heading_c,
             "predictions": preds
         }
@@ -423,9 +437,15 @@ def predict_map_by_vsl(
         used_tp, top3 = predict(float(row_t["lat"]), float(row_t["lon"]),
                                 float(row_t["cog"]), float(row_t["heading"]), int(t))
         preds_t = [{"rank": i+1, "port_id": pid, "prob": _round_prob(p)} for i,(pid,p) in enumerate(top3)]
+        # ATD_t = 해당 row의 입력시간(time_stamp) - actual_time_point
+        row_ts = pd.to_datetime(row_t["time_stamp"], errors="coerce")
+        atd_t = None
+        if pd.notna(row_ts):
+            atd_t = (row_ts - timedelta(hours=float(row_t["time_point"]))).strftime("%Y-%m-%d %H:%M:%S")
         timeline.append({
             "time_point": int(used_tp),
             "time_stamp": str(row_t["time_stamp"]),
+            "atd": atd_t,
             "actual_time_point": float(row_t["time_point"]),
             "lat": float(row_t["lat"]), "lon": float(row_t["lon"]),
             "cog": float(row_t["cog"]), "heading": float(row_t["heading"]),
@@ -498,5 +518,5 @@ def health_db():
 # cd C:\dima5_project\PredictServer
 # python -m uvicorn main:app --reload
 # http://127.0.0.1:8000/docs
-# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=193342ef-09db-3821-b67f-c4c0fa27418e
-# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=${vslIdToFetch}
+# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=193342ef-09db-3821-b67f-c4c0fa27418e # FastAPI 주소
+# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=${vslIdToFetch} # JS 주소
