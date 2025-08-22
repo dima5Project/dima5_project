@@ -143,14 +143,46 @@ function buildEnvPopupHTML(env) {
     if (!env) return "<div>데이터 없음</div>";
     const fmt = (v, f = 1, suf = '') => (v == null || isNaN(v)) ? '-' : (Number(v).toFixed(f) + suf);
 
+    // 각 데이터에 클래스를 부여하여 CSS로 스타일링할 수 있도록 합니다.
+    // <img src="/images/portpredictImages/marker.png" class="header-icon" alt="marker icon" />
     return `
-  <div style="font:12px/1.5 -apple-system,Segoe UI,Arial">
-    <div><strong>기온</strong> ${fmt(env.airTempC, 1, '°C')} ${env.emoji ?? ''}</div>
-    <div><strong>바람</strong> ${fmt(env.windMS, 1, ' m/s')} (${degToCompass8(env.windFromDeg)}에서)</div>
-    <div><strong>가시거리</strong> ${env.visibilityKm != null ? fmt(env.visibilityKm, 1, ' km') : '-'}</div>
-    <div><strong>파고</strong> ${fmt(env.waveHeightM, 1, ' m')} (${degToCompass8(env.waveFromDeg)})</div>
-    <div><strong>해류</strong> ${fmt(env.currentMS, 2, ' m/s')} (${degToCompass8(env.currentToDeg)})</div>
-    <div><strong>해수온도</strong> ${fmt(env.sstC, 1, ' °C')}</div>
+  <div class="marine-popup-content">
+    <div class="marine-popup-header">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="ico">
+            <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" fill="currentColor"/>
+        </svg>
+        <span class="title">사용자 현위치</span>
+    </div>
+    <div class="marine-popup-body">
+        <div class="marine-popup-row">
+            <span class="label">기온</span>
+            <span class="value data-air-temp">${fmt(env.airTempC, 1, '°C')}</span>
+            <span class="emoji data-emoji">${env.emoji ?? ''}</span>
+        </div>
+        <div class="marine-popup-row">
+            <span class="label">바람</span>
+            <span class="value data-wind-speed">${fmt(env.windMS, 1, ' m/s')}</span>
+            <span class="sub-value data-wind-deg">(${degToCompass8(env.windFromDeg)})</span>
+        </div>
+        <div class="marine-popup-row">
+            <span class="label">가시거리</span>
+            <span class="value data-visibility">${env.visibilityKm != null ? fmt(env.visibilityKm, 1, ' km') : '-'}</span>
+        </div>
+        <div class="marine-popup-row">
+            <span class="label">파고</span>
+            <span class="value data-wave-height">${fmt(env.waveHeightM, 1, ' m')}</span>
+            <span class="sub-value data-wave-deg">(${degToCompass8(env.waveFromDeg)})</span>
+        </div>
+        <div class="marine-popup-row">
+            <span class="label">해류</span>
+            <span class="value data-current-speed">${fmt(env.currentMS, 2, ' m/s')}</span>
+            <span class="sub-value data-current-deg">(${degToCompass8(env.currentToDeg)})</span>
+        </div>
+        <div class="marine-popup-row">
+            <span class="label">해수온도</span>
+            <span class="value data-sst">${fmt(env.sstC, 1, ' °C')}</span>
+        </div>
+    </div>
   </div>`;
 }
 
