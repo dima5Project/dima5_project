@@ -385,13 +385,18 @@ def predict_map_by_vsl(
 
     # ✅ < 3h (예측 안 하고 위치만)
     if latest_tp < 3:
-        # ATD = 입력시간(현재시간) - actual_time_point
+    # ATD = 입력시간(현재시간) - actual_time_point
         atd_dt = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
+
+        # ✅ PSO 항로 추가: 최신 행의 port_id 기준
+        pid_for_pso = _normalize_port_id(row_latest["port_id"])
+        pso_track_lt3 = _get_pso_route_for_port(pid_for_pso) if pid_for_pso else []
+
         return {
             "vsl_id": vsl_id,
-            "status": "timepoint less than 3hours",            # NEW: 상태 플래그
+            "status": "timepoint less than 3hours",
             "latest": {
-                "used_time_point": None,     # NEW: 스키마 통일
+                "used_time_point": None,
                 "actual_time_point": float(latest_tp),
                 "time_stamp": now_ts.strftime("%Y-%m-%d %H:%M:%S"),
                 "atd": atd_dt,
@@ -399,9 +404,13 @@ def predict_map_by_vsl(
                 "lon": float(row_latest["lon"]),
                 "cog": float(row_latest["cog"]),
                 "heading": float(row_latest["heading"]),
-                "predictions": []            # 그대로
+                "predictions": []
             },
-            "note": "tp<3h: only current position returned"  # 선택
+            # ✅ 여기서 PSO 항로를 tracks_topk로 제공
+            "tracks_topk": [
+                {"rank": 1, "port_id": pid_for_pso, "track": pso_track_lt3}
+            ] if pid_for_pso else [],
+            "note": "tp<3h: current position + PSO track (by latest port_id)"
         }
 
     # ✅ 모델 시점 결정
