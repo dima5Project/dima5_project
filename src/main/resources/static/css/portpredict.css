@@ -1587,6 +1587,25 @@ html {
     /* 핀 끝을 기준 */
 }
 
+/* KRPUS 마커 애니메이션 */
+@keyframes pulse-krpus {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.port-marker .krpus-inner-marker.is-pulsing {
+    animation: pulse-krpus 1.5s infinite ease-in-out;
+}
+
 /* Mapbox +/- 버튼 내부 아이콘 중앙 정렬 */
 .mapboxgl-ctrl-zoom-in,
 .mapboxgl-ctrl-zoom-out {

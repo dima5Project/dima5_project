@@ -452,6 +452,12 @@ $(function () {
 
         window.resetMapViewToInitialState();
 
+        if (typeof window.toggleKrpusPulseAnimation === 'function') {
+            window.toggleKrpusPulseAnimation(false); // 초기화 시 애니메이션 끄기
+        }
+        if (typeof window.toggleKrpusHover === 'function') {
+            window.toggleKrpusHover(true); // 초기화 시 KRPUS 호버 기능 활성화
+        }
         clearTimeline();
 
         $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
@@ -625,6 +631,38 @@ $(function () {
 
         window.dispatchEvent(new Event('resize'));
 
+        if (target === 'log') {
+            // 시점별 예측 타임라인 활성화 시
+            window.clearRoutesAndMarkers(); // 모든 경로 및 마커 지우기
+            window.drawRoutes(globalRoutesData.filter(r => r.rank === 1)); // Rank 1 경로만 그리기
+            const portsToShow = ['KRPUS'];
+            window.showSpecificPortMarkers(portsToShow); // KRPUS만 표시
+            if (window.markerInstanceByPortId && window.portCoordsById) {
+                const krpusMarker = window.markerInstanceByPortId.get('KRPUS');
+                const krpusCoords = window.portCoordsById.get('KRPUS');
+                if (krpusMarker && krpusCoords) {
+                    krpusMarker.setLngLat([krpusCoords.lng, krpusCoords.lat]);
+                }
+            }
+
+            window.toggleMarkersVisibility(false); // 현재 위치 마커 숨기기
+            window.toggleKrpusHover(false); // KRPUS 호버 기능 비활성화
+            window.toggleKrpusPulseAnimation(true); // KRPUS 애니메이션 시작
+        } else if (target === 'predict') {
+            // 차항지 예측 활성화 시
+            window.clearRoutesAndMarkers(); // 모든 경로 및 마커 지우기
+            // 현재 활성화된 예측 박스에 따라 경로 및 마커 다시 그리기
+            const activeRanks = [];
+            $('.box.is-active').each(function () {
+                const rank = $(this).hasClass('one') ? 1 : ($(this).hasClass('two') ? 2 : 3);
+                activeRanks.push(rank);
+            });
+            window.drawRoutes(globalRoutesData.filter(route => activeRanks.includes(route.rank)));
+            window.togglePortMarkersByRank(activeRanks);
+            window.toggleMarkersVisibility(true); // 현재 위치 마커 보이기
+            window.toggleKrpusHover(true); // KRPUS 호버 기능 활성화
+            window.toggleKrpusPulseAnimation(false); // KRPUS 애니메이션 중지
+        }
     });
 
 

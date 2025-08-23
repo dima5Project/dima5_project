@@ -34,6 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const markerElByPortId = new Map(); // portId -> DOM Element
     const portCoordsById = new Map();   // portId -> {lng, lat}
 
+    // Expose to window for portpredict.js
+    window.markerInstanceByPortId = new Map(); // New map for marker instances
+    window.portCoordsById = portCoordsById; // Expose existing map
+
     // 날씨/혼잡 토글
     let weatherVisible = false;
     let congestionVisible = false;
@@ -43,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '340px', offset: 35 });
     const busanHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '90px', offset: 35, anchor: 'bottom', className: 'busan-popup-container' });
     const marineHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, anchor: 'bottom', offset: 16, className: 'marine-popup' });
+
+    let isKrpusHoverEnabled = true; // KRPUS 마커 호버 기능 활성화 여부
 
     function safeLngLat(coords) {
         const a = Array.isArray(coords) ? Number(coords[0]) : NaN;
@@ -208,22 +214,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // New function for KRPUS marker
     function updateKRPUSMarkerIcon(useVesselIcon) {
+        console.log('updateKRPUSMarkerIcon called with useVesselIcon:', useVesselIcon);
         const krpusEl = markerElByPortId.get('KRPUS');
         if (!krpusEl) return;
+        console.log('KRPUS el in updateKRPUSMarkerIcon:', krpusEl);
+
+        // Ensure krpusEl is a clean container for Mapbox positioning
+        krpusEl.innerHTML = ''; // Clear any existing content
+        krpusEl.style.width = '24px'; // Fixed size for Mapbox positioning
+        krpusEl.style.height = '24px';
+        krpusEl.style.backgroundColor = 'transparent'; // Make it transparent
+        krpusEl.style.border = 'none'; // No border on the outer element
+        krpusEl.style.borderRadius = '0'; // No border-radius on the outer element
+        krpusEl.style.cursor = 'pointer';
+        krpusEl.style.boxSizing = 'border-box';
+        krpusEl.style.display = 'flex'; // Still flex to contain inner element
+        krpusEl.style.justifyContent = 'center';
+        krpusEl.style.alignItems = 'center';
+        krpusEl.style.zIndex = '9999'; // KRPUS 마커를 최상단으로
+
+        const innerWrapper = document.createElement('div');
+        innerWrapper.className = 'krpus-inner-marker'; // Add a class to target for animation
+        innerWrapper.style.width = '100%'; // Fill parent (krpusEl)
+        innerWrapper.style.height = '100%';
+        innerWrapper.style.display = 'flex';
+        innerWrapper.style.justifyContent = 'center';
+        innerWrapper.style.alignItems = 'center';
+        innerWrapper.style.position = 'relative'; // For animation
+        innerWrapper.style.transformOrigin = 'center center'; // For animation
+        innerWrapper.style.willChange = 'transform'; // For animation
 
         if (useVesselIcon) {
-            // Ensure it's a circle first, then add the image
-            krpusEl.innerHTML = ''; // Clear any existing content
-            krpusEl.style.width = '24px'; // Larger circle
-            krpusEl.style.height = '24px';
-            krpusEl.style.backgroundColor = '#FFFFFF'; // White background for the image
-            krpusEl.style.border = '2px solid #013895'; // Blue border
-            krpusEl.style.borderRadius = '50%';
-            krpusEl.style.cursor = 'pointer';
-            krpusEl.style.boxSizing = 'border-box';
-            krpusEl.style.display = 'flex'; // For centering the image
-            krpusEl.style.justifyContent = 'center';
-            krpusEl.style.alignItems = 'center';
+            // Apply circle and icon styles to innerWrapper
+            innerWrapper.style.backgroundColor = '#FFFFFF'; // White background for the image
+            innerWrapper.style.border = '2px solid #013895'; // Blue border
+            innerWrapper.style.borderRadius = '50%'; // Make it a circle
 
             const img = document.createElement('img');
             img.src = '/images/portpredictImages/vessel_Icon.png';
@@ -231,13 +256,19 @@ document.addEventListener("DOMContentLoaded", () => {
             img.style.width = '16px'; // Image size
             img.style.height = '16px';
             img.style.objectFit = 'contain';
-            krpusEl.appendChild(img);
+            innerWrapper.appendChild(img);
 
         } else {
-            // Revert to original circle style
-            const originalColor = krpusEl.dataset.color || '#013895';
-            applyCircleStyle(krpusEl, originalColor);
+            // Revert to original circle style on innerWrapper
+            const originalColor = krpusEl.dataset.color || '#013895'; // Use original color from dataset
+            innerWrapper.style.backgroundColor = originalColor;
+            innerWrapper.style.border = '2px solid #fff';
+            innerWrapper.style.borderRadius = '50%';
+            // Clear any image content if it was there
+            innerWrapper.innerHTML = '';
         }
+        krpusEl.appendChild(innerWrapper);
+        console.log('KRPUS el display after updateKRPUSMarkerIcon (vessel icon): After appendChild', krpusEl.style.display);
     }
 
     async function addPortMarkers() {
@@ -405,10 +436,25 @@ document.addEventListener("DOMContentLoaded", () => {
         allPortMarkers.push(busanMarker);
         markerElByPortId.set('KRPUS', busanEl);
         portCoordsById.set('KRPUS', { lng: 129.040, lat: 35.106 });
-        busanEl.addEventListener('mouseenter', () => {
+        window.markerInstanceByPortId.set('KRPUS', busanMarker); // Store the marker instance
+        busanEl.addEventListener('mouseenter', async () => {
+            if (!isKrpusHoverEnabled) return; // 호버 비활성화 시 동작 안 함
             busanHoverPopup.setLngLat([129.040, 35.106]).setHTML(`<div class="port-hover-card busan-hover-card"><div class="port-hover-card__hd">부산</div></div>`).addTo(map);
         });
-        busanEl.addEventListener('mouseleave', () => busanHoverPopup.remove());
+        busanEl.addEventListener('mouseleave', () => {
+            if (!isKrpusHoverEnabled) return; // 호버 비활성화 시 동작 안 함
+            busanHoverPopup.remove();
+        });
+        busanEl.addEventListener('click', () => {
+            if (typeof window.toggleKrpusPulseAnimation === 'function') {
+                window.toggleKrpusPulseAnimation(false);
+            }
+            console.log('KRPUS marker clicked. Animation stopped.');
+        });
+
+        console.log('KRPUS busanEl created:', busanEl);
+        console.log('KRPUS in markerElByPortId:', markerElByPortId.get('KRPUS'));
+        console.log('KRPUS marker display style after creation:', busanEl.style.display);
 
         isInitialStyleLoad = false;
     });
@@ -590,21 +636,25 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     window.showSpecificPortMarkers = function (portIdsToShow) {
+        console.log('showSpecificPortMarkers called with portIdsToShow:', portIdsToShow);
         const idSet = new Set(portIdsToShow);
         allPortMarkers.forEach(m => {
             const el = m.getElement();
             const id = el.dataset.portId;
             if (id) {
                 if (idSet.has(id)) {
-                    el.style.display = '';
+                    el.style.display = ''; // Show
                     if (id === 'KRPUS') {
+                        console.log('KRPUS marker found in showSpecificPortMarkers. Current display:', el.style.display, 'classList:', el.classList.value);
                         updateKRPUSMarkerIcon(true); // Vessel icon for KRPUS
+                        console.log('KRPUS marker display set to empty string. New display:', el.style.display);
                     } else {
                         // For other specific ports, use dest_icon.svg with rank 1 color
                         updatePortMarkerIcon(id, true, 1);
                     }
                 } else {
-                    el.style.display = 'none';
+                    el.style.display = 'none'; // Hide
+                    if (id === 'KRPUS') { console.log('KRPUS marker hidden in showSpecificPortMarkers.'); }
                 }
             }
         });
@@ -668,7 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         map.fitBounds(bounds, {
-            padding: { top: 130, bottom: 110, left: 450, right: 110 }, // 사이드바 고려하여 패딩 조정
+            padding: { top: 150, bottom: 110, left: 450, right: 110 }, // 사이드바 고려하여 패딩 조정
             maxZoom: 10,
             duration: 1000
         });
@@ -704,5 +754,25 @@ document.addEventListener("DOMContentLoaded", () => {
             zoom: 5.5,
             duration: 1000 // Optional: smooth transition
         });
+    };
+
+    window.toggleKrpusPulseAnimation = function (enable) {
+        console.log('toggleKrpusPulseAnimation called with enable:', enable);
+        const krpusEl = markerElByPortId.get('KRPUS');
+        if (krpusEl) {
+            const innerMarker = krpusEl.querySelector('.krpus-inner-marker');
+            if (innerMarker) { // Only apply to inner wrapper if it exists (i.e., vessel icon is active)
+                if (enable) {
+                    innerMarker.classList.add('is-pulsing');
+                } else {
+                    innerMarker.classList.remove('is-pulsing');
+                }
+                console.log('KRPUS innerMarker classList after animation toggle:', innerMarker.classList.value);
+            }
+        }
+    };
+
+    window.toggleKrpusHover = function (enable) {
+        isKrpusHoverEnabled = enable;
     };
 });
