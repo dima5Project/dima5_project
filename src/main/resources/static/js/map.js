@@ -206,6 +206,40 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // New function for KRPUS marker
+    function updateKRPUSMarkerIcon(useVesselIcon) {
+        const krpusEl = markerElByPortId.get('KRPUS');
+        if (!krpusEl) return;
+
+        if (useVesselIcon) {
+            // Ensure it's a circle first, then add the image
+            krpusEl.innerHTML = ''; // Clear any existing content
+            krpusEl.style.width = '24px'; // Larger circle
+            krpusEl.style.height = '24px';
+            krpusEl.style.backgroundColor = '#FFFFFF'; // White background for the image
+            krpusEl.style.border = '2px solid #013895'; // Blue border
+            krpusEl.style.borderRadius = '50%';
+            krpusEl.style.cursor = 'pointer';
+            krpusEl.style.boxSizing = 'border-box';
+            krpusEl.style.display = 'flex'; // For centering the image
+            krpusEl.style.justifyContent = 'center';
+            krpusEl.style.alignItems = 'center';
+
+            const img = document.createElement('img');
+            img.src = '/images/portpredictImages/vessel_Icon.png';
+            img.alt = 'Vessel Icon';
+            img.style.width = '16px'; // Image size
+            img.style.height = '16px';
+            img.style.objectFit = 'contain';
+            krpusEl.appendChild(img);
+
+        } else {
+            // Revert to original circle style
+            const originalColor = krpusEl.dataset.color || '#013895';
+            applyCircleStyle(krpusEl, originalColor);
+        }
+    }
+
     async function addPortMarkers() {
         const geojson = await fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => {
             if (!r.ok) throw new Error('ports.geojson 로드 실패');
@@ -495,7 +529,6 @@ document.addEventListener("DOMContentLoaded", () => {
             el.style.display = 'flex';
             el.style.justifyContent = 'center';
             el.style.alignItems = 'center';
-            el.style.boxShadow = '0 0 0 2px white';
             el.style.cursor = 'pointer';
 
             const arrow = document.createElement('div');
@@ -541,16 +574,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.togglePortMarkersByRank = function (ranksToKeep) {
         const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
-        portIdsToKeep.add('KRPUS');
+        const isRank1Active = ranksToKeep.includes(1); // Check if Rank 1 is among the active ranks
 
         for (const [portId, el] of markerElByPortId.entries()) {
-            if (portIdsToKeep.has(portId)) {
+            if (portId === 'KRPUS') {
+                el.style.display = ''; // KRPUS is always visible
+                updateKRPUSMarkerIcon(isRank1Active); // Apply vessel icon if rank 1 is active, else circle
+            } else if (portIdsToKeep.has(portId)) {
                 el.style.display = '';
-                if (portId !== 'KRPUS') {
-                    updatePortMarkerIcon(portId, true, globalPredictions.find(p => p.port_id === portId)?.rank); // Pass rank
-                }
+                updatePortMarkerIcon(portId, true, globalPredictions.find(p => p.port_id === portId)?.rank); // Apply dest_icon.svg for other ranked ports
             } else {
-                el.style.display = 'none';
+                el.style.display = 'none'; // Hide other ports
             }
         }
     };
@@ -575,8 +609,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const el = m.getElement();
             el.style.display = '';
             const portId = el.dataset.portId;
-            if (portId) {
-                updatePortMarkerIcon(portId, false);
+            if (portId === 'KRPUS') {
+                updateKRPUSMarkerIcon(false); // Revert KRPUS to circle
+            } else if (portId) {
+                updatePortMarkerIcon(portId, false); // Revert other ports to circle
             }
         });
     };
@@ -621,7 +657,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         map.fitBounds(bounds, {
-            padding: { top: 100, bottom: 100, left: 450, right: 100 }, // 사이드바 고려하여 패딩 조정
+            padding: { top: 130, bottom: 110, left: 450, right: 110 }, // 사이드바 고려하여 패딩 조정
             maxZoom: 10,
             duration: 1000
         });
