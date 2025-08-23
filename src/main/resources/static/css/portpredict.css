@@ -1463,8 +1463,8 @@ html {
 
 /* 수준별 색상, 크기, 그림자 효과 */
 .port-marker .cong-ring.cong--high {
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     border-color: rgba(239, 68, 68, 0.3);
     /* 빨간색, 투명도 50% */
     box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.7);
@@ -1472,8 +1472,8 @@ html {
 
 /* 매우 혼잡  */
 .port-marker .cong-ring.cong--mid {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-color: rgba(245, 158, 11, 0.3);
     /* 주황색, 투명도 50% */
     box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.7);

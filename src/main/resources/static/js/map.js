@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
         center: [127.05, 33.13],
-        zoom: 5,
+        zoom: 5.5,
         scrollZoom: true,
         attributionControl: false
     });
@@ -133,6 +133,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 ring.style.display = congestionVisible ? '' : 'none';
                 el.appendChild(ring);
             });
+
+            // KRPUS에 대한 가짜 주황색 원 추가
+            const krpusEl = markerElByPortId.get('KRPUS');
+            if (krpusEl) {
+                // 다른 데이터에 의해 KRPUS 링이 생성되었을 수 있으므로, 일단 모두 제거
+                krpusEl.querySelectorAll('.cong-ring').forEach(n => n.remove());
+                const krpusRing = document.createElement('span');
+                krpusRing.className = 'cong-ring cong--mid'; // '혼잡' 수준(주황색)
+                krpusRing.style.display = congestionVisible ? '' : 'none';
+                krpusEl.appendChild(krpusRing);
+            }
         } catch (e) { console.error(e); }
     }
 
