@@ -624,8 +624,8 @@ $(function () {
 
         const type = btn.dataset.type;
 
-        // congestion, weather 버튼은 map.js에서 별도 처리하므로 제외
-        if (type === 'congestion' || type === 'weather') {
+        // congestion, weather, style 버튼은 map.js에서 별도 처리하므로 제외
+        if (type === 'congestion' || type === 'weather' || type === 'style') {
             return;
         }
 
@@ -662,7 +662,7 @@ $(function () {
         const $startRows = $('<div class="voy-rows"></div>');
         // 출발항 명
         $startRows.append(`<div class="voy-label">KRPUS</div>`);                                              // 수정해라
-        const $startRow = $(`<div class="voy-row"><div class="depart_pillbtn">ATD</div><div class="voy-chip">${latest.departure_time}</div></div>`);
+        const $startRow = $(`<div class="voy-row"><div class="depart_pillbtn">ATD</div><div class="voy-chip">${latest.atd}</div></div>`);
         $startRows.append($startRow);
         $startItem.append($startNode);
         $startItem.append($startRows);

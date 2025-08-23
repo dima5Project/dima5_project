@@ -1255,27 +1255,6 @@ html {
     font-weight: 700;
 }
 
-/* 혼잡도 뱃지 (원활 > 보통 > 매우 혼잡) */
-.cong-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 4.8px;
-}
-
-.cong--low {
-    background: #2ecc71;
-}
-
-.cong--mid {
-    background: #f1c40f;
-}
-
-.cong--high {
-    background: #e74c3c;
-}
-
 /* 작은 보조 텍스트 "(S)",
  "(UTC+3)" */
 .subtle {
@@ -1429,6 +1408,27 @@ html {
     transform: scale(1.3);
 }
 
+/* 혼잡도 뱃지 (원활 > 보통 > 매우 혼잡) */
+.cong-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4.8px;
+}
+
+.cong--low {
+    background: #2ecc71;
+}
+
+.cong--mid {
+    background: #f1c40f;
+}
+
+.cong--high {
+    background: #e74c3c;
+}
+
 /* 혼잡도별 색상 정의 */
 .port-congestion-label {
     font-size: 10px;
@@ -1450,33 +1450,42 @@ html {
 /* (기존 margin-left/-top로 억지 보정하던 것 전부 제거) */
 .port-marker .cong-ring {
     position: absolute;
+    top: 50%;
     left: 50%;
-    bottom: 0;
-    /* 핀 끝(=anchor: bottom) 기준 */
-    width: 42px;
-    height: 42px;
-    transform: translate(-50%, -85%);
-    /* 핀 끝에서 위로 띄우기 */
+    transform: translate(-50%, -50%);
     border-radius: 999px;
     box-sizing: border-box;
     pointer-events: none;
     border: 3px solid;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .15));
+    transition: width 0.2s ease, height 0.2s ease, box-shadow 0.2s ease;
+    /* 부드러운 전환 효과 */
 }
 
-/* 수준별 색상 */
+/* 수준별 색상, 크기, 그림자 효과 */
 .port-marker .cong-ring.cong--high {
-    border-color: #ef4444;
+    width: 50px;
+    height: 50px;
+    border-color: rgba(239, 68, 68, 0.3);
+    /* 빨간색, 투명도 50% */
+    box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.7);
 }
 
 /* 매우 혼잡  */
 .port-marker .cong-ring.cong--mid {
-    border-color: #f59e0b;
+    width: 40px;
+    height: 40px;
+    border-color: rgba(245, 158, 11, 0.3);
+    /* 주황색, 투명도 50% */
+    box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.7);
 }
 
 /* 혼잡   */
 .port-marker .cong-ring.cong--low {
-    border-color: #10b981;
+    width: 30px;
+    height: 30px;
+    border-color: rgba(16, 185, 129, 0.3);
+    /* 초록색, 투명도 50% */
+    box-shadow: 0 0 8px 1px rgba(16, 185, 129, 0.7);
 }
 
 /* 날씨 이모지: 핀 왼쪽에 고정 */
@@ -1493,6 +1502,8 @@ html {
     line-height: 1;
     user-select: none;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .25));
+    text-shadow: 0 0 3px black;
+    /* 아이콘 가독성을 위한 그림자 */
 }
 
 /* map +/- btn 적용, 맨 아래 권장 */
