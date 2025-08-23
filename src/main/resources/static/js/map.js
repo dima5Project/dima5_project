@@ -592,9 +592,20 @@ document.addEventListener("DOMContentLoaded", () => {
     window.showSpecificPortMarkers = function (portIdsToShow) {
         const idSet = new Set(portIdsToShow);
         allPortMarkers.forEach(m => {
-            const id = m.getElement().dataset.portId;
+            const el = m.getElement();
+            const id = el.dataset.portId;
             if (id) {
-                m.getElement().style.display = idSet.has(id) ? '' : 'none';
+                if (idSet.has(id)) {
+                    el.style.display = '';
+                    if (id === 'KRPUS') {
+                        updateKRPUSMarkerIcon(true); // Vessel icon for KRPUS
+                    } else {
+                        // For other specific ports, use dest_icon.svg with rank 1 color
+                        updatePortMarkerIcon(id, true, 1);
+                    }
+                } else {
+                    el.style.display = 'none';
+                }
             }
         });
     };
@@ -666,6 +677,26 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('.sidebar__btn.primary').addEventListener('click', () => {
         setTimeout(fitMapViewToTopPorts, 500);
     });
+
+    window.fitMapViewToSpecificPorts = function (portIds) {
+        if (!portCoordsById || portIds.length === 0) return;
+
+        const bounds = new mapboxgl.LngLatBounds();
+        portIds.forEach(portId => {
+            const coords = portCoordsById.get(portId);
+            if (coords) {
+                bounds.extend([coords.lng, coords.lat]);
+            }
+        });
+
+        if (bounds.isEmpty()) return; // No valid coordinates found
+
+        map.fitBounds(bounds, {
+            padding: { top: 130, bottom: 110, left: 450, right: 110 }, // Adjust padding as needed
+            maxZoom: 10,
+            duration: 1000
+        });
+    };
 
     window.resetMapViewToInitialState = function () {
         map.flyTo({

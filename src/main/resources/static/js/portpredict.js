@@ -187,6 +187,9 @@ $(function () {
                         if (typeof window.showSpecificPortMarkers === 'function') {
                             window.showSpecificPortMarkers(['KRPUS', detail.port_id]);
                         }
+                        if (typeof window.fitMapViewToSpecificPorts === 'function') {
+                            window.fitMapViewToSpecificPorts(['KRPUS', detail.port_id]);
+                        }
 
                         // 저장 버튼 비활성화
                         $('.sidebar__btn.save').off('click').on('click', function (e) {
