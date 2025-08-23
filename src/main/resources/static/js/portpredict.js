@@ -447,6 +447,8 @@ $(function () {
 
         window.showAllPortMarkers();
 
+        window.resetMapViewToInitialState();
+
         clearTimeline();
 
         $('.sidebar__input').prop('disabled', false).removeAttr('aria-disabled').removeClass('is-locked');
