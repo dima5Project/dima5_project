@@ -151,6 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
+    map.on('load', function () {
+        const zoomControl = document.querySelector('.mapboxgl-ctrl-zoom-in').parentElement;
+        if (zoomControl) {
+            zoomControl.classList.add('map-control-with-bg');
+        }
+    });
+
     // 항구 마커 생성
     function makeCircleMarker({ color = '#013895' } = {}) {
         const el = document.createElement('div');

@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script defer th:src="@{/js/header.js}"></script>
 
+    <!-- faq frament -->
+    <link rel="stylesheet" th:href="@{/css/faq.css}">
+    <script defer th:src="@{/js/faq.js}"></script>
+
     <!-- jQuery -->
     <script th:src="@{/js/jquery-3.7.1.js}"></script>
 
@@ -284,6 +288,7 @@
 
     <script src="/js/env-api.js"></script> <!-- Open-Meteo util -->
     <script src="/js/vessel-map.js"></script> <!-- 선박/팝업 -->
+    <div th:replace="~{fragment/faq :: widget}"></div> <!-- faq fragment -->
 </body>
 
 </html>
