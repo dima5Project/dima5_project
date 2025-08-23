@@ -1507,13 +1507,18 @@ html {
 }
 
 /* map +/- btn 적용, 맨 아래 권장 */
+/* 우상단: 줌 컨트롤과 라인 맞추기 */
+/* map +/- btn 적용, 맨 아래 권장 */
 .mapboxgl-ctrl-bottom-right {
-    margin: 0 10px 5px 0;
+    bottom: 70px;
+    /* top: 230px; */
+    right: 13px;
 }
 
 .mapboxgl-ctrl {
     z-index: 20;
 }
+
 
 /* map box 저작권 모양 */
 .mapboxgl-ctrl-attrib button:focus {
@@ -1580,4 +1585,15 @@ html {
     transform: scale(1.06);
     transform-origin: 50% 100%;
     /* 핀 끝을 기준 */
+}
+
+/* Mapbox +/- 버튼 내부 아이콘 중앙 정렬 */
+.mapboxgl-ctrl-zoom-in,
+.mapboxgl-ctrl-zoom-out {
+    display: flex !important;
+    /* flexbox 레이아웃 강제 */
+    justify-content: center !important;
+    /* 가로 중앙 */
+    align-items: center !important;
+    /* 세로 중앙 */
 }

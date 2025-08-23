@@ -187,6 +187,9 @@ $(function () {
                         if (typeof window.showSpecificPortMarkers === 'function') {
                             window.showSpecificPortMarkers(['KRPUS', detail.port_id]);
                         }
+                        if (typeof window.fitMapViewToSpecificPorts === 'function') {
+                            window.fitMapViewToSpecificPorts(['KRPUS', detail.port_id]);
+                        }
 
                         // 저장 버튼 비활성화
                         $('.sidebar__btn.save').off('click').on('click', function (e) {
@@ -256,28 +259,54 @@ $(function () {
 
             routesData.forEach(topRouteData => {
                 const trackPoints = topRouteData.track || [];
-                if (trackPoints.length > 0) {
-                    const coordinates = trackPoints.map(point => [point.lon, point.lat]);
+                if (trackPoints.length === 0) return;
+
+                const color = topRouteData.rank === 2 ? '#4F6F52' : topRouteData.rank === 3 ? '#A9A9A9' : '#007cbf';
+                const name = '예상 항로 (Top ' + topRouteData.rank + ')';
+                // Ensure all coordinates are numbers
+                const coordinates = trackPoints.map(point => [Number(point.lon), Number(point.lat)]);
+
+                if (topRouteData.rank === 1) {
+                    top1RouteData = topRouteData;
+                    // Ensure the current position coordinates are numbers
+                    const currentPos = [Number(resp.latest.lon), Number(resp.latest.lat)];
+
+                    let closestIndex = 0;
+                    let minDistance = Infinity;
+                    coordinates.forEach((p, i) => {
+                        const dist = Math.pow(p[0] - currentPos[0], 2) + Math.pow(p[1] - currentPos[1], 2);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            closestIndex = i;
+                        }
+                    });
+
+                    const pastCoordinates = coordinates.slice(0, closestIndex + 1);
+                    pastCoordinates.push(currentPos);
+
+                    const futureCoordinates = [currentPos, ...coordinates.slice(closestIndex + 1)];
+
+                    if (departurePort) {
+                        pastCoordinates.unshift([departurePort.lon, departurePort.lat]);
+                    }
+
+                    routes.push({
+                        route_name: name,
+                        past_coordinates: pastCoordinates,
+                        future_coordinates: futureCoordinates,
+                        color: color,
+                        rank: topRouteData.rank
+                    });
+                } else { // For ranks 2 and 3
                     if (departurePort) {
                         coordinates.unshift([departurePort.lon, departurePort.lat]);
                     }
-                    let color = '#007cbf';
-                    if (topRouteData.rank === 2) {
-                        color = '#4F6F52';
-                    } else if (topRouteData.rank === 3) {
-                        color = '#A9A9A9';
-                    }
-                    const name = `예상 항로 (Top ${topRouteData.rank})`;
                     routes.push({
                         route_name: name,
                         coordinates: coordinates,
                         color: color,
                         rank: topRouteData.rank
                     });
-
-                    if (topRouteData.rank === 1) {
-                        top1RouteData = topRouteData;
-                    }
                 }
             });
 
@@ -289,29 +318,11 @@ $(function () {
 
             const validMarkers = [];
 
-            if (top1RouteData && top1RouteData.track && top1RouteData.track.length > 0) {
-                const firstPoint = top1RouteData.track[0];
-                validMarkers.push({
-                    coordinates: [firstPoint.lon, firstPoint.lat],
-                    description: `예상 항로 시작점 (Time 0)`
-                });
-            }
-
-            if (resp.timeline && resp.timeline.length > 0) {
-                resp.timeline.forEach(timeData => {
-                    if (timeData.lat && timeData.lon) {
-                        validMarkers.push({
-                            coordinates: [timeData.lon, timeData.lat],
-                            description: `예측 시점: ${timeData.time_point}h`
-                        });
-                    }
-                });
-            }
-
             if (resp.latest && resp.latest.lat && resp.latest.lon) {
                 lastMarker = {
                     coordinates: [resp.latest.lon, resp.latest.lat],
-                    description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`
+                    description: `현재 시점 (출항 후 ${resp.latest.time_point}시간)`,
+                    cog: resp.latest.cog
                 };
             }
 
@@ -438,6 +449,8 @@ $(function () {
         window.clearRoutesAndMarkers();
 
         window.showAllPortMarkers();
+
+        window.resetMapViewToInitialState();
 
         clearTimeline();
 
