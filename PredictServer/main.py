@@ -222,10 +222,37 @@ def _nearest_model_tp(tp_float: float) -> int:
     return TIMEPOINTS[-1]
 
 def _pick_row_for_t(sub: pd.DataFrame, t: int) -> pd.Series:
+    """
+    run_reports 스타일:
+      - time_point == t가 있으면 그 중 '가장 늦은 timestamp'
+      - 없으면 time_point <= t 중 '가장 늦은 timestamp'
+      - 전혀 없으면 t와 가장 가까운 time_point로 fallback (동률이면 늦은 timestamp)
+    """
+    if sub.empty:
+        raise HTTPException(404, "No rows to pick")
+
     s = sub["time_point"].astype(float)
-    mask = s <= t
-    idx = s[mask].idxmax() if mask.any() else (s.sub(t).abs()).idxmin()
-    return sub.loc[idx]
+    ts_col = "time_stamp" if "time_stamp" in sub.columns else None
+
+    df = sub.copy()
+    if ts_col:
+        df[ts_col] = pd.to_datetime(df[ts_col], errors="coerce")
+        df = df.sort_values(ts_col)
+
+    exact = df[s == float(t)]
+    if not exact.empty:
+        return exact.iloc[-1]
+
+    le = df[s <= float(t)]
+    if not le.empty:
+        t_sel = le["time_point"].astype(float).max()
+        return df[df["time_point"].astype(float) == t_sel].iloc[-1]
+
+    # 정말 없으면 diff 기준으로 가장 가까운 것
+    df["__diff__"] = (s - float(t)).abs()
+    picked = df.sort_values(["__diff__"] + ([ts_col] if ts_col else [])).iloc[0]
+    df.drop(columns="__diff__", errors="ignore", inplace=True)
+    return picked
 
 def _round_prob(v: float, nd: int=6) -> float:
     try: return round(float(v), nd)
@@ -299,14 +326,44 @@ def _attach_eta_to_preds(preds: List[Dict[str, Any]], actual_tp: float, now_ts: 
 # =========================
 # 9) "현재 시점" 예측만 계산 (저장에 재사용)
 # =========================
+def _subset_for_vsl_with_major_port(df_tp: pd.DataFrame, vsl_id: str) -> pd.DataFrame:
+    """
+    run_reports 스타일 반영:
+      - 동일 vsl_id 서브셋 확보
+      - port_name 컬럼이 있으면 가장 많이 등장한 port_name으로 필터(없으면 통과)
+    """
+    sub_all = df_tp[df_tp["vsl_id"].apply(_normalize_vsl_id) == _normalize_vsl_id(vsl_id)]
+    if sub_all.empty:
+        return sub_all
+    if "port_name" in sub_all.columns:
+        major_port = sub_all["port_name"].value_counts().idxmax()
+        return sub_all[sub_all["port_name"] == major_port].copy()
+    return sub_all.copy()
+
+def _latest_row_by_tp_then_ts(sub_tp: pd.DataFrame) -> pd.Series:
+    """
+    최대 time_point를 구한 뒤, 그 time_point 내에서 timestamp가 가장 늦은 행을 선택.
+    """
+    if sub_tp.empty:
+        raise HTTPException(404, "No rows for latest selection")
+    tp_max = float(sub_tp["time_point"].astype(float).max())
+    cand = sub_tp[sub_tp["time_point"].astype(float) == tp_max].copy()
+    if "time_stamp" in cand.columns:
+        cand["time_stamp"] = pd.to_datetime(cand["time_stamp"], errors="coerce")
+        cand = cand.sort_values("time_stamp")
+    return cand.iloc[-1]
+
 def _predict_latest_for_vsl(vsl_id: str) -> Dict[str, Any]:
     """GET과 동일한 규칙으로 '현재 시점' 예측만 계산."""
     df_tp = _load_df_tp()
-    sub_tp = df_tp[df_tp["vsl_id"].apply(_normalize_vsl_id) == _normalize_vsl_id(vsl_id)]
+
+    # run_reports와 동일하게 vsl_id + (선택)major port_name 필터
+    sub_tp = _subset_for_vsl_with_major_port(df_tp, vsl_id)
     if sub_tp.empty:
         raise HTTPException(404, f"No rows in ais_timepoint.csv for vsl_id={vsl_id}")
 
-    row_latest = sub_tp.loc[sub_tp["time_point"].idxmax()]
+    # 최신 행 선택: max(time_point) 안에서 가장 늦은 timestamp
+    row_latest = _latest_row_by_tp_then_ts(sub_tp)
     latest_tp = float(row_latest["time_point"])
     now_ts = datetime.now()
 
@@ -360,13 +417,20 @@ def predict_map_by_vsl(
         - timeline: 현재 시점 제외
         - 항로: rank1=route.csv, rank2/3=pso_route.csv
         - ETA: latest.predictions rank1~3에만 부착
+
+    run_reports 정합성 개선:
+        - 동일 vsl에 대해 가장 많이 등장한 port_name으로 1차 필터(있을 때만)
+        - 시점별 행 선택은 '가장 늦은 timestamp' 기준으로 동일화
     """
     df_tp = _load_df_tp()
-    sub_tp = df_tp[df_tp["vsl_id"].apply(_normalize_vsl_id) == _normalize_vsl_id(vsl_id)]
+
+    # vsl_id + (선택)major port_name 필터
+    sub_tp = _subset_for_vsl_with_major_port(df_tp, vsl_id)
     if sub_tp.empty:
         raise HTTPException(404, f"No rows in ais_timepoint.csv for vsl_id={vsl_id}")
 
-    row_latest = sub_tp.loc[sub_tp["time_point"].idxmax()]
+    # 최신 행 = max(tp) 내에서 가장 늦은 timestamp
+    row_latest = _latest_row_by_tp_then_ts(sub_tp)
     latest_tp = float(row_latest["time_point"])
     now_ts = datetime.now()
 
@@ -385,10 +449,7 @@ def predict_map_by_vsl(
 
     # ✅ < 3h (예측 안 하고 위치만)
     if latest_tp < 3:
-    # ATD = 입력시간(현재시간) - actual_time_point
         atd_dt = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
-
-        # ✅ PSO 항로 추가: 최신 행의 port_id 기준
         pid_for_pso = _normalize_port_id(row_latest["port_id"])
         pso_track_lt3 = _get_pso_route_for_port(pid_for_pso) if pid_for_pso else []
 
@@ -406,14 +467,13 @@ def predict_map_by_vsl(
                 "heading": float(row_latest["heading"]),
                 "predictions": []
             },
-            # ✅ 여기서 PSO 항로를 tracks_topk로 제공
             "tracks_topk": [
                 {"rank": 1, "port_id": pid_for_pso, "track": pso_track_lt3}
             ] if pid_for_pso else [],
             "note": "tp<3h: current position + PSO track (by latest port_id)"
         }
 
-    # ✅ 모델 시점 결정
+    # ✅ 모델 시점 결정 (현 구조 유지)
     snap_tp = 29 if latest_tp >= 30 else _nearest_model_tp(latest_tp)
 
     # latest predictions + ETA
@@ -424,7 +484,6 @@ def predict_map_by_vsl(
     preds = [{"rank": i+1, "port_id": pid, "prob": _round_prob(p)} for i,(pid,p) in enumerate(top3_current)]
     preds = _attach_eta_to_preds(preds, actual_tp=latest_tp, now_ts=now_ts)
 
-    # ATD = 입력시간(현재시간) - actual_time_point
     atd_dt_latest = (now_ts - timedelta(hours=float(latest_tp))).strftime("%Y-%m-%d %H:%M:%S")
 
     response: Dict[str, Any] = {
@@ -439,14 +498,13 @@ def predict_map_by_vsl(
         }
     }
 
-    # timeline
+    # timeline (스냅 시점 미만)
     timeline: List[Dict[str, Any]] = []
     for t in [x for x in TIMEPOINTS if x < snap_tp]:
         row_t = _pick_row_for_t(sub_tp, t)
         used_tp, top3 = predict(float(row_t["lat"]), float(row_t["lon"]),
                                 float(row_t["cog"]), float(row_t["heading"]), int(t))
         preds_t = [{"rank": i+1, "port_id": pid, "prob": _round_prob(p)} for i,(pid,p) in enumerate(top3)]
-        # ATD_t = 해당 row의 입력시간(time_stamp) - actual_time_point
         row_ts = pd.to_datetime(row_t["time_stamp"], errors="coerce")
         atd_t = None
         if pd.notna(row_ts):
@@ -508,12 +566,20 @@ def save_by_vsl(
         }
     except pymysql.err.IntegrityError as e:
         msg = e.args[1] if len(e.args) > 1 else str(e)
-        # (예) 1452: Cannot add or update a child row: a foreign key constraint fails
         raise HTTPException(400, f"Integrity error: {msg}")
 
 # =========================
-# 12) (옵션) DB 헬스체크
+# 12) (옵션) 캐시 리로드 & DB 헬스체크
 # =========================
+@app.post("/reload_data")
+def reload_data():
+    global _DF_TP_CACHE, _DF_ROUTE_VSL_CACHE, _DF_PSO_PORT_CACHE, _PORT_MEDIAN_CACHE
+    _DF_TP_CACHE = None
+    _DF_ROUTE_VSL_CACHE = None
+    _DF_PSO_PORT_CACHE = None
+    _PORT_MEDIAN_CACHE = None
+    return {"ok": True, "msg": "Caches cleared. Data will be reloaded on next request."}
+
 @app.get("/health/db")
 def health_db():
     try:
@@ -527,5 +593,4 @@ def health_db():
 # cd C:\dima5_project\PredictServer
 # python -m uvicorn main:app --reload
 # http://127.0.0.1:8000/docs
-# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=193342ef-09db-3821-b67f-c4c0fa27418e # FastAPI 주소
-# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=${vslIdToFetch} # JS 주소
+# http://127.0.0.1:8000/predict_map_by_vsl?vsl_id=193342ef-09db-3821-b67f-c4c0fa27418e
