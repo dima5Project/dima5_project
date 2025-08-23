@@ -27,8 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const routeLayerId_rank3 = 'route-layer-rank3';
     const markerSourceId = 'marker-source';
     const markerLayerId = 'marker-layer';
-    const lastMarkerSourceId = 'last-marker-source';
-    const lastMarkerLayerId = 'last-marker-layer';
+    let lastPositionMarker = null; // 현재 위치 마커 DOM 요소를 저장할 변수
 
     // 항구 마커(지도 위 DOM Marker) 관리
     const allPortMarkers = [];
@@ -319,7 +318,17 @@ document.addEventListener("DOMContentLoaded", () => {
             paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] }
         });
 
-        // Rank 1 (top layer)
+        // Rank 1 - Solid (past route)
+        map.addSource('route-source-rank1-solid', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({
+            id: 'route-layer-rank1-solid',
+            type: 'line',
+            source: 'route-source-rank1-solid',
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': ['get', 'color'], 'line-width': 4 }
+        });
+
+        // Rank 1 (dotted-future)
         map.addSource(routeSourceId_rank1, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({
             id: routeLayerId_rank1, type: 'line', source: routeSourceId_rank1,
@@ -331,12 +340,6 @@ document.addEventListener("DOMContentLoaded", () => {
         map.addLayer({
             id: markerLayerId, type: 'circle', source: markerSourceId,
             paint: { 'circle-radius': 10, 'circle-color': '#e6ebf0', 'circle-stroke-width': 1.5, 'circle-stroke-color': '#e6ebf0' }
-        });
-
-        map.addSource(lastMarkerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-        map.addLayer({
-            id: lastMarkerLayerId, type: 'circle', source: lastMarkerSourceId,
-            paint: { 'circle-radius': 8, 'circle-color': '#00bfff', 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' }
         });
 
         // 항구 마커 DOM으로 추가(★ 제자리 고정)
@@ -360,22 +363,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         busanEl.addEventListener('mouseleave', () => busanHoverPopup.remove());
 
-        // 최신점 hover(환경정보)
-        let hoverTimeout;
-        map.on('mouseenter', lastMarkerLayerId, async (e) => {
-            clearTimeout(hoverTimeout);
-            const f = e.features && e.features[0];
-            if (!f) return;
-            const [lon, lat] = f.geometry.coordinates;
-            const targetISO = (typeof window.lastVesselTsISO === 'string' && window.lastVesselTsISO) ? window.lastVesselTsISO : new Date().toISOString();
-            try {
-                const env = await window.ajaxEnvAt(lat, lon, targetISO);
-                const html = window.buildEnvPopupHTML(env);
-                marineHoverPopup.setLngLat([lon, lat]).setHTML(html).addTo(map);
-            } catch (err) { console.error('hover env fail', err); }
-        });
-        map.on('mouseleave', lastMarkerLayerId, () => { marineHoverPopup.remove(); });
-
         // ▼ [추가] 초기 로드가 완료되었음을 플래그로 표시
         isInitialStyleLoad = false;
     });
@@ -397,15 +384,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // Rank 2
         map.addSource(routeSourceId_rank2, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: routeLayerId_rank2, type: 'line', source: routeSourceId_rank2, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
-        // Rank 1
+        // Rank 1 - Solid
+        map.addSource('route-source-rank1-solid', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ id: 'route-layer-rank1-solid', type: 'line', source: 'route-source-rank1-solid', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4 } });
+        // Rank 1 - Dotted
         map.addSource(routeSourceId_rank1, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: routeLayerId_rank1, type: 'line', source: routeSourceId_rank1, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': 4, 'line-dasharray': [0.5, 2.5] } });
         // Markers
         map.addSource(markerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         map.addLayer({ id: markerLayerId, type: 'circle', source: markerSourceId, paint: { 'circle-radius': 10, 'circle-color': '#e6ebf0', 'circle-stroke-width': 1.5, 'circle-stroke-color': '#e6ebf0' } });
-        // Last Marker
-        map.addSource(lastMarkerSourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-        map.addLayer({ id: lastMarkerLayerId, type: 'circle', source: lastMarkerSourceId, paint: { 'circle-radius': 8, 'circle-color': '#00bfff', 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } });
 
         // 2. DOM 마커들 다시 추가
         allPortMarkers.forEach(marker => marker.addTo(map));
@@ -429,19 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // 5. 기타 설정 및 이벤트 리스너 복원
         map.setProjection('mercator');
         map.getStyle().layers.filter(l => l.type === 'symbol' && (l.id.includes('poi-label') || l.id.includes('harbor-label'))).forEach(l => map.setLayoutProperty(l.id, 'visibility', 'none'));
-        map.on('mouseenter', lastMarkerLayerId, async (e) => {
-            clearTimeout(hoverTimeout);
-            const f = e.features && e.features[0];
-            if (!f) return;
-            const [lon, lat] = f.geometry.coordinates;
-            const targetISO = (typeof window.lastVesselTsISO === 'string' && window.lastVesselTsISO) ? window.lastVesselTsISO : new Date().toISOString();
-            try {
-                const env = await window.ajaxEnvAt(lat, lon, targetISO);
-                const html = window.buildEnvPopupHTML(env);
-                marineHoverPopup.setLngLat([lon, lat]).setHTML(html).addTo(map);
-            } catch (err) { console.error('hover env fail', err); }
-        });
-        map.on('mouseleave', lastMarkerLayerId, () => { marineHoverPopup.remove(); });
     });
 
     // ===== 외부 API =====
@@ -450,60 +424,124 @@ document.addEventListener("DOMContentLoaded", () => {
         lastDrawnRoutes = routes; // [추가]
 
         // Prepare features for each rank
-        const featuresRank1 = [];
+        const featuresRank1Solid = [];
+        const featuresRank1Dotted = [];
         const featuresRank2 = [];
         const featuresRank3 = [];
         const featuresArrived = [];
 
         routes.forEach(r => {
-            const feature = {
-                type: 'Feature',
-                geometry: { type: 'LineString', coordinates: r.coordinates },
-                properties: { name: r.route_name, color: r.color }
-            };
             if (r.route_name === '도착 항로') {
-                featuresArrived.push(feature);
+                featuresArrived.push({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: r.coordinates },
+                    properties: { name: r.route_name, color: r.color }
+                });
             } else if (r.rank === 1) {
-                featuresRank1.push(feature);
-            } else if (r.rank === 2) {
-                featuresRank2.push(feature);
-            } else if (r.rank === 3) {
-                featuresRank3.push(feature);
+                if (r.past_coordinates && r.past_coordinates.length > 1) {
+                    featuresRank1Solid.push({
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: r.past_coordinates },
+                        properties: { name: r.route_name, color: r.color }
+                    });
+                }
+                if (r.future_coordinates && r.future_coordinates.length > 1) {
+                    featuresRank1Dotted.push({
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: r.future_coordinates },
+                        properties: { name: r.route_name, color: r.color }
+                    });
+                }
+            } else if (r.rank === 2 || r.rank === 3) {
+                const feature = {
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: r.coordinates },
+                    properties: { name: r.route_name, color: r.color }
+                };
+                if (r.rank === 2) featuresRank2.push(feature);
+                else featuresRank3.push(feature);
             }
         });
 
         // Update sources for each rank
-        map.getSource('arrived-route-source').setData({ type: 'FeatureCollection', features: featuresArrived });
-        map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1 });
-        map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
-        map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
+        if (map.getSource('arrived-route-source')) map.getSource('arrived-route-source').setData({ type: 'FeatureCollection', features: featuresArrived });
+        if (map.getSource('route-source-rank1-solid')) map.getSource('route-source-rank1-solid').setData({ type: 'FeatureCollection', features: featuresRank1Solid });
+        if (map.getSource(routeSourceId_rank1)) map.getSource(routeSourceId_rank1).setData({ type: 'FeatureCollection', features: featuresRank1Dotted });
+        if (map.getSource(routeSourceId_rank2)) map.getSource(routeSourceId_rank2).setData({ type: 'FeatureCollection', features: featuresRank2 });
+        if (map.getSource(routeSourceId_rank3)) map.getSource(routeSourceId_rank3).setData({ type: 'FeatureCollection', features: featuresRank3 });
     };
 
-    window.drawMarkers = function (markers, lastMarker) {
+    window.drawMarkers = function (markers, lastMarkerData) {
         if (!map) return;
-        lastDrawnMarkers = markers; // [추가]
-        lastDrawnLastMarker = lastMarker; // [추가]
+        lastDrawnMarkers = markers;
+        lastDrawnLastMarker = lastMarkerData;
+
         const feats = markers.map(m => ({
             type: 'Feature',
             geometry: { type: 'Point', coordinates: m.coordinates },
             properties: { description: m.description }
         }));
-        map.getSource(markerSourceId).setData({ type: 'FeatureCollection', features: feats });
+        if (map.getSource(markerSourceId)) {
+            map.getSource(markerSourceId).setData({ type: 'FeatureCollection', features: feats });
+        }
 
-        const last = {
-            type: 'Feature',
-            geometry: { type: 'Point', coordinates: lastMarker.coordinates },
-            properties: { description: lastMarker.description }
-        };
-        map.getSource(lastMarkerSourceId).setData({ type: 'FeatureCollection', features: [last] });
+        if (lastPositionMarker) {
+            lastPositionMarker.remove();
+            lastPositionMarker = null;
+        }
+
+        if (lastMarkerData && lastMarkerData.coordinates) {
+            const el = document.createElement('div');
+            el.style.width = '24px';
+            el.style.height = '24px';
+            el.style.backgroundColor = '#FDDDE6';
+            el.style.borderRadius = '50%';
+            el.style.display = 'flex';
+            el.style.justifyContent = 'center';
+            el.style.alignItems = 'center';
+            // el.style.boxShadow = '0 0 0 2px white';
+            el.style.cursor = 'pointer';
+
+            const arrow = document.createElement('div');
+            arrow.style.width = '0';
+            arrow.style.height = '0';
+            arrow.style.borderLeft = '6px solid transparent';
+            arrow.style.borderRight = '6px solid transparent';
+            arrow.style.borderBottom = '11px solid red';
+            el.appendChild(arrow);
+
+            const cog = lastMarkerData.cog || 0;
+            arrow.style.transform = `rotate(${cog}deg)`;
+
+            el.addEventListener('mouseenter', async () => {
+                const [lon, lat] = lastMarkerData.coordinates;
+                const targetISO = (typeof window.lastVesselTsISO === 'string' && window.lastVesselTsISO) ? window.lastVesselTsISO : new Date().toISOString();
+                try {
+                    const env = await window.ajaxEnvAt(lat, lon, targetISO);
+                    const html = window.buildEnvPopupHTML(env);
+                    marineHoverPopup.setLngLat([lon, lat]).setHTML(html).addTo(map);
+                } catch (err) { console.error('hover env fail', err); }
+            });
+            el.addEventListener('mouseleave', () => {
+                marineHoverPopup.remove();
+            });
+
+            lastPositionMarker = new mapboxgl.Marker(el)
+                .setLngLat(lastMarkerData.coordinates)
+                .addTo(map);
+        }
     };
 
     // 타임라인/최신점 표시만 토글 (항구 DOM 마커는 그대로)
     window.toggleMarkersVisibility = function (isVisible) {
-        if (!map || !map.getLayer(markerLayerId) || !map.getLayer(lastMarkerLayerId)) return;
+        if (!map) return;
         const vis = isVisible ? 'visible' : 'none';
-        map.setLayoutProperty(markerLayerId, 'visibility', vis);
-        map.setLayoutProperty(lastMarkerLayerId, 'visibility', vis);
+        if (map.getLayer(markerLayerId)) {
+            map.setLayoutProperty(markerLayerId, 'visibility', vis);
+        }
+        if (lastPositionMarker) {
+            lastPositionMarker.getElement().style.visibility = vis;
+        }
     };
 
     // 랭크 필터 (부산은 항상 표시)
@@ -540,11 +578,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!map) return;
         const empty = { type: 'FeatureCollection', features: [] };
         if (map.getSource('arrived-route-source')) map.getSource('arrived-route-source').setData(empty);
+        if (map.getSource('route-source-rank1-solid')) map.getSource('route-source-rank1-solid').setData(empty);
         if (map.getSource(routeSourceId_rank1)) map.getSource(routeSourceId_rank1).setData(empty);
         if (map.getSource(routeSourceId_rank2)) map.getSource(routeSourceId_rank2).setData(empty);
         if (map.getSource(routeSourceId_rank3)) map.getSource(routeSourceId_rank3).setData(empty);
         if (map.getSource(markerSourceId)) map.getSource(markerSourceId).setData(empty);
-        if (map.getSource(lastMarkerSourceId)) map.getSource(lastMarkerSourceId).setData(empty);
+
+        if (lastPositionMarker) {
+            lastPositionMarker.remove();
+            lastPositionMarker = null;
+        }
 
         // [추가] 저장된 데이터도 초기화
         lastDrawnRoutes = null;
