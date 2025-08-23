@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
         krpusEl.style.borderRadius = '0'; // No border-radius on the outer element
         krpusEl.style.cursor = 'pointer';
         krpusEl.style.boxSizing = 'border-box';
-        krpusEl.style.display = 'flex'; // Still flex to contain inner element
+        // krpusEl.style.display = 'flex'; // Removed this line
         krpusEl.style.justifyContent = 'center';
         krpusEl.style.alignItems = 'center';
         krpusEl.style.zIndex = '9999'; // KRPUS 마커를 최상단으로
@@ -259,6 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
             innerWrapper.appendChild(img);
 
         } else {
+            krpusEl.style.width = '16px'; // Fixed size for Mapbox positioning
+            krpusEl.style.height = '16px';
             // Revert to original circle style on innerWrapper
             const originalColor = krpusEl.dataset.color || '#013895'; // Use original color from dataset
             innerWrapper.style.backgroundColor = originalColor;
@@ -572,7 +574,7 @@ document.addEventListener("DOMContentLoaded", () => {
             el.style.height = '24px';
             el.style.backgroundColor = '#FDDDE6';
             el.style.borderRadius = '50%';
-            el.style.display = 'flex';
+            // el.style.display = 'flex'; // Removed this line
             el.style.justifyContent = 'center';
             el.style.alignItems = 'center';
             el.style.cursor = 'pointer';
@@ -608,29 +610,38 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     window.toggleMarkersVisibility = function (isVisible) {
+        console.log('toggleMarkersVisibility called with isVisible:', isVisible);
         if (!map) return;
-        const vis = isVisible ? 'visible' : 'none';
+        const displayStyle = isVisible ? 'flex' : 'none'; // Use 'flex' when visible, 'none' when hidden
         if (map.getLayer(markerLayerId)) {
-            map.setLayoutProperty(markerLayerId, 'visibility', vis);
+            map.setLayoutProperty(markerLayerId, 'visibility', isVisible ? 'visible' : 'none'); // Keep this for other circle markers
         }
         if (lastPositionMarker) {
-            lastPositionMarker.getElement().style.visibility = vis;
+            lastPositionMarker.getElement().style.display = displayStyle; // Change to display
+            console.log(`Pink marker new display: ${lastPositionMarker.getElement().style.display}`);
         }
     };
 
     window.togglePortMarkersByRank = function (ranksToKeep) {
+        console.log('togglePortMarkersByRank called with ranksToKeep:', ranksToKeep);
         const portIdsToKeep = new Set(globalPredictions.filter(p => ranksToKeep.includes(p.rank)).map(p => p.port_id));
-        const isRank1Active = ranksToKeep.includes(1); // Check if Rank 1 is among the active ranks
+        console.log('portIdsToKeep:', portIdsToKeep);
+        const isAnyRankActive = ranksToKeep.length > 0; // Check if any rank is active
+        console.log('isAnyRankActive:', isAnyRankActive);
 
         for (const [portId, el] of markerElByPortId.entries()) {
+            console.log(`Processing portId: ${portId}, current display: ${el.style.display}`);
             if (portId === 'KRPUS') {
-                el.style.display = ''; // KRPUS is always visible
-                updateKRPUSMarkerIcon(isRank1Active); // Apply vessel icon if rank 1 is active, else circle
+                el.style.display = isAnyRankActive ? '' : 'none'; // KRPUS visible only if any rank is active
+                console.log(`KRPUS new display: ${el.style.display}`);
+                updateKRPUSMarkerIcon(isAnyRankActive); // Apply vessel icon if any rank is active, else circle
             } else if (portIdsToKeep.has(portId)) {
-                el.style.display = '';
-                updatePortMarkerIcon(portId, true, globalPredictions.find(p => p.port_id === portId)?.rank); // Apply dest_icon.svg for other ranked ports
+                el.style.display = ''; // Destination port visible if its rank is active
+                console.log(`Destination port ${portId} new display: ${el.style.display}`);
+                updatePortMarkerIcon(portId, true, globalPredictions.find(p => p.port_id === portId)?.rank);
             } else {
                 el.style.display = 'none'; // Hide other ports
+                console.log(`Other port ${portId} new display: ${el.style.display}`);
             }
         }
     };

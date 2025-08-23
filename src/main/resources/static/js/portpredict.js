@@ -636,7 +636,12 @@ $(function () {
             window.clearRoutesAndMarkers(); // 모든 경로 및 마커 지우기
             window.drawRoutes(globalRoutesData.filter(r => r.rank === 1)); // Rank 1 경로만 그리기
             const portsToShow = ['KRPUS'];
-            window.showSpecificPortMarkers(portsToShow); // KRPUS만 표시
+            // Find the rank 1 prediction to get its port_id
+            const rank1Prediction = globalPredictions.find(p => p.rank === 1);
+            if (rank1Prediction && rank1Prediction.port_id) {
+                portsToShow.push(rank1Prediction.port_id);
+            }
+            window.showSpecificPortMarkers(portsToShow); // KRPUS와 목적항 표시
             if (window.markerInstanceByPortId && window.portCoordsById) {
                 const krpusMarker = window.markerInstanceByPortId.get('KRPUS');
                 const krpusCoords = window.portCoordsById.get('KRPUS');
@@ -645,12 +650,19 @@ $(function () {
                 }
             }
 
-            window.toggleMarkersVisibility(false); // 현재 위치 마커 숨기기
+            // 현재 위치 핑크색 마커 다시 그리기 및 보이기
+            if (typeof window.drawMarkers === 'function' && lastMarker) {
+                window.drawMarkers([], lastMarker); // lastMarker는 portpredict.js의 전역 변수
+            }
+            window.toggleMarkersVisibility(true); // 현재 위치 마커 보이기
+
             window.toggleKrpusHover(false); // KRPUS 호버 기능 비활성화
             window.toggleKrpusPulseAnimation(true); // KRPUS 애니메이션 시작
         } else if (target === 'predict') {
             // 차항지 예측 활성화 시
-            window.clearRoutesAndMarkers(); // 모든 경로 및 마커 지우기
+            // 모든 경로 및 마커 지우기는 여기서 하지 않고, 필요에 따라 개별적으로 제어
+            // window.clearRoutesAndMarkers(); // REMOVED
+
             // 현재 활성화된 예측 박스에 따라 경로 및 마커 다시 그리기
             const activeRanks = [];
             $('.box.is-active').each(function () {
@@ -658,8 +670,17 @@ $(function () {
                 activeRanks.push(rank);
             });
             window.drawRoutes(globalRoutesData.filter(route => activeRanks.includes(route.rank)));
+
+            // KRPUS 및 목적항 마커 표시/숨기기
             window.togglePortMarkersByRank(activeRanks);
-            window.toggleMarkersVisibility(true); // 현재 위치 마커 보이기
+
+            // 현재 위치 핑크색 마커 다시 그리기 및 보이기
+            if (typeof window.drawMarkers === 'function' && lastMarker) {
+                window.drawMarkers([], lastMarker); // lastMarker는 portpredict.js의 전역 변수
+            }
+            const isBoxOneActive = $('.box.one').hasClass('is-active');
+            window.toggleMarkersVisibility(isBoxOneActive); // 현재 위치 마커 보이기/숨기기 (box one 상태에 따라)
+
             window.toggleKrpusHover(true); // KRPUS 호버 기능 활성화
             window.toggleKrpusPulseAnimation(false); // KRPUS 애니메이션 중지
         }
