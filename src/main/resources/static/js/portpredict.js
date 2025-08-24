@@ -2,8 +2,8 @@
 let vesselData = [];
 let portData = [];
 // 전역 변수 초기화
-let globalRoutesData = [];
-let globalPredictions = [];
+window.globalRoutesData = []; // Explicitly make it a window property from the start
+window.globalPredictions = []; // Also make this explicit
 
 // 페이지 로드 시 CSV 데이터를 불러오는 함수
 async function loadVesselData() {

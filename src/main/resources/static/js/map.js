@@ -56,6 +56,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return [a, b]; // 데이터가 이미 [lng,lat] 이므로 그대로 반환
     }
 
+    // calculateLineLength 함수 추가
+    function calculateLineLength(coordinates) {
+        let length = 0;
+        for (let i = 0; i < coordinates.length - 1; i++) {
+            const p1 = coordinates[i];
+            const p2 = coordinates[i + 1];
+            // 간단한 유클리드 거리 계산 (지도 단위)
+            length += Math.sqrt(Math.pow(p2[0] - p1[0], 2) + Math.pow(p2[1] - p1[1], 2));
+        }
+        return length;
+    }
+
     function ensureEmojiEl(markerEl) {
         let span = markerEl.querySelector('.weather-emoji');
         if (!span) {
@@ -273,6 +285,130 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('KRPUS el display after updateKRPUSMarkerIcon (vessel icon): After appendChild', krpusEl.style.display);
     }
 
+    // animateRouteDrawing 함수 추가
+    window.animateRouteDrawing = function () {
+        console.log('animateRouteDrawing called.');
+        console.log('Current window.globalRoutesData:', window.globalRoutesData);
+        if (!map || !window.globalRoutesData || window.globalRoutesData.length === 0) {
+            console.warn('Map or route data not available for animation.');
+            return;
+        }
+
+        const rank1Route = window.globalRoutesData.find(r => r.rank === 1);
+        if (!rank1Route || !rank1Route.past_coordinates || !rank1Route.future_coordinates) {
+            console.warn('Rank 1 route data not complete for animation.');
+            return;
+        }
+
+        const solidCoords = rank1Route.past_coordinates;
+        const dottedCoords = rank1Route.future_coordinates;
+        const color = rank1Route.color; // Blue for rank 1
+
+        const animationDuration = 5000; // Total duration for both parts
+        // Calculate proportional duration based on number of points
+        const totalPoints = solidCoords.length + dottedCoords.length;
+        const solidPartDuration = (solidCoords.length / totalPoints) * animationDuration;
+        const dottedPartDuration = (dottedCoords.length / totalPoints) * animationDuration;
+
+        let startTime = null;
+        let currentSolidIndex = 0;
+        let currentDottedIndex = 0;
+        let pinkMarkerShown = false; // Flag to ensure pink marker is shown only once
+
+        // Hide pink marker and destination port marker at the start
+        window.toggleMarkersVisibility(false);
+        const rank1Prediction = window.globalPredictions.find(p => p.rank === 1);
+        const destinationPortId = rank1Prediction ? rank1Prediction.port_id : null;
+        window.showSpecificPortMarkers(['KRPUS']); // Only show KRPUS initially
+
+        // Clear existing routes before starting new animation
+        map.getSource('route-source-rank1-solid').setData({ type: 'FeatureCollection', features: [] });
+        map.getSource('route-source-rank1').setData({ type: 'FeatureCollection', features: [] });
+
+        function animate(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+
+            // Animate solid part
+            if (currentSolidIndex < solidCoords.length) {
+                const solidProgress = Math.min(elapsed / solidPartDuration, 1);
+                const targetIndex = Math.floor(solidProgress * solidCoords.length);
+
+                if (targetIndex > currentSolidIndex) {
+                    currentSolidIndex = targetIndex;
+                    const currentPath = solidCoords.slice(0, currentSolidIndex + 1);
+                    map.getSource('route-source-rank1-solid').setData({
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: { type: 'LineString', coordinates: currentPath },
+                            properties: { name: 'Past Track', color: color }
+                        }]
+                    });
+
+                    // Show pink marker when current position is reached
+                    if (currentSolidIndex === solidCoords.length - 1 && !pinkMarkerShown) {
+                        window.toggleMarkersVisibility(true);
+                        pinkMarkerShown = true;
+                    }
+                }
+            }
+
+            // Animate dotted part (only after solid part has started or completed)
+            if (currentSolidIndex === solidCoords.length && currentDottedIndex < dottedCoords.length) {
+                const dottedElapsed = elapsed - solidPartDuration;
+                const dottedProgress = Math.min(dottedElapsed / dottedPartDuration, 1);
+                const targetIndex = Math.floor(dottedProgress * dottedCoords.length);
+
+                if (targetIndex > currentDottedIndex) {
+                    currentDottedIndex = targetIndex;
+                    const currentPath = dottedCoords.slice(0, currentDottedIndex + 1);
+                    map.getSource('route-source-rank1').setData({
+                        type: 'FeatureCollection',
+                        features: [{
+                            type: 'Feature',
+                            geometry: { type: 'LineString', coordinates: currentPath },
+                            properties: { name: 'Future Prediction', color: color }
+                        }]
+                    });
+                    // Ensure dotted line style is applied
+                    map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]);
+                }
+            }
+
+            // Continue animation if not finished
+            if (currentSolidIndex < solidCoords.length || currentDottedIndex < dottedCoords.length) {
+                requestAnimationFrame(animate);
+            } else {
+                // Animation finished, ensure final state is correct
+                map.getSource('route-source-rank1-solid').setData({
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: solidCoords },
+                        properties: { name: 'Past Track', color: color }
+                    }]
+                });
+                map.getSource('route-source-rank1').setData({
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: dottedCoords },
+                        properties: { name: 'Future Prediction', color: color }
+                    }]
+                });
+                map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]); // Final dotted style
+
+                // Show destination port marker after animation is complete
+                if (destinationPortId) {
+                    window.showSpecificPortMarkers(['KRPUS', destinationPortId]);
+                }
+            }
+        }
+
+        requestAnimationFrame(animate);
+    };
+
     async function addPortMarkers() {
         const geojson = await fetch('/data/ports.geojson', { cache: 'no-cache' }).then(r => {
             if (!r.ok) throw new Error('ports.geojson 로드 실패');
@@ -451,7 +587,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (typeof window.toggleKrpusPulseAnimation === 'function') {
                 window.toggleKrpusPulseAnimation(false);
             }
-            console.log('KRPUS marker clicked. Animation stopped.');
+            console.log('KRPUS marker clicked. Attempting route animation.');
+            // 새로운 항로 애니메이션 함수 호출
+            if (typeof window.animateRouteDrawing === 'function') {
+                window.animateRouteDrawing();
+            }
         });
 
         console.log('KRPUS busanEl created:', busanEl);
