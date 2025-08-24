@@ -673,3 +673,7 @@ header {
 #holidayListContainer ul li {
     margin-bottom: 8px;
 }
+
+.holiColor {
+    color: #B91C1C;
+}

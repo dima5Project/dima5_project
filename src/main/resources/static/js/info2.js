@@ -708,7 +708,7 @@
             let html = '<h4>이번 달 공휴일</h4><ul>';
             thisMon.forEach(h => {
                 const d = new Date(h.holidayDate);
-                html += `<li>${d.getDate()}일(${days[d.getDay()]}) : ${h.holidayName}</li>`;
+                html += `<li><span class="holiColor">${d.getDate()}일(${days[d.getDay()]})</span> : ${h.holidayName}</li>`;
             });
             html += '</ul>';
             $list.append(html);
