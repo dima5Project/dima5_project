@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const allPortMarkers = [];
     const markerElByPortId = new Map(); // portId -> DOM Element
     const portCoordsById = new Map();   // portId -> {lng, lat}
+    let globalTimePointMarkerInstances = []; // New global variable for time point markers
 
     // Expose to window for portpredict.js
     window.markerInstanceByPortId = new Map(); // New map for marker instances
@@ -214,6 +215,33 @@ document.addEventListener("DOMContentLoaded", () => {
         return el;
     }
 
+    // New function for time_point markers
+    function makeTimePointMarker(timePoint) {
+        const el = document.createElement('div');
+        el.className = 'time-point-marker';
+        el.style.width = '30px';
+        el.style.height = '30px';
+        el.style.backgroundColor = '#cfeeff'; // Circle color
+        el.style.borderRadius = '50%';
+        el.style.textAlign = 'center'; // NEW: Center content using text-align on parent
+        el.style.border = 'none'; // 외곽선 제거
+        el.style.boxShadow = '0 1px 2px rgba(0,0,0,0.4)';
+        el.style.cursor = 'pointer';
+        el.style.zIndex = '1000'; // Ensure it's above routes
+
+        const span = document.createElement('span');
+        span.textContent = timePoint;
+        span.style.color = '#013895'; // Text color
+        span.style.fontWeight = '700';
+        span.style.fontSize = '14px';
+        span.style.lineHeight = '30px'; // For vertical centering within its line box
+        span.style.textAlign = 'center'; // Add this for horizontal centering of text
+        span.style.width = '100%'; // NEW: Ensure span takes full width for text-align to work
+        el.appendChild(span);
+
+        return el;
+    }
+
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-left');
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
@@ -325,6 +353,50 @@ document.addEventListener("DOMContentLoaded", () => {
         map.getSource('route-source-rank1-solid').setData({ type: 'FeatureCollection', features: [] });
         map.getSource('route-source-rank1').setData({ type: 'FeatureCollection', features: [] });
 
+        // NEW: Clear previous time point markers before starting new animation
+        clearTimePointMarkers();
+
+        // NEW: Create and add time point markers (initially hidden)
+        const shownTimePoints = new Set(); // To track which time points have been shown
+
+        // Collect all points of the animated path for easier indexing
+        const fullAnimatedPath = solidCoords.concat(dottedCoords.slice(1)); // Avoid duplicating currentPos
+
+        if (window.globalTimePointCoords && window.globalTimePointCoords.length > 0) {
+            window.globalTimePointCoords.forEach(tpData => {
+                const el = makeTimePointMarker(tpData.time_point);
+                const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+                    .setLngLat([tpData.lon, tpData.lat])
+                    .addTo(map);
+                el.style.display = 'none'; // Hide initially
+
+                // Find the index of this time_point's coordinate in the fullAnimatedPath
+                let foundIndex = -1;
+                const toleranceForMapping = 0.000001; // Strict tolerance for initial mapping
+                for (let i = 0; i < fullAnimatedPath.length; i++) {
+                    const pathLon = fullAnimatedPath[i][0];
+                    const pathLat = fullAnimatedPath[i][1];
+                    if (Math.abs(tpData.lat - pathLat) < toleranceForMapping && Math.abs(tpData.lon - pathLon) < toleranceForMapping) {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+
+                if (foundIndex !== -1) {
+                    globalTimePointMarkerInstances.push({
+                        time_point: tpData.time_point,
+                        index: foundIndex, // Store the index
+                        markerInstance: marker,
+                        element: el
+                    });
+                } else {
+                    // If a time_point coordinate is not found in the animated path, remove its marker
+                    marker.remove();
+                    console.warn(`Time point ${tpData.time_point} at [${tpData.lat}, ${tpData.lon}] not found in animated path.`);
+                }
+            });
+        }
+
         function animate(currentTime) {
             if (!startTime) startTime = currentTime;
             const elapsed = currentTime - startTime;
@@ -375,6 +447,28 @@ document.addEventListener("DOMContentLoaded", () => {
                     map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]);
                 }
             }
+
+            // NEW: Check and display time point markers based on index
+            // Check solid part
+            globalTimePointMarkerInstances.forEach(tpMap => {
+                if (!shownTimePoints.has(tpMap.time_point)) {
+                    if (tpMap.index === currentSolidIndex) { // Check if current solid index matches
+                        tpMap.element.style.display = ''; // Show the marker
+                        shownTimePoints.add(tpMap.time_point); // Mark as shown
+                    }
+                }
+            });
+
+            // Check dotted part (adjust index for the solid part's length)
+            const currentDottedPathIndex = solidCoords.length + currentDottedIndex; // Index in fullAnimatedPath
+            globalTimePointMarkerInstances.forEach(tpMap => {
+                if (!shownTimePoints.has(tpMap.time_point)) {
+                    if (tpMap.index === currentDottedPathIndex) { // Check if current dotted index matches
+                        tpMap.element.style.display = ''; // Show the marker
+                        shownTimePoints.add(tpMap.time_point); // Mark as shown
+                    }
+                }
+            });
 
             // Continue animation if not finished
             if (currentSolidIndex < solidCoords.length || currentDottedIndex < dottedCoords.length) {
@@ -847,6 +941,9 @@ document.addEventListener("DOMContentLoaded", () => {
         lastDrawnRoutes = null;
         lastDrawnMarkers = null;
         lastDrawnLastMarker = null;
+
+        // NEW: Clear time point markers
+        clearTimePointMarkers();
     };
 
     function fitMapViewToTopPorts() {
@@ -906,6 +1003,12 @@ document.addEventListener("DOMContentLoaded", () => {
             duration: 1000 // Optional: smooth transition
         });
     };
+
+    // New: Function to clear time point markers
+    function clearTimePointMarkers() {
+        globalTimePointMarkerInstances.forEach(markerObj => markerObj.markerInstance.remove());
+        globalTimePointMarkerInstances = [];
+    }
 
     window.toggleKrpusPulseAnimation = function (enable) {
         console.log('toggleKrpusPulseAnimation called with enable:', enable);

@@ -4,6 +4,7 @@ let portData = [];
 // 전역 변수 초기화
 window.globalRoutesData = []; // Explicitly make it a window property from the start
 window.globalPredictions = []; // Also make this explicit
+window.globalTimePointCoords = []; // New: Store time_point coordinates globally
 
 // 페이지 로드 시 CSV 데이터를 불러오는 함수
 async function loadVesselData() {
@@ -222,6 +223,13 @@ $(function () {
             window.currentLat = Number(resp?.latest?.lat ?? 0);
             window.currentLon = Number(resp?.latest?.lon ?? 0);
             window.globalPredictions = Array.isArray(resp?.latest?.predictions) ? resp.latest.predictions : [];
+
+            // time_point별 좌표를 전역 변수에 저장
+            window.globalTimePointCoords = (Array.isArray(resp?.timeline) ? resp.timeline : []).map(tp => ({
+                time_point: tp.time_point,
+                lat: Number(tp.lat),
+                lon: Number(tp.lon)
+            }));
 
             // 3시간 미만일 경우 처리
             if (resp.note && resp.note.includes("<3h")) {
@@ -445,6 +453,7 @@ $(function () {
         globalRoutesData = [];
 
         globalPredictions = [];
+        window.globalTimePointCoords = []; // time_point 좌표 초기화
 
         window.clearRoutesAndMarkers();
 
