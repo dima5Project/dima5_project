@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const markerElByPortId = new Map(); // portId -> DOM Element
     const portCoordsById = new Map();   // portId -> {lng, lat}
     let globalTimePointMarkerInstances = []; // New global variable for time point markers
+    let destinationLabelPopup = null; // ▼ [추가] 1순위 항구 라벨 Popup 인스턴스
 
     // Expose to window for portpredict.js
     window.markerInstanceByPortId = new Map(); // New map for marker instances
@@ -50,6 +51,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const marineHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, anchor: 'bottom', offset: 16, className: 'marine-popup' });
 
     let isKrpusHoverEnabled = true; // KRPUS 마커 호버 기능 활성화 여부
+
+    // ▼ [추가] 1순위 항구 라벨(Popup)을 생성/업데이트하는 함수
+    window.updateDestinationLabel = function (portId, rank, lng, lat) {
+        window.removeDestinationLabel(); // 기존 라벨이 있으면 일단 지우기
+
+        if (rank !== 1) return; // 1순위가 아니면 아무것도 안함
+
+        const html = `<div class="dest-label-box">Top-1 ${portId}</div>`;
+
+        destinationLabelPopup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            offset: 35, // 마커 아이콘으로부터의 거리
+            anchor: 'bottom', // 기본 위치는 마커 하단에 고정 (라벨이 위에 보임)
+            className: 'destination-label-popup' // 커스텀 스타일을 위한 클래스
+        })
+            .setLngLat([lng, lat])
+            .setHTML(html)
+            .addTo(map);
+    }
+
+    // ▼ [추가] 1순위 항구 라벨(Popup)을 제거하는 함수
+    window.removeDestinationLabel = function () {
+        if (destinationLabelPopup) {
+            destinationLabelPopup.remove();
+            destinationLabelPopup = null;
+        }
+    }
 
     function safeLngLat(coords) {
         const a = Array.isArray(coords) ? Number(coords[0]) : NaN;
@@ -413,6 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             properties: { name: 'Past Track', color: color }
                         }]
                     });
+
 
                     if (currentSolidIndex === solidCoords.length - 1 && !pinkMarkerShown) {
                         window.toggleMarkersVisibility(true);
@@ -840,7 +870,7 @@ document.addEventListener("DOMContentLoaded", () => {
             el.style.height = '24px';
             el.style.backgroundColor = '#FDDDE6';
             el.style.borderRadius = '50%';
-            // el.style.display = 'flex'; // Removed this line
+            el.style.boxShadow = '0 0 0 3px rgba(253, 221, 230, 0.7)';
             el.style.justifyContent = 'center';
             el.style.alignItems = 'center';
             el.style.cursor = 'pointer';
@@ -895,6 +925,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const isAnyRankActive = ranksToKeep.length > 0; // Check if any rank is active
         console.log('isAnyRankActive:', isAnyRankActive);
 
+        // ▼ [수정] 1순위가 비활성화되면 라벨 제거
+        if (!ranksToKeep.includes(1)) {
+            window.removeDestinationLabel();
+        }
+
         for (const [portId, el] of markerElByPortId.entries()) {
             console.log(`Processing portId: ${portId}, current display: ${el.style.display}`);
             if (portId === 'KRPUS') {
@@ -904,7 +939,16 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (portIdsToKeep.has(portId)) {
                 el.style.display = ''; // Destination port visible if its rank is active
                 console.log(`Destination port ${portId} new display: ${el.style.display}`);
-                updatePortMarkerIcon(portId, true, globalPredictions.find(p => p.port_id === portId)?.rank);
+                const prediction = globalPredictions.find(p => p.port_id === portId);
+                updatePortMarkerIcon(portId, true, prediction?.rank);
+
+                // ▼ [수정] 1순위 항구인 경우 라벨 표시
+                if (prediction?.rank === 1) {
+                    const coords = portCoordsById.get(portId);
+                    if (coords) {
+                        window.updateDestinationLabel(portId, 1, coords.lng, coords.lat);
+                    }
+                }
             } else {
                 el.style.display = 'none'; // Hide other ports
                 console.log(`Other port ${portId} new display: ${el.style.display}`);
@@ -976,6 +1020,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // NEW: Clear time point markers
         clearTimePointMarkers();
+        // ▼ [추가] 도착 항구 라벨 제거
+        window.removeDestinationLabel();
     };
 
     function fitMapViewToTopPorts() {

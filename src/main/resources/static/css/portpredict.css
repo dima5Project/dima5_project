@@ -1035,7 +1035,7 @@ html {
 }
 
 .voy-rows {
-    margin: 5px 0 10px 11px;
+    margin: 15px 0 20px 11px;
 }
 
 /* 한 줄(버튼 + 값칩) : 콘텐츠는 왼쪽 패딩 이후부터 배치 */
@@ -1615,4 +1615,37 @@ html {
     /* 가로 중앙 */
     align-items: center !important;
     /* 세로 중앙 */
+}
+
+/* ===== [추가] 1순위 도착 항구 라벨 ===== */
+.destination-label-popup .mapboxgl-popup-content {
+    background-color: rgba(85, 85, 85, 0.75) !important;
+    /* 반투명 회색 */
+    color: black !important;
+    padding: 2px 5px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    box-shadow: none !important;
+    margin-right: 10px;
+    /* 기본 그림자 제거 */
+}
+
+
+/* Popup의 기본 흰색 꼬리(tip) 숨기기 */
+.destination-label-popup .mapboxgl-popup-tip {
+    display: none !important;
+
+}
+
+/* 현재 위치(마지막) 노드가 활성화되었을 때의 특별 스타일 */
+.voy-item:last-child .voy-node.is-active {
+    background: #FDDDE6;
+    /* 분홍색 배경 */
+}
+
+/* 현재 위치(마지막) 노드 활성화 시 내부 마커 아이콘 색상 변경 */
+.voy-item:last-child .voy-node.is-active img {
+    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+    /* 빨간색으로 변경 */
 }

@@ -41,7 +41,7 @@ function toggleBox() {
     dialog.innerHTML = '';
     dialog.innerHTML += `
       <div class="faq-message assistant">
-        <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+        <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
         <div class="faq-bubble-wrapper">
           <div class="faq-bubble">
             <div class="faq-text">
@@ -102,8 +102,8 @@ const faqData = {
       question: `예측은 출항 후 몇 시간부터 가능한가요?`,
       answer: `지원 구간은 **출항 후 3~30시간**입니다.
 
-- 0 ~ 4시간: 출항 직후 분산 구간
-- 5 ~ 30시간: 항로가 안정화되는 구간
+- 0 ~ 3시간: 출항 직후 분산 구간
+- 3 ~ 30시간: 항로가 안정화되는 구간
 - 31시간 ~: 이미 목적지로 항로 고정`
     },
     {
@@ -179,7 +179,7 @@ function selectFAQ(category) {
       </div>
     </div>
     <div class="faq-message assistant">
-      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble">
           <div class="faq-buttons">${buttonsHTML}</div>
@@ -203,7 +203,7 @@ function showAnswer(category, question) {
       </div>
     </div>
     <div class="faq-message assistant">
-      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble" style="line-height:1.55; max-width:300px;">
         ${formatAnswer(qa.answer)}
@@ -244,7 +244,7 @@ function renderInitialFAQButtons() {
   const currentTime = getTime();
   dialog.innerHTML += `
     <div class="faq-message assistant">
-      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble">
           <div class="faq-text">다른 질문도 확인해보세요.</div>
@@ -272,7 +272,7 @@ function renderSubQuestions(category) {
 
   dialog.innerHTML += `
     <div class="faq-message assistant">
-      <img src="/images/admin_icon.png" alt="admin" class="faq-avatar" />
+      <img src="/images/admin-icon.png" alt="admin" class="faq-avatar" />
       <div class="faq-bubble-wrapper">
         <div class="faq-bubble">
           <div class="faq-buttons">${buttonsHTML}</div>
