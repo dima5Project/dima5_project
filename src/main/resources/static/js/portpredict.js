@@ -824,6 +824,10 @@ $(function () {
             $('.voy-timeline').append($latestItem);
 
         }
+        // ★ 추가: 타임라인이 모두 그려진 후 첫 번째 voy-node 활성화
+        if (typeof window.setActiveVoyNode === 'function') {
+            window.setActiveVoyNode(0);
+        }
 
     }
 
@@ -1041,6 +1045,27 @@ $(function () {
     // $(document).off('click', '#saveModal [data-action="yes"]')
     //             .on('click', '#saveModal [data-action="yes"]', handleSaveYesClick);
 
+    window.setActiveVoyNode = function (index) {
+        const nodes = document.querySelectorAll('.voy-timeline .voy-node');
+        if (!nodes || nodes.length === 0) return;
+
+        // Remove 'is-active' from all nodes (REMOVED per user request to keep previous active)
+        // nodes.forEach(node => node.classList.remove('is-active'));
+
+        let targetNode;
+        if (index === -1) {
+            // -1 means the last node
+            targetNode = nodes[nodes.length - 1];
+        } else if (index >= 0 && index < nodes.length) {
+            targetNode = nodes[index];
+        }
+
+        if (targetNode) {
+            targetNode.classList.add('is-active');
+            // Optional: Scroll the timeline to the active node
+            targetNode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
 });
 
 

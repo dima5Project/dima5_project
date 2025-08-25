@@ -332,35 +332,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const dottedCoords = rank1Route.future_coordinates;
         const color = rank1Route.color; // Blue for rank 1
 
-        const animationDuration = 5000; // Total duration for both parts
-        // Calculate proportional duration based on number of points
-        const totalPoints = solidCoords.length + dottedCoords.length;
-        const solidPartDuration = (solidCoords.length / totalPoints) * animationDuration;
-        const dottedPartDuration = (dottedCoords.length / totalPoints) * animationDuration;
+        const animationDuration = 8000; // 총 애니메이션 시간: 실선 6초 + 점선 2초
+        const solidPartDuration = 6000; // 실선 6초
+        const dottedPartDuration = 2000; // 점선 2초
 
         let startTime = null;
         let currentSolidIndex = 0;
         let currentDottedIndex = 0;
-        let pinkMarkerShown = false; // Flag to ensure pink marker is shown only once
+        let pinkMarkerShown = false;
 
-        // Hide pink marker and destination port marker at the start
         window.toggleMarkersVisibility(false);
         const rank1Prediction = window.globalPredictions.find(p => p.rank === 1);
         const destinationPortId = rank1Prediction ? rank1Prediction.port_id : null;
-        window.showSpecificPortMarkers(['KRPUS']); // Only show KRPUS initially
+        window.showSpecificPortMarkers(['KRPUS']);
 
-        // Clear existing routes before starting new animation
         map.getSource('route-source-rank1-solid').setData({ type: 'FeatureCollection', features: [] });
         map.getSource('route-source-rank1').setData({ type: 'FeatureCollection', features: [] });
 
-        // NEW: Clear previous time point markers before starting new animation
         clearTimePointMarkers();
 
-        // NEW: Create and add time point markers (initially hidden)
-        const shownTimePoints = new Set(); // To track which time points have been shown
-
-        // Collect all points of the animated path for easier indexing
-        const fullAnimatedPath = solidCoords.concat(dottedCoords.slice(1)); // Avoid duplicating currentPos
+        const shownTimePoints = new Set();
+        const fullAnimatedPath = solidCoords.concat(dottedCoords.slice(1));
 
         if (window.globalTimePointCoords && window.globalTimePointCoords.length > 0) {
             window.globalTimePointCoords.forEach(tpData => {
@@ -368,11 +360,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
                     .setLngLat([tpData.lon, tpData.lat])
                     .addTo(map);
-                el.style.display = 'none'; // Hide initially
+                el.style.display = 'none';
 
-                // Find the index of this time_point's coordinate in the fullAnimatedPath
                 let foundIndex = -1;
-                const toleranceForMapping = 0.000001; // Strict tolerance for initial mapping
+                const toleranceForMapping = 0.000001;
                 for (let i = 0; i < fullAnimatedPath.length; i++) {
                     const pathLon = fullAnimatedPath[i][0];
                     const pathLat = fullAnimatedPath[i][1];
@@ -385,23 +376,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (foundIndex !== -1) {
                     globalTimePointMarkerInstances.push({
                         time_point: tpData.time_point,
-                        index: foundIndex, // Store the index
+                        index: foundIndex,
                         markerInstance: marker,
                         element: el
                     });
                 } else {
-                    // If a time_point coordinate is not found in the animated path, remove its marker
                     marker.remove();
                     console.warn(`Time point ${tpData.time_point} at [${tpData.lat}, ${tpData.lon}] not found in animated path.`);
                 }
             });
         }
 
+        const krpusCoords = portCoordsById.get('KRPUS');
+        const clickZoomLevel = map.getZoom(); // Capture zoom level on click                                                                         │
+        map.setMinZoom(clickZoomLevel); // Set minimum zoom for the animation  
+
+
         function animate(currentTime) {
             if (!startTime) startTime = currentTime;
             const elapsed = currentTime - startTime;
 
-            // Animate solid part
+            let currentCoords;
+
             if (currentSolidIndex < solidCoords.length) {
                 const solidProgress = Math.min(elapsed / solidPartDuration, 1);
                 const targetIndex = Math.floor(solidProgress * solidCoords.length);
@@ -418,15 +414,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         }]
                     });
 
-                    // Show pink marker when current position is reached
                     if (currentSolidIndex === solidCoords.length - 1 && !pinkMarkerShown) {
                         window.toggleMarkersVisibility(true);
                         pinkMarkerShown = true;
+                        // ★ 추가: 현재 위치 마커(분홍색) 표시 시점에 마지막 voy-node 활성화
+                        if (typeof window.setActiveVoyNode === 'function') {
+                            window.setActiveVoyNode(-1); // -1은 마지막 노드를 의미
+                        }
                     }
                 }
+                currentCoords = solidCoords[currentSolidIndex];
             }
 
-            // Animate dotted part (only after solid part has started or completed)
             if (currentSolidIndex === solidCoords.length && currentDottedIndex < dottedCoords.length) {
                 const dottedElapsed = elapsed - solidPartDuration;
                 const dottedProgress = Math.min(dottedElapsed / dottedPartDuration, 1);
@@ -443,38 +442,71 @@ document.addEventListener("DOMContentLoaded", () => {
                             properties: { name: 'Future Prediction', color: color }
                         }]
                     });
-                    // Ensure dotted line style is applied
                     map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]);
                 }
+                currentCoords = dottedCoords[currentDottedIndex];
             }
 
-            // NEW: Check and display time point markers based on index
-            // Check solid part
+            if (krpusCoords && currentCoords) {
+                const bounds = new mapboxgl.LngLatBounds();
+                bounds.extend(krpusCoords);
+                bounds.extend(currentCoords);
+
+                map.fitBounds(bounds, {
+                    padding: 200,
+                    maxZoom: 8,
+                    duration: 0
+                });
+            }
+
             globalTimePointMarkerInstances.forEach(tpMap => {
                 if (!shownTimePoints.has(tpMap.time_point)) {
-                    if (tpMap.index === currentSolidIndex) { // Check if current solid index matches
-                        tpMap.element.style.display = ''; // Show the marker
-                        shownTimePoints.add(tpMap.time_point); // Mark as shown
+                    const currentOverallIndex = (currentSolidIndex < solidCoords.length)
+                        ? currentSolidIndex
+                        : (solidCoords.length - 1) + currentDottedIndex;
+
+                    if (tpMap.index === currentOverallIndex) {
+                        tpMap.element.style.display = '';
+                        shownTimePoints.add(tpMap.time_point);
+
+                        // ★ 추가: time_point 마커 표시 시점에 해당하는 voy-node 활성화
+                        const timePointIndex = window.globalTimePointCoords.findIndex(
+                            (coord) => coord.time_point === tpMap.time_point
+                        );
+                        if (timePointIndex !== -1 && typeof window.setActiveVoyNode === 'function') {
+                            // 타임라인 노드는 [출발항, ...time_points, 현재시점] 순서이므로 +1
+                            window.setActiveVoyNode(timePointIndex + 1);
+                        }
                     }
                 }
             });
 
-            // Check dotted part (adjust index for the solid part's length)
-            const currentDottedPathIndex = solidCoords.length + currentDottedIndex; // Index in fullAnimatedPath
+            const currentDottedPathIndex = solidCoords.length + currentDottedIndex;
             globalTimePointMarkerInstances.forEach(tpMap => {
                 if (!shownTimePoints.has(tpMap.time_point)) {
-                    if (tpMap.index === currentDottedPathIndex) { // Check if current dotted index matches
-                        tpMap.element.style.display = ''; // Show the marker
-                        shownTimePoints.add(tpMap.time_point); // Mark as shown
+                    const currentOverallIndex = (currentSolidIndex < solidCoords.length)
+                        ? currentSolidIndex
+                        : (solidCoords.length - 1) + currentDottedIndex; // Adjusted for dotted path index
+
+                    if (tpMap.index === currentOverallIndex) {
+                        tpMap.element.style.display = '';
+                        shownTimePoints.add(tpMap.time_point);
+
+                        // ★ 추가: time_point 마커 표시 시점에 해당하는 voy-node 활성화
+                        const timePointIndex = window.globalTimePointCoords.findIndex(
+                            (coord) => coord.time_point === tpMap.time_point
+                        );
+                        if (timePointIndex !== -1 && typeof window.setActiveVoyNode === 'function') {
+                            // 타임라인 노드는 [출발항, ...time_points, 현재시점] 순서이므로 +1
+                            window.setActiveVoyNode(timePointIndex + 1);
+                        }
                     }
                 }
             });
 
-            // Continue animation if not finished
             if (currentSolidIndex < solidCoords.length || currentDottedIndex < dottedCoords.length) {
                 requestAnimationFrame(animate);
             } else {
-                // Animation finished, ensure final state is correct
                 map.getSource('route-source-rank1-solid').setData({
                     type: 'FeatureCollection',
                     features: [{
@@ -491,12 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         properties: { name: 'Future Prediction', color: color }
                     }]
                 });
-                map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]); // Final dotted style
+                map.setPaintProperty('route-layer-rank1', 'line-dasharray', [0.5, 2.5]);
 
-                // Show destination port marker after animation is complete
                 if (destinationPortId) {
                     window.showSpecificPortMarkers(['KRPUS', destinationPortId]);
                 }
+                map.setMinZoom(0);
             }
         }
 
