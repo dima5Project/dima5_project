@@ -1293,6 +1293,10 @@ html {
 }
 
 /* 부산항 호버 카드 전용 스타일 */
+.busan-popup-container {
+    z-index: 10060;
+}
+
 .busan-hover-card {
     min-width: auto !important;
     /* min-width를 무효화하여 max-width가 적용되게 합니다. */
@@ -1311,6 +1315,10 @@ html {
 }
 
 /* 팝업 카드 */
+
+.marine-popup {
+    z-index: 10000;
+}
 
 .marine-popup .marine-popup-content {
     width: 180px;

@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let weatherBulkAvailable = true; // ★ 추가
 
     // 팝업
-    const hoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '340px', offset: 35 });
+    const hoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '340px', offset: 35, className: 'port-hover-popup' });
     const busanHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, maxWidth: '90px', offset: 35, anchor: 'bottom', className: 'busan-popup-container' });
     const marineHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, anchor: 'bottom', offset: 16, className: 'marine-popup' });
 
@@ -1044,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         map.fitBounds(bounds, {
-            padding: { top: 150, bottom: 110, left: 450, right: 110 }, // 사이드바 고려하여 패딩 조정
+            padding: { top: 230, bottom: 70, left: 450, right: 110 }, // 사이드바 고려하여 패딩 조정
             maxZoom: 10,
             duration: 1000
         });
