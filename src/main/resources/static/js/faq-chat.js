@@ -375,7 +375,7 @@ async function startChat() {
     chat.roomId = room.id;
 
     ensureComposer();
-    await loadHistory(0, CHAT_OPTS.historyPageSiz);
+    await loadHistory(0, CHAT_OPTS.historyPageSize);
 
     // 히스토리 아래에 안내 + 종료버튼
     if (CHAT_OPTS.showWelcomeNotice) showWelcomeAndEndButton()
