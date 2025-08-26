@@ -106,6 +106,8 @@ $(function () {
     // 조회 버튼: 클릭 이벤트
 
     $(document).on('click', '.sidebar__btn.primary', async function () {
+        $('#predict-content').scrollTop(0);
+
         const idType = $('input[name="idType"]').val(); // 숨겨진 input에서 정확한 값 가져오기
         const idValue = $('.sidebar__input').val().trim();
 
@@ -346,6 +348,7 @@ $(function () {
             // 로딩 종료 및 결과 표시
             $('#loading-spinner').addClass('is-hidden');
             $('#predict-content').removeClass('is-hidden');
+            $('#predict-content').scrollTop(0); // 스크롤 상단으로 이동
             $('.sidebar__input').blur().prop('disabled', true).attr('aria-disabled', 'true').addClass('is-locked');
             $('.cselect__control').prop('disabled', true);
 
