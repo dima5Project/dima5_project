@@ -1627,9 +1627,9 @@ html {
 
 /* ===== [추가] 1순위 도착 항구 라벨 ===== */
 .destination-label-popup .mapboxgl-popup-content {
-    background-color: rgba(85, 85, 85, 0.75) !important;
+    background-color: #ffff !important;
     /* 반투명 회색 */
-    color: black !important;
+    color: #000000 !important;
     padding: 2px 5px !important;
     border-radius: 6px !important;
     font-size: 11px !important;
