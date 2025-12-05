@@ -1,15 +1,15 @@
 ---------------------------------------------------------
 -- 1) 관리자 계정 생성
 ---------------------------------------------------------
-INSERT INTO predict_user (user_name, user_id, user_pwd, user_email, user_type, user_role)
-VALUES (
-   '관리자',
-   'admin',
-   '$2b$12$egE6vgtDweVhHfPI1OJcOu61Jg4jnryc.W0NvxyTqt2nWr0HZ6OrS',
-   'admin@example.com',
-   '일반 사용자',
-   'ROLE_ADMIN'
-);
+-- INSERT INTO predict_user (user_name, user_id, user_pwd, user_email, user_type, user_role)
+-- VALUES (
+--    '관리자',
+--    'admin',
+--    '$2b$12$egE6vgtDweVhHfPI1OJcOu61Jg4jnryc.W0NvxyTqt2nWr0HZ6OrS',
+--    'admin@example.com',
+--    '일반 사용자',
+--    'ROLE_ADMIN'
+-- );
 
 ---------------------------------------------------------
 -- 2) 항구 정보 (전부 샘플)
