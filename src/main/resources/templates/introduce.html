@@ -23,10 +23,10 @@
 
 <body>
     <div sec:authorize="isAnonymous()">
-        <div th:replace="~{/fragment/header :: bu3_navigation}"></div>
+        <div th:replace="~{fragment/header :: bu3_navigation}"></div>
     </div>
     <div sec:authorize="isAuthenticated()">
-        <div th:replace="~{/fragment/headerJoin :: bu3_navigation_join}"></div>
+        <div th:replace="~{fragment/headerJoin :: bu3_navigation_join}"></div>
     </div>
 
     <section id="hero" class="hero_section">
@@ -199,7 +199,7 @@
     </div>
 
     <div th:replace="~{fragment/faq :: widget}"></div>
-    <div th:replace="~{/fragment/footer::footer(title='부3갈매기')}"></div>
+    <div th:replace="~{fragment/footer::footer(title='부3갈매기')}"></div>
 </body>
 
 </html>
