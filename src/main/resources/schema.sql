@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS ais_all (
     lat decimal(15, 10) NOT NULL,
     lon decimal(15, 10) NOT NULL,
     cog decimal(15, 10) NOT NULL,
-    heading decimal(15, 10) NOT NULL,
+    heading decimal(15, 10) NOT NULL
     -- FOREIGN KEY (port_id) REFERENCES port_info(port_id),
     -- FOREIGN KEY (vsl_id) REFERENCES vessel_master(vsl_id)
 );
