@@ -1,5 +1,5 @@
 # 빌드 스테이지
-FROM gradle:8.7-jdk17 AS builder
+FROM gradle:8.7-jdk21 AS builder
 WORKDIR /app
 
 # Gradle wrapper 복사
@@ -20,7 +20,7 @@ RUN ./gradlew bootJar --no-daemon
 
 
 # ------------ 실행 스테이지 -------------
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
