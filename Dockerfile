@@ -32,3 +32,6 @@ EXPOSE 8080
 
 # 컨테이너 시작 시 실행할 명령
 ENTRYPOINT ["java","-jar","app.jar"]
+
+# 🔹 이 줄 추가
+RUN chmod +x gradlew
