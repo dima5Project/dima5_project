@@ -91,10 +91,17 @@ def save_top1_raw(*, eta_str: Optional[str], lat: float, lon: float,
 # =========================
 # 2) FastAPI & CORS
 # =========================
+
+origins = [
+    "https://dima5-project.onrender.com",
+    "https://dima5-fastapi.onrender.com",
+]
+
 app = FastAPI(title="Port Prediction API")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # 필요시 도메인으로 좁히기
+    allow_origins=origins,   # 필요시 도메인으로 좁히기
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
