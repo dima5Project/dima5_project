@@ -11,6 +11,9 @@
 --    'ROLE_ADMIN'
 -- );
 
+INSERT INTO predict_user (user_id, user_name, user_pwd, user_email, user_role, user_type, join_date)
+VALUES ('busam', '부삼갈매기', '1234', 'busam@naver.com', 'ROLE_USER', '일반 사용자', CURRENT_TIMESTAMP);
+
 ---------------------------------------------------------
 -- 2) 항구 정보 (전부 샘플)
 ---------------------------------------------------------
