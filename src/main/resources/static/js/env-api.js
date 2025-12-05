@@ -144,7 +144,7 @@ function buildEnvPopupHTML(env) {
     const fmt = (v, f = 1, suf = '') => (v == null || isNaN(v)) ? '-' : (Number(v).toFixed(f) + suf);
 
     // 각 데이터에 클래스를 부여하여 CSS로 스타일링할 수 있도록 합니다.
-    // <img src="/images/portpredictImages/marker.png" class="header-icon" alt="marker icon" />
+    // <img src="/images/PortPredictImages/marker.png" class="header-icon" alt="marker icon" />
     return `
   <div class="marine-popup-content">
     <div class="marine-popup-header">
