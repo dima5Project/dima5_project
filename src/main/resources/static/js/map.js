@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (useIcon) {
             if (!destIconSvgContent) {
                 try {
-                    const response = await fetch('/images/portpredictImages/dest_icon.svg');
+                    const response = await fetch('/images/PortPredictImages/dest_icon.svg');
                     destIconSvgContent = await response.text();
                 } catch (error) {
                     console.error('Failed to load dest_icon.svg:', error);
@@ -320,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
             innerWrapper.style.borderRadius = '50%'; // Make it a circle
 
             const img = document.createElement('img');
-            img.src = '/images/portpredictImages/vessel_Icon.png';
+            img.src = '/images/PortPredictImages/vessel_Icon.png';
             img.alt = 'Vessel Icon';
             img.style.width = '16px'; // Image size
             img.style.height = '16px';
