@@ -8,3 +8,4 @@ pandas
 pymysql
 python-dotenv
 lightgbm
+xgboost
