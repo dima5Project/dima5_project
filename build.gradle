@@ -40,6 +40,7 @@ dependencies {
    implementation 'org.json:json:20230227'
    implementation 'org.springframework.boot:spring-boot-starter-webflux'
    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+   runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
