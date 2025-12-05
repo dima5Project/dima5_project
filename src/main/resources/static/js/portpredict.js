@@ -143,7 +143,7 @@ $(function () {
 
         // API 호출 로직
         try {
-            const response = await fetch(`http://dima5-fastapi.onrender.com/predict_map_by_vsl?vsl_id=${vslIdToFetch}`);
+            const response = await fetch(`https://dima5-fastapi.onrender.com/predict_map_by_vsl?vsl_id=${vslIdToFetch}`);
 
             // 응답 Content-Type 확인
             const contentType = response.headers.get("content-type");

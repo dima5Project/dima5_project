@@ -28,26 +28,26 @@ public class VesselService {
     private final VesselMasterRepository vesselMasterRepository;
     private final RestTemplate restTemplate;
 
-
     /** 이미 있는 메서드 — type: "imo" | "mmsi" */
     public Optional<String> findVslId(String type, String query) {
-        if (query == null || query.isBlank()) return Optional.empty();
+        if (query == null || query.isBlank())
+            return Optional.empty();
         final String q = query.trim();
         final String t = (type == null) ? "" : type.trim().toLowerCase();
 
         Optional<String> vslId = switch (t) {
-            case "imo"  -> vesselMasterRepository.findVslIdByVslImo(q);
+            case "imo" -> vesselMasterRepository.findVslIdByVslImo(q);
             case "mmsi" -> vesselMasterRepository.findVslIdByVslMmsi(q);
-            default     -> Optional.empty();
+            default -> Optional.empty();
         };
 
         vslId.ifPresent(id -> log.info("Found vsl_id = {}", id));
         return vslId;
     }
 
-
     /**
      * FastAPI 연결하여 특정 imo/mmsi 에 해당하는 선박의 예측 결과 가져오기
+     * 
      * @param imo
      * @param mmsi
      * @return
@@ -55,7 +55,7 @@ public class VesselService {
     // @Bean
     public Map<String, Object> predictByImoOrMmsi(String imo, String mmsi) {
         // 1) 입력 정리
-        String IMO  = (imo == null || imo.isBlank()) ? null : imo.trim();
+        String IMO = (imo == null || imo.isBlank()) ? null : imo.trim();
         String MMSI = (mmsi == null || mmsi.isBlank()) ? null : mmsi.trim();
 
         if (IMO == null && MMSI == null) {
@@ -70,8 +70,8 @@ public class VesselService {
         if (vslIdOpt.isEmpty()) {
             return Map.of(
                     "error", "NOT_FOUND",
-                    "detail", (IMO != null) ? ("IMO="+IMO+" 로 vsl_id가 없습니다.") : ("MMSI="+MMSI+" 로 vsl_id가 없습니다.")
-            );
+                    "detail",
+                    (IMO != null) ? ("IMO=" + IMO + " 로 vsl_id가 없습니다.") : ("MMSI=" + MMSI + " 로 vsl_id가 없습니다."));
         }
 
         String vslId = vslIdOpt.get();
@@ -80,7 +80,7 @@ public class VesselService {
         // 3) FastAPI 호출
         try {
             URI uri = UriComponentsBuilder
-                    .fromUriString("http://127.0.0.1:8000/predict_map_by_vsl")
+                    .fromUriString("https://dima5-fastapi.onrender.com/predict_map_by_vsl")
                     .queryParam("vsl_id", vslId)
                     .build(true)
                     .toUri();
@@ -91,8 +91,8 @@ public class VesselService {
 
             ResponseEntity<Map<String, Object>> resp = restTemplate.exchange(
                     uri, HttpMethod.GET, req,
-                    new ParameterizedTypeReference<Map<String, Object>>() {}
-            );
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
 
             Map<String, Object> body = resp.getBody();
             log.info("FastAPI status = {}", resp.getStatusCode());
@@ -104,15 +104,13 @@ public class VesselService {
             log.error("FastAPI error {} {}", e.getStatusCode(), e.getResponseBodyAsString());
             return Map.of(
                     "error", "HTTP_" + e.getStatusCode().value(),
-                    "detail", e.getResponseBodyAsString()
-            );
+                    "detail", e.getResponseBodyAsString());
         } catch (RestClientException e) {
             // 연결 실패 등 클라이언트 에러
             log.error("FastAPI call failed: {}", e.getMessage(), e);
             return Map.of(
                     "error", "CLIENT_EXCEPTION",
-                    "detail", e.getMessage()
-            );
+                    "detail", e.getMessage());
         } catch (Exception e) {
             log.error("Unexpected error", e);
             return Map.of("error", "INTERNAL");
