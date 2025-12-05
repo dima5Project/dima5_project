@@ -741,7 +741,7 @@ $(function () {
 
         const $startItem = $('<li class="voy-item"></li>');
         //출발항 버튼
-        const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/vessel_Icon.png" th:src="@{/images/portpredictImages/vessel_Icon.png}"alt="출발항 아이콘" /></button>`);
+        const $startNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/PortPredictImages/vessel_Icon.png" th:src="@{/images/PortPredictImages/vessel_Icon.png}"alt="출발항 아이콘" /></button>`);
         // 출발항의 컨테이너
         const $startRows = $('<div class="voy-rows"></div>');
         // 출발항 명
@@ -763,7 +763,7 @@ $(function () {
 
             const $timelineItem = $('<li class="voy-item"></li>');
 
-            const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"alt="마커 아이콘" /></button>`);
+            const $voyNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/PortPredictImages/marker.png" th:src="@{/images/PortPredictImages/marker.png}"alt="마커 아이콘" /></button>`);
 
             $timelineItem.append($voyNode);
 
@@ -797,7 +797,7 @@ $(function () {
 
             const $latestItem = $('<li class="voy-item"></li>');
 
-            const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/portpredictImages/marker.png" th:src="@{/images/portpredictImages/marker.png}"alt="마커 아이콘" /></button>`);
+            const $latestNode = $(`<button class="voy-node" type="button" aria-pressed="false"><img src="/images/PortPredictImages/marker.png" th:src="@{/images/PortPredictImages/marker.png}"alt="마커 아이콘" /></button>`);
             $latestItem.append($latestNode);
 
             const $latestRows = $('<div class="voy-rows"></div>');
@@ -1127,7 +1127,7 @@ function updateVesselInfo(type, value) {
         $('.sidebar__vesselinfo .kv strong:eq(1)').text(foundVessel.ship_type || '정보 없음');
         $('.sidebar__vesselinfo .kv strong:eq(2)').text(foundVessel.vsl_length ? foundVessel.vsl_length + ' m' : '정보 없음');
         $('.sidebar__vesselinfo .kv strong:eq(3)').text(foundVessel.vsl_width ? foundVessel.vsl_width + ' m' : '정보 없음');
-        $('.vessel_image').attr('src', foundVessel.vsl_img || '/images/portpredictImages/vessel.jpg');
+        $('.vessel_image').attr('src', foundVessel.vsl_img || '/images/PortPredictImages/vessel.jpg');
         return foundVessel.vsl_id; // 찾은 선박의 vsl_id 반환
     } else {
         alert('일치하는 선박 정보가 없습니다.');
